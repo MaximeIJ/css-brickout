@@ -1,4 +1,5 @@
 module.exports = {
+  base: '',
   root: './src', // specify your source directory
   build: {
     outDir: '../dist', // specify your build output directory
