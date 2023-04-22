@@ -1,5 +1,6 @@
 import Ball, {BallConfig} from './Ball';
 import Brick from './Brick';
+import Clickable from './Clickable';
 import Debug from './Debug';
 import {GameObjectConfig} from './GameObject';
 import Level, {LevelConfig} from './Level';
@@ -28,6 +29,7 @@ export default class Game {
   paddle: Paddle;
   debug: Debug | null;
   paused: Pause | null;
+  resumeLink: Clickable | null;
   debounceTimer: number | undefined = undefined;
 
   constructor(params: GameParams) {
@@ -42,6 +44,7 @@ export default class Game {
     });
     this.debug = null;
     this.paused = null;
+    this.resumeLink = null;
     this.level = new Level({
       ...params.levelConfig,
       parent: this.element,
@@ -59,6 +62,7 @@ export default class Game {
     document.addEventListener('keydown', e => this.handleKeyPress(e));
     this.element.addEventListener('mouseenter', () => this.handleMouseEnter());
     this.element.addEventListener('mouseleave', () => this.handleMouseLeave());
+    new ResizeObserver(() => this.handleResize()).observe(this.element);
   }
 
   debounce(func: () => void, timeout = 500) {
@@ -71,7 +75,7 @@ export default class Game {
   }
 
   start() {
-    this.createdPausedElement('SPACE to start');
+    this.createdPausedElement('Start');
   }
 
   update() {
@@ -122,12 +126,21 @@ export default class Game {
     }
   }
 
+  handleResize() {
+    this.paddle.updateElementPosition();
+    this.balls.forEach(ball => ball.updateElementPosition());
+    this.level.updateElementPositions();
+    this.paused?.updateElementPosition();
+    this.resumeLink?.updateElementPosition();
+    this.debug?.updateElementPosition();
+    console.log('resize');
+  }
+
   handleVisibilityChange() {
     if (document.hidden) {
-      this.pause();
-      this.state = 'away';
+      this.pause('away');
     } else {
-      this.resume();
+      this.resume('away');
     }
   }
 
@@ -176,21 +189,22 @@ export default class Game {
 
   createdPausedElement(content: string, classes = '') {
     this.paused?.destroy();
+    this.resumeLink?.destroy();
     this.paused = new Pause({
       parent: this.element,
       className: classes,
     });
-    this.paused.setContent(content);
+    this.resumeLink = new Clickable({
+      parent: this.paused.element,
+      className: 'resume-link',
+      onClick: () => this.resume(this.state === 'starting' ? 'starting' : undefined),
+    });
+    this.resumeLink.setContent(content);
   }
 
   pause(to?: State) {
     if (PAUSABLE.includes(this.state)) {
-      this.createdPausedElement(
-        to === 'away'
-          ? 'Away'
-          : `Paused 
-(SPACE to resume)`,
-      );
+      this.createdPausedElement(to === 'away' ? 'Away' : `Resume`);
       this.state = to ?? 'paused';
       this.debug?.setContent(this.state);
     }

@@ -1,6 +1,6 @@
 export type GameObjectConfig = {
   parent: HTMLDivElement;
-  elementId: string;
+  elementId?: string;
   className?: string;
   x: number;
   y: number;
@@ -25,7 +25,9 @@ export default class GameObject {
     this.height = height;
     this.parent = parent;
     this.element = document.createElement('div');
-    this.element.id = elementId;
+    if (elementId) {
+      this.element.id = elementId;
+    }
     if (width) {
       this.element.style.width = `${width}%`;
     }
@@ -33,7 +35,7 @@ export default class GameObject {
       this.element.style.height = `${height}%`;
     }
     if (className) {
-      this.element.classList.add(className);
+      this.element.classList.add(...className.split(' '));
     }
     parent.appendChild(this.element);
     this.updateElementPosition();

@@ -50,6 +50,14 @@ export default class Level {
     };
   }
 
+  updateElementPositions() {
+    this.bricks.forEach(row => {
+      row.forEach(brick => {
+        brick.updateElementPosition();
+      });
+    });
+  }
+
   isDone() {
     return this.left === 0;
   }

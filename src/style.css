@@ -93,32 +93,40 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding-top: 25%;
   text-align: center;
   font-size: xx-large;
   font-family: system-ui;
   font-weight: bold;
   color: var(--light);
-  background: #000a;
+  background: #0008;
   letter-spacing: 0.75vmin;
   cursor: default;
   white-space: pre;
-  /* opacity pulse animation */
-  animation: pulse 8s infinite ease-in-out;
 }
 
 #pause.final {
   animation: none;
 }
 
+/* Link */
+
+.clickable {
+  cursor: pointer;
+}
+
+.resume-link {
+  /* opacity pulse animation */
+  animation: pulse 3s infinite ease-in-out;
+}
+
 @keyframes pulse {
   0% {
-    opacity: 0.85;
-  }
-  50% {
     opacity: 1;
   }
+  60% {
+    opacity: 0.5;
+  }
   100% {
-    opacity: 0.85;
+    opacity: 1;
   }
 }
