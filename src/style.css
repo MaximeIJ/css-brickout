@@ -81,6 +81,7 @@
   background: var(--dark);
   color: var(--light);
   padding: 0.5%;
+  font-size: x-large;
   border-radius: 5%;
   position: absolute;
 }
@@ -94,7 +95,7 @@
   left: 0;
   right: 0;
   text-align: center;
-  font-size: xx-large;
+  font-size: xxx-large;
   font-family: system-ui;
   font-weight: bold;
   color: var(--light);

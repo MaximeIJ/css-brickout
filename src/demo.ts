@@ -3,7 +3,7 @@ import '../src/style.css';
 
 // Start the game loop
 const ng = -Math.PI / 2.001;
-const ballBase = {x: 50, y: 35, radius: 0.5, speed: 0.45};
+const ballBase = {x: 50, y: 35, radius: 0.6, speed: 0.45};
 const input = {
   ballConfigs: [
     {

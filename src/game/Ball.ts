@@ -20,6 +20,17 @@ export default class Ball extends GameObject {
     this.radius = radius;
     this.angle = angle;
     this.speed = speed;
+    // const diagonal = Math.sqrt(Math.pow(this.parent.offsetWidth, 2) + Math.pow(this.parent.offsetHeight, 2));
+    this.updateElementSize();
+  }
+
+  updateElement(): void {
+    this.updateElementSize();
+    this.updateElementPosition();
+  }
+
+  updateElementSize(): void {
+    const diagonal = Math.sqrt(Math.pow(this.parent.offsetWidth, 2) + Math.pow(this.parent.offsetHeight, 2));
     const pxRadius = Math.round((this.radius / 100.0) * this.parent.offsetHeight);
     this.element.style.setProperty('--diameter', pxRadius * 2 + 'px');
   }
