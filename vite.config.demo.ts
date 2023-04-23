@@ -1,21 +1,17 @@
-import {resolve} from 'path';
-
 import {defineConfig} from 'vite';
-import dts from 'vite-plugin-dts';
 
-const config = {
-  base: '/css-brickout/',
+export default defineConfig({
+  base: '',
   build: {
+    outDir: 'demo-pages',
     rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'demo/index.html'),
-      },
       output: {
-        preserveModules: false,
+        assetFileNames: 'assets/[name].[ext]',
+        entryFileNames: 'assets/[name].js',
+      },
+      input: {
+        demo: './index.html',
       },
     },
-    outDir: './demo-pages',
   },
-};
-
-export default defineConfig(config);
+});

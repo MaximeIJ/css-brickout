@@ -49,8 +49,8 @@
   },
   "scripts": {
     "build": "vite build",
-    "build:demo": "vite build --config vite.config.demo.ts",
-    "dev": "vite",
+    "build:demo": "vite build -c vite.config.demo.ts",
+    "dev": "vite -c vite.config.demo.ts",
     "lint": "eslint . --fix && prettier -w .",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
