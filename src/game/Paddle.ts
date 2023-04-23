@@ -8,7 +8,7 @@ export default class Paddle extends GameObject {
   }
 
   handleMouseMove(e: MouseEvent) {
-    const mouseX = e.clientX;
+    const mouseX = e.clientX - this.parent.offsetLeft;
     const paddleX = (mouseX / this.parent.offsetWidth) * 100;
     this.updatePosition(paddleX);
   }

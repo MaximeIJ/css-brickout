@@ -20,7 +20,6 @@ export default class Ball extends GameObject {
     this.radius = radius;
     this.angle = angle;
     this.speed = speed;
-    // const diagonal = Math.sqrt(Math.pow(this.parent.offsetWidth, 2) + Math.pow(this.parent.offsetHeight, 2));
     this.updateElementSize();
   }
 
@@ -30,7 +29,6 @@ export default class Ball extends GameObject {
   }
 
   updateElementSize(): void {
-    const diagonal = Math.sqrt(Math.pow(this.parent.offsetWidth, 2) + Math.pow(this.parent.offsetHeight, 2));
     const pxRadius = Math.round((this.radius / 100.0) * this.parent.offsetHeight);
     this.element.style.setProperty('--diameter', pxRadius * 2 + 'px');
   }
@@ -50,62 +48,52 @@ export default class Ball extends GameObject {
     let i = 0;
 
     while (i < level.bricks.length && !hitBrick) {
-      let j = 0;
-      while (j < level.bricks[i].length && !hitBrick) {
-        const brick = level.bricks[i][j];
-        j++;
-        if (brick.destroyed) continue;
-
-        // Check for collision
-        if (this.isColliding(brick)) {
-          hitBrick = true;
-          // Determine collision direction
-          const deltaX = brick.x + brick.width / 2.0 - this.x;
-          const deltaY = brick.y - brick.height / 2.0 - this.y;
-          console.log('deltaX', deltaX, 'deltaY', deltaY);
-
-          // determine delta with each side of the brick
-          const deltaLeft = Math.abs(brick.x - (this.x + this.radius));
-          const deltaRight = Math.abs(brick.x + brick.width - (this.x + this.radius));
-          const deltaTop = Math.abs(brick.y - (this.y + this.radius));
-          const deltaBottom = Math.abs(brick.y + brick.height - (this.y + this.radius));
-
-          const prevX = this.x;
-          const prevY = this.y;
-          const prevAngle = this.angle;
-
-          if (Math.min(deltaLeft, deltaRight) > Math.min(deltaTop, deltaBottom)) {
-            // Horizontal collision
-            console.log('side hit brick', brick.y, brick.x, deltaBottom, deltaTop, deltaLeft, deltaRight);
-            this.angle = Math.atan2(this.speed * Math.sin(this.angle), -this.speed * Math.cos(this.angle));
-
-            // Update ball pos and check if it's still colliding, if yes, revert and treat as vertical collision
-            this.updatePosition();
-            if (this.isColliding(brick)) {
-              console.warn('side hit was wrong, switching to vertical', this.angle);
-              this.angle = Math.atan2(-this.speed * Math.sin(prevAngle), this.speed * Math.cos(prevAngle));
-            }
-            this.x = prevX;
-            this.y = prevY;
-          } else {
-            // Vertical collision
-            console.log('vert hit brick', brick.y, brick.x, deltaBottom, deltaTop, deltaLeft, deltaRight);
-            this.angle = Math.atan2(-this.speed * Math.sin(this.angle), this.speed * Math.cos(this.angle));
-
-            this.updatePosition();
-            if (this.isColliding(brick)) {
-              console.warn('vertical hit was wrong, switching to side', this.angle);
-              this.angle = Math.atan2(this.speed * Math.sin(prevAngle), -this.speed * Math.cos(prevAngle));
-            }
-            this.x = prevX;
-            this.y = prevY;
-          }
-
-          brick.destroy();
-          level.onBrickDestroyed(brick);
-        }
-      }
+      const brick = level.bricks[i];
       i++;
+      if (brick.destroyed) continue;
+
+      // Check for collision
+      if (this.isColliding(brick)) {
+        hitBrick = true;
+
+        // determine delta with each side of the brick
+        const deltaLeft = Math.abs(brick.x - (this.x + this.radius));
+        const deltaRight = Math.abs(brick.x + brick.width - (this.x + this.radius));
+        const deltaTop = Math.abs(brick.y - (this.y + this.radius));
+        const deltaBottom = Math.abs(brick.y + brick.height - (this.y + this.radius));
+
+        const prevX = this.x;
+        const prevY = this.y;
+        const prevAngle = this.angle;
+
+        if (Math.min(deltaLeft, deltaRight) > Math.min(deltaTop, deltaBottom)) {
+          // Horizontal collision
+          this.angle = Math.atan2(this.speed * Math.sin(this.angle), -this.speed * Math.cos(this.angle));
+
+          // Update ball pos and check if it's still colliding, if yes, revert and treat as vertical collision
+          this.updatePosition();
+          if (this.isColliding(brick)) {
+            console.warn('side hit was wrong, switching to vertical', this.angle);
+            this.angle = Math.atan2(-this.speed * Math.sin(prevAngle), this.speed * Math.cos(prevAngle));
+          }
+          this.x = prevX;
+          this.y = prevY;
+        } else {
+          // Vertical collision
+          this.angle = Math.atan2(-this.speed * Math.sin(this.angle), this.speed * Math.cos(this.angle));
+
+          this.updatePosition();
+          if (this.isColliding(brick)) {
+            console.warn('vertical hit was wrong, switching to side', this.angle);
+            this.angle = Math.atan2(this.speed * Math.sin(prevAngle), -this.speed * Math.cos(prevAngle));
+          }
+          this.x = prevX;
+          this.y = prevY;
+        }
+
+        brick.destroy();
+        level.onBrickDestroyed(brick);
+      }
     }
 
     const anyCollision = hitBrick || hitBoundary || this.handlePaddleCollision(paddle) || false;

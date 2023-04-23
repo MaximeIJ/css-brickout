@@ -7,7 +7,7 @@ import Level, {LevelConfig} from './Level';
 import Paddle from './Paddle';
 import Pause from './Pause';
 
-type GameParams = {
+export type GameParams = {
   ballConfigs: Array<Omit<BallConfig, 'idx' | 'parent'>>;
   levelConfig: Omit<LevelConfig, 'parent'>;
   paddleConfig: Partial<GameObjectConfig>;
@@ -90,7 +90,6 @@ export default class Game {
         ball.handleLevelCollision(this.level, this.paddle);
         // autoplay lol
         if (this.debug && ball.y > this.paddle.y - this.paddle.height && ball.y < this.paddle.y) {
-          console.log(ball.element.id + ' is near paddle');
           const semiR = Math.round(ball.x - this.paddle.width / 2 + (Math.random() * this.paddle.width) / 2);
           this.paddle.updatePosition(semiR);
         }
@@ -224,5 +223,11 @@ export default class Game {
     document.removeEventListener('keydown', e => this.handleKeyPress(e));
     this.element.removeEventListener('mouseenter', () => this.handleMouseEnter());
     this.element.removeEventListener('mouseleave', () => this.handleMouseLeave());
+    this.debug?.destroy();
+    this.paused?.destroy();
+    this.resumeLink?.destroy();
+    this.paddle.destroy();
+    this.balls.forEach(ball => ball.destroy());
+    this.level.destroy();
   }
 }

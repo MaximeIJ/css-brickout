@@ -1,20 +1,117 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>CSS Brickout - Fullscreen Demo</title>
+    <title>CSS Brickout Demo - Play the Game Online</title>
+    <meta 
+      property="og:title" 
+      content="CSS Brickout Demo - Play the Game Online" 
+    />
+    <meta 
+      name="description" 
+      content="Play the CSS Brickout Demo game online. Mobile-friendly. Move the paddle with mouse or touch, start/pause/resume the game with spacebar or 'P' key, and enable debug mode with 'D' key." 
+    />
+    <meta 
+      property="og:description" 
+      content="Play the CSS Brickout Demo game online. Mobile-friendly. Move the paddle with mouse or touch, start/pause/resume the game with spacebar or 'P' key, and enable debug mode with 'D' key." 
+    />
+    <meta 
+      property="og:image" 
+      content="https://user-images.githubusercontent.com/5600516/233820243-b3b23fbf-7ee6-44fe-becd-d74f74b42d9a.png"
+    />
+    <meta name="keywords" content="CSS Brickout, game, paddle, demo, CSS game, online game, HTML5 game" />
+    <link rel="canonical" href="https://maximeij.dev/css-brickout" />
+    <meta name="author" content="Maxime IJ">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
       :root {
-        --cb-ball-bg: hsl(89, 100%, 33%);
+        /* Random theme :/ */
+        --cb-ball-bg: hsl(53, 96%, 43%);
+        --cb-light: hsl(0, 0%, 90%);
+        --cb-dark: hsl(0, 0%, 10%);
+
+        --cb-paddle-bg: hsl(231, 96%, 59%);
+        --cb-brick-bg: hsl(133, 77%, 22%);
+
+        --cb-bg: hsl(23, 97%, 24%);
+        --cb-bg2: hsl(0, 66%, 36%);
+      }
+      html {
+        color-scheme: dark light;
+        font-size: 16px;
       }
       body {
         margin: 0;
         height: 100vh;
         width: 100vw;
+        overflow-x: hidden;
+        position: relative;
+      }
+      main {
+        padding: 0 1rem;
+      }
+      article {
+        overflow: hidden;
+      }
+      #instructions {
+        display: flex;
+      }
+      #instructions > div {
+        flex-grow: 1;
+        padding: 0 min(1rem, 5%);
+      }
+      label {
+        display: block;
+        margin: 0.5rem 0;
+      }
+      #demo-screen.windowed {
+        width: min(900px, 90vw);
+        height: min(600px, 60vh);
+        margin: 0 auto;
+      }
+      #demo-screen.fullscreen {
+        position: absolute;
+        top: 0;
+        height: 100vh;
+        left: 0;
+        right: 0;
+        /* Subtract 16px for scrollbar */
+        width: calc(100vw - 16px);
+        /* To still see controls */
+        margin-top: 10rem; 
       }
     </style>
   </head>
   <body>
-    <div id="game"></div>
+    <main>
+      <article id="intro">
+        <h1>CSS Brickout Demo</h1>
+        <section id="instructions">
+          <div>
+            <ul>
+              <li>Mouse or Touch - Move Paddle</li>
+              <li>Spacebar or P - Start/Pause/Resume Game</li>
+              <li>D - Debug mode (with auto-play, FPS tracking)</li>
+            </ul>
+          </div>
+          <div>
+            <label for="layout-type">Brick layout
+              <select id="layout-type">
+                <option value="even">Even</option>
+                <option value="custom">Custom</option>
+              </select>
+            </label>
+            
+            <label for="display">Display <select id="display">
+              <option value="windowed">Windowed</option>
+              <option value="fullscreen">Full Screen</option>
+            </select></label>
+            
+          </div>
+        </section>
+        <section id="demo-screen" class="windowed"><div id="game"></div></section>
+        
+      </article>
+    </main>
     <script src="src/demo.ts" type="module"></script>
   </body>
 </html>
