@@ -11,6 +11,9 @@
   "homepage": "http://MaximeIJ.github.io/css-brickout",
   "keywords": [
     "css",
+    "css-art",
+    "css-game",
+    "css-brickout",
     "game",
     "brickout",
     "breakout",
@@ -37,6 +40,8 @@
   "devDependencies": {
     "@types/node": "^18.15.13",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
+    "auto-changelog": "^2.4.0",
+    "clean-package": "^2.2.0",
     "eslint": "8.25.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^3.5.1",
@@ -52,6 +57,29 @@
     "build:demo": "vite build -c vite.config.demo.ts",
     "dev": "vite -c vite.config.demo.ts",
     "lint": "eslint . --fix && prettier -w .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "custom:publish": "npm publish && npx clean-package restore && git restore . && git push",
+    "prepublishOnly": "npm run build && npm run lint && clean-package",
+    "publish:major": "npm version major && npm run custom:publish",
+    "publish:minor": "npm version minor && npm run custom:publish",
+    "publish:patch": "npm version patch && npm run custom:publish",
+    "version": "auto-changelog -p && git add CHANGELOG.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MaximeIJ/css-brickout.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "clean-package": {
+    "extends": "clean-package/common",
+    "remove": [
+      "clean-package",
+      "dependencies",
+      "devDependencies",
+      "publishConfig",
+      "scripts"
+    ]
   }
 }
