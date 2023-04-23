@@ -29,13 +29,16 @@ export default class HUD extends GameObject {
     this.score = new GameObject({
       parent: this.element,
       elementId: 'score',
-      x: 95,
+      x: 0,
       y: 33,
     });
   }
 
   updateLives(lives: number) {
     this.lives.element.textContent = `❤ ${lives}`;
+  }
+  updateScore(score: number) {
+    this.score.element.textContent = score.toString();
   }
 
   updateElementPositions() {

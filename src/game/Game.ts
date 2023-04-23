@@ -74,7 +74,8 @@ export default class Game {
       this.lives = params.playerConfig.lives;
     }
     this.hud = new HUD({parent: this.element});
-    this.updateHUD();
+    this.updateHUDLives();
+    this.updateHUDScore();
 
     // Event listeners
     document.addEventListener('visibilitychange', () => this.handleVisibilityChange());
@@ -133,7 +134,7 @@ export default class Game {
     if (this.balls.length === 0) {
       this.lives--;
       if (this.lives >= 0) {
-        this.updateHUD();
+        this.updateHUDLives();
         this.setBalls();
       } else {
         this.state = 'lost';
@@ -143,7 +144,9 @@ export default class Game {
   }
 
   onBrickDestroyed(brick: Brick) {
-    // console.log(brick, 'destroyed, level done:', this.level.isDone());
+    // todo: add score from brick params if they exist
+    this.score += 1;
+    this.updateHUDScore();
     if (this.level.isDone()) {
       this.state = 'won';
       this.createdPausedElement('Victory!', 'final');
@@ -160,8 +163,12 @@ export default class Game {
     }
   }
 
-  updateHUD() {
+  updateHUDLives() {
     this.hud?.updateLives(this.lives);
+  }
+
+  updateHUDScore() {
+    this.hud?.updateScore(this.score);
   }
 
   handleResize() {
