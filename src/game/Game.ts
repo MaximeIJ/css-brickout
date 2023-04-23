@@ -138,9 +138,11 @@ export default class Game {
 
   handleVisibilityChange() {
     if (document.hidden) {
-      this.pause('away');
+      this.debounce(() => {
+        this.pause('away');
+      })();
     } else {
-      this.resume('away');
+      this.debounce(() => this.resume('away'), 1000)();
     }
   }
 
@@ -176,9 +178,7 @@ export default class Game {
   }
 
   handleMouseEnter() {
-    if (this.debounceTimer) {
-      this.debounce(() => this.resume('away'), 1000)();
-    }
+    this.debounce(() => this.resume('away'), 1000)();
   }
 
   handleMouseLeave() {

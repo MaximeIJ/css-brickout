@@ -4,7 +4,6 @@ import {defineConfig} from 'vite';
 import dts from 'vite-plugin-dts';
 
 const config = {
-  base: '',
   build: {
     lib: {
       // Could also be a dictionary or array of multiple entry points
@@ -12,6 +11,8 @@ const config = {
       name: 'CSS Brickout',
       fileName: 'css-brickout',
     },
+    cssCodeSplit: false,
+    sourcemap: false,
     outDir: 'dist',
   },
 };
