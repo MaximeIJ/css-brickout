@@ -30,7 +30,7 @@ export default class Game {
   debug: Debug | null;
   paused: Pause | null;
   resumeLink: Clickable | null;
-  debounceTimer: number | undefined = undefined;
+  debounceTimer: NodeJS.Timeout | undefined = undefined;
 
   constructor(params: GameParams) {
     this.element = document.getElementById(params.parentId ?? 'game') as HTMLDivElement;

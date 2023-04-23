@@ -1,14 +1,14 @@
 {
   "name": "@maximeij/css-brickout",
   "version": "0.1.0",
+  "type": "module",
   "description": "Classic Brickout rendered with CSS",
-  "main": "src/game/Game.ts",
-  "scripts": {
-    "build": "vite build",
-    "dev": "vite",
-    "lint": "eslint . --fix && prettier -w .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "author": "Maxime IJ",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/MaximeIJ/css-brickout/issues"
   },
+  "homepage": "http://MaximeIJ.github.io/css-brickout",
   "keywords": [
     "css",
     "game",
@@ -16,9 +16,26 @@
     "breakout",
     "typescript"
   ],
-  "author": "Maxime IJ",
-  "license": "SEE LICENSE IN LICENSE",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "main": "./dist/css-brickout.umd.js",
+  "module": "./dist/css-brickout.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/css-brickout.js",
+      "require": "./dist/css-brickout.umd.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
+  },
   "devDependencies": {
+    "@types/node": "^18.15.13",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "eslint": "8.25.0",
     "eslint-config-prettier": "^8.5.0",
@@ -27,6 +44,14 @@
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.7",
     "typescript": "^5.0.4",
-    "vite": "^4.2.1"
+    "vite": "^4.2.1",
+    "vite-plugin-dts": "^2.3.0"
+  },
+  "scripts": {
+    "build": "vite build",
+    "build:demo": "vite build --config vite.config.demo.ts",
+    "dev": "vite",
+    "lint": "eslint . --fix && prettier -w .",
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

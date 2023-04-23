@@ -24,7 +24,7 @@ export default class Level {
     this.bricks = [];
     let total = 0;
     for (let i = 0; i < rows; i++) {
-      const brickRow = [];
+      const brickRow: Array<Brick> = [];
       const width = 100.0 / cols;
       for (let j = 0; j < cols; j++) {
         brickRow.push(

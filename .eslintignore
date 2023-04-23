@@ -5,6 +5,7 @@
 
 # production
 /dist
+/demo-pages
 
 # debug
 npm-debug.log*
