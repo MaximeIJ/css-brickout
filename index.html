@@ -25,15 +25,18 @@
     <style>
       :root {
         /* Random theme :/ */
-        --cb-ball-bg: hsl(53, 96%, 43%);
-        --cb-light: hsl(0, 0%, 90%);
-        --cb-dark: hsl(0, 0%, 10%);
+        --game-bg: linear-gradient(213deg, hsl(0, 66%, 36%) 10%, hsl(23, 97%, 24%) 70%);
 
-        --cb-paddle-bg: hsl(231, 96%, 59%);
-        --cb-brick-bg: hsl(133, 77%, 22%);
+        --ball-bg: hsl(53, 96%, 43%);
+        --paddle-bg: hsl(231, 96%, 59%);
+        --brick-bg: hsl(133, 77%, 22%);
 
-        --cb-bg: hsl(23, 97%, 24%);
-        --cb-bg2: hsl(0, 66%, 36%);
+        --paddle-border: hsl(53, 76%, 36%);
+        --ball-border: hsl(231, 76%, 49%);
+        --brick-border: hsl(133, 5%, 50%, 50%);
+
+        --text: hsl(0, 0%, 90%);
+        --hud-text: hsl(231, 100%, 71%, 90%);
       }
       html {
         color-scheme: dark light;
@@ -64,8 +67,8 @@
         margin: 0.5rem 0;
       }
       #demo-screen.windowed {
-        width: min(900px, 90vw);
-        height: min(600px, 60vh);
+        width: min(960px, 90vw);
+        height: min(650px, 65vh);
         margin: 0 auto;
       }
       #demo-screen.fullscreen {

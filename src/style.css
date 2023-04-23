@@ -1,16 +1,8 @@
 #game {
   /* Default theme */
-  --light: var(--cb-light, hsl(0, 0%, 90%));
   --dark: var(--cb-dark, hsl(0, 0%, 20%));
 
-  --ball-bg: var(--cb-ball-bg, hsl(0, 0%, 90%));
-  --paddle-bg: var(--cb-paddle-bg, hsl(0, 0%, 90%));
-  --brick-bg: var(--cb-brick-bg, hsl(0, 0%, 90%));
-
-  --bg: var(--cb-bg, hsl(0, 0%, 45%));
-  --bg2: var(--cb-bg2, hsl(0, 0%, 60%));
-
-  background: linear-gradient(213deg, var(--bg2) 10%, var(--bg) 70%);
+  background: var(--game-bg, hsl(0, 0%, 45%));
   height: 100%;
   width: 100%;
   position: relative;
@@ -19,16 +11,16 @@
   font-size: 1.75rem;
   font-family: system-ui;
   font-weight: bold;
-  color: var(--light);
+  color: var(--text, hsl(0, 0%, 90%));
 }
 
 /* Ball */
 
 .ball {
-  height: var(--diameter, 2.5vh);
-  width: var(--diameter, 2.5vh);
-  background: var(--ball-bg);
-  border: var(--dark) solid 3px;
+  height: var(--diameter, 10px);
+  width: var(--diameter, 10px);
+  background: var(--ball-bg, hsl(0, 0%, 90%));
+  border: var(--ball-border, hsl(0, 0%, 20%)) solid 3px;
   border-radius: 50%;
   position: absolute;
   top: 0;
@@ -38,7 +30,7 @@
 }
 
 .ball--destroyed {
-  background: var(--bg);
+  background: transparent;
   border-width: 0;
   height: 15%;
   width: 15%;
@@ -49,8 +41,8 @@
 /* Paddle */
 
 .paddle {
-  background: var(--paddle-bg);
-  border: var(--dark) solid 3px;
+  background: var(--paddle-bg, hsl(0, 0%, 90%));
+  border: var(--paddle-border, hsl(0, 0%, 20%)) solid 3px;
   position: absolute;
   top: 0;
   left: 0;
@@ -62,16 +54,16 @@
 /* Bricks */
 
 .brick {
-  background: var(--brick-bg);
+  background: var(--brick-bg, hsl(0, 0%, 90%));
+  border: var(--brick-border, hsl(0, 0%, 20%)) solid 3px;
   position: absolute;
-  border: var(--dark) solid 3px;
   box-sizing: border-box;
   top: 0;
   left: 0;
 }
 
 .brick--destroyed {
-  background: var(--bg);
+  background: transparent;
   border-width: 0;
   opacity: 0;
   transition: border-width 250ms ease-out, opacity 200ms ease-in-out 100ms, background 120ms ease-in;
@@ -82,8 +74,7 @@
 #debug {
   height: fit-content;
   width: fit-content;
-  background: var(--dark);
-  color: var(--light);
+  background: #0008;
   padding: 0.5%;
   font-size: 1.5rem;
   border-radius: 5%;
@@ -106,10 +97,7 @@
   -webkit-text-stroke: 0;
   z-index: 1;
   opacity: 0.95;
-}
-
-#lives {
-  color: var(--ball-bg);
+  color: var(--hud-text, hsl(0, 0%, 90%));
 }
 
 /* Pause */
@@ -124,7 +112,6 @@
   font-size: 3.5rem;
   font-family: system-ui;
   font-weight: bold;
-  color: var(--light);
   background: #0008;
   letter-spacing: .5rem;
   cursor: default;
