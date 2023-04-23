@@ -3,6 +3,7 @@ import Brick from './Brick';
 import Clickable from './Clickable';
 import Debug from './Debug';
 import {GameObjectConfig} from './GameObject';
+import HUD from './HUD';
 import Level, {LevelConfig} from './Level';
 import Paddle from './Paddle';
 import Pause from './Pause';
@@ -11,7 +12,12 @@ export type GameParams = {
   ballConfigs: Array<Omit<BallConfig, 'idx' | 'parent'>>;
   levelConfig: Omit<LevelConfig, 'parent'>;
   paddleConfig: Partial<GameObjectConfig>;
+  playerConfig?: PlayerParams;
   parentId?: string;
+};
+
+type PlayerParams = {
+  lives: number;
 };
 
 type State = 'paused' | 'playing' | 'debug' | 'won' | 'lost' | 'away' | 'starting';
@@ -20,19 +26,28 @@ const RESUMABLE: Array<State> = ['paused', 'away'];
 
 // GameLoop class
 export default class Game {
+  // Internals
   element: HTMLDivElement;
   state: State = 'starting';
+  debounceTimer: NodeJS.Timeout | undefined = undefined;
+  ogParams: GameParams;
+  // Debug
+  debug: Debug | null;
   lastFrameTime: number = Date.now();
   lastFpsUpdate: number = Date.now();
+  // Gameplay
   balls: Ball[] = [];
   level: Level;
   paddle: Paddle;
-  debug: Debug | null;
+  hud: HUD | null;
+  lives = 0;
+  score = 0;
+  // Pause
   paused: Pause | null;
   resumeLink: Clickable | null;
-  debounceTimer: NodeJS.Timeout | undefined = undefined;
 
   constructor(params: GameParams) {
+    this.ogParams = {...params};
     this.element = document.getElementById(params.parentId ?? 'game') as HTMLDivElement;
 
     this.paddle = new Paddle({
@@ -52,17 +67,31 @@ export default class Game {
       onBrickDestroyed: (brick: Brick) => this.onBrickDestroyed(brick),
     });
 
-    // Create Ball objects based on ballConfig
-    params.ballConfigs.forEach((ballConfig, idx) => {
-      const ball = new Ball({...ballConfig, idx, parent: this.element});
-      this.balls.push(ball);
-    });
+    this.setBalls();
 
+    // Set up player
+    if (params.playerConfig) {
+      this.lives = params.playerConfig.lives;
+    }
+    this.hud = new HUD({parent: this.element});
+    this.updateHUD();
+
+    // Event listeners
     document.addEventListener('visibilitychange', () => this.handleVisibilityChange());
     document.addEventListener('keydown', e => this.handleKeyPress(e));
     this.element.addEventListener('mouseenter', () => this.handleMouseEnter());
     this.element.addEventListener('mouseleave', () => this.handleMouseLeave());
     new ResizeObserver(() => this.handleResize()).observe(this.element);
+  }
+
+  // Create Ball objects based on ballConfig
+  setBalls() {
+    this.balls.forEach(ball => ball.destroy());
+    this.balls = [];
+    this.ogParams.ballConfigs.forEach((ballConfig, idx) => {
+      const ball = new Ball({...ballConfig, idx, parent: this.element});
+      this.balls.push(ball);
+    });
   }
 
   debounce(func: () => void, timeout = 500) {
@@ -102,8 +131,14 @@ export default class Game {
   onBallLost() {
     this.balls = this.balls.filter(ball => !ball.destroyed);
     if (this.balls.length === 0) {
-      this.state = 'lost';
-      this.createdPausedElement('Game Over', 'final');
+      this.lives--;
+      if (this.lives >= 0) {
+        this.updateHUD();
+        this.setBalls();
+      } else {
+        this.state = 'lost';
+        this.createdPausedElement('Game Over', 'final');
+      }
     }
   }
 
@@ -125,6 +160,10 @@ export default class Game {
     }
   }
 
+  updateHUD() {
+    this.hud?.updateLives(this.lives);
+  }
+
   handleResize() {
     this.paddle.updateElementPosition();
     this.balls.forEach(ball => ball.updateElement());
@@ -132,6 +171,7 @@ export default class Game {
     this.paused?.updateElementPosition();
     this.resumeLink?.updateElementPosition();
     this.debug?.updateElementPosition();
+    this.hud?.updateElementPosition();
     console.log('resize');
   }
 
@@ -229,5 +269,8 @@ export default class Game {
     this.paddle.destroy();
     this.balls.forEach(ball => ball.destroy());
     this.level.destroy();
+    this.hud?.destroy();
+    this.element.innerHTML = '';
+    this.state = 'lost';
   }
 }

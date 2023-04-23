@@ -65,6 +65,13 @@ const exampleCustomLayout: GameParams['levelConfig'] = {
 // Start the game loop
 const ng = -Math.PI / 2;
 const ballBase = {x: 50, y: 35, radius: 0.6, speed: 0.5};
+const paddleConfig = {
+  width: 8.9,
+  height: 1,
+};
+const playerConfig = {
+  lives: 3,
+};
 const inputMap: Record<'even' | 'custom', GameParams> = {
   even: {
     ballConfigs: [
@@ -74,10 +81,8 @@ const inputMap: Record<'even' | 'custom', GameParams> = {
       },
     ],
     levelConfig: exampleEvenLayout,
-    paddleConfig: {
-      width: 8.9,
-      height: 1,
-    },
+    paddleConfig,
+    playerConfig,
   },
   custom: {
     ballConfigs: [
@@ -89,10 +94,8 @@ const inputMap: Record<'even' | 'custom', GameParams> = {
       },
     ],
     levelConfig: exampleCustomLayout,
-    paddleConfig: {
-      width: 8.9,
-      height: 1,
-    },
+    paddleConfig,
+    playerConfig,
   },
 };
 
@@ -116,10 +119,6 @@ function onLayoutChange(e: any) {
   const layout = e.target.value;
   gameLoop.pause();
   gameLoop.destroy();
-  const gameElement = document.getElementById('game');
-  if (gameElement) {
-    gameElement.innerHTML = '';
-  }
   if (layout === 'even') {
     gameLoop = new Game(inputMap.even);
   } else if (layout === 'custom') {
