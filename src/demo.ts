@@ -1,14 +1,17 @@
 import Game, {GameParams} from '../src/game/Game';
 
 import '../src/style.css';
+import GameObject from './game/GameObject';
+import Paddle from './game/Paddle';
+import {BONUSES} from './util/presets';
 
 const exampleEvenLayout: GameParams['levelConfig'] = {
   layout: {
     type: 'even',
     y: 10,
-    rows: 4,
-    cols: 20,
-    height: 3,
+    rows: 3,
+    cols: 13,
+    height: 4,
   },
 };
 
@@ -63,11 +66,12 @@ const exampleCustomLayout: GameParams['levelConfig'] = {
 };
 
 // Start the game loop
-const ng = -Math.PI / 2;
-const ballBase = {x: 50, y: 35, radius: 0.6, speed: 0.5};
+const ng = -Math.PI / 1.5;
+const ballBase = {x: 75, y: 35, radius: 0.75, speed: 1, startingBonuses: [BONUSES.speedup1]};
 const paddleConfig = {
   width: 8.9,
-  height: 1,
+  height: 1.8,
+  startingBonuses: [BONUSES.grip1],
 };
 const playerConfig = {
   lives: 3,

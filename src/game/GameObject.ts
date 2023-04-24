@@ -6,6 +6,13 @@ export type GameObjectConfig = {
   y: number;
   width?: number;
   height?: number;
+  startingBonuses?: Array<BonusConfig>;
+};
+
+export type BonusConfig = {
+  cssClass: string;
+  duration: number;
+  effect: (object: GameObject) => (object: GameObject) => void;
 };
 
 type StyleKey = 'top' | 'left' | 'transform';
@@ -15,15 +22,17 @@ export default class GameObject {
   y: number;
   width: number;
   height: number;
+  bonuses: Array<BonusConfig>;
   element: HTMLDivElement;
   parent: HTMLDivElement;
 
-  constructor({parent, elementId, className, x, y, width = 0, height = 0}: GameObjectConfig) {
+  constructor({parent, elementId, className, x, y, width = 0, height = 0, startingBonuses = []}: GameObjectConfig) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.parent = parent;
+    this.bonuses = startingBonuses;
     this.element = document.createElement('div');
     if (elementId) {
       this.element.id = elementId;
@@ -39,6 +48,22 @@ export default class GameObject {
     }
     parent.appendChild(this.element);
     this.updateElementPosition();
+  }
+
+  applyBonuses() {
+    this.bonuses.forEach(bonus => {
+      this.element.classList.add(bonus.cssClass);
+      const undo = bonus.effect(this);
+      if (bonus.duration) {
+        // todo: track timeout and pause it when needed?
+        setTimeout(() => {
+          undo(this);
+          this.element.classList.remove(bonus.cssClass);
+          this.bonuses.splice(this.bonuses.indexOf(bonus), 1);
+        }, bonus.duration);
+      }
+      // bonus.effect(this);
+    });
   }
 
   updatePosition(x?: number, y?: number) {

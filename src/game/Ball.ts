@@ -14,12 +14,15 @@ export default class Ball extends GameObject {
   radius: number;
   speed: number;
   angle: number;
+  dx = 0;
+  dy = 0;
 
   constructor({idx, radius, angle, speed, ...objConfig}: BallConfig) {
     super({...objConfig, className: [...(objConfig.className ?? []), 'ball'].join(' '), elementId: `ball-${idx}`});
     this.radius = radius;
     this.angle = angle;
     this.speed = speed;
+    this.applyBonuses();
     this.updateElementSize();
   }
 
@@ -34,7 +37,11 @@ export default class Ball extends GameObject {
   }
 
   updatePosition() {
-    super.updatePosition(this.x + this.speed * Math.cos(this.angle), this.y - this.speed * Math.sin(this.angle));
+    this.dx = this.speed * Math.cos(this.angle);
+    this.dy = -this.speed * Math.sin(this.angle);
+    this.element.style.setProperty('--dx', this.dx + 'px');
+    this.element.style.setProperty('--dy', this.dy + 'px');
+    super.updatePosition(this.x + this.dx, this.y + this.dy);
   }
 
   handleLevelCollision(level: Level, paddle: Paddle) {
@@ -110,6 +117,13 @@ export default class Ball extends GameObject {
   handleBoundaryCollision(level: Level) {
     if (this.x - this.radius <= 0 || this.x + this.radius >= 100) {
       this.angle = Math.PI - this.angle;
+      // Adjust angle if it's too flat
+      if (Math.abs(this.angle) < Math.PI / 8) {
+        this.angle *= 1.5;
+        if (this.angle === 0) {
+          this.angle = Math.PI / 8;
+        }
+      }
       return true;
     }
 
@@ -138,7 +152,7 @@ export default class Ball extends GameObject {
       const incomingAngle = this.angle;
 
       // Calculate the new angle with skewness towards more vertical angles
-      const angleMultiplier = 0.4; // Adjust this value to control the skewness
+      const angleMultiplier = paddle.gripFactor ?? 0; // Adjust this value to control the skewness
       const hitPositionSkewness = hitPositionNormalized * angleMultiplier;
       const angle = -(incomingAngle + hitPositionSkewness);
 

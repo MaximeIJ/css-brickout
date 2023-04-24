@@ -32,10 +32,10 @@
 .ball--destroyed {
   background: transparent;
   border-width: 0;
-  height: 15%;
-  width: 15%;
+  height: 23%;
+  width: 23%;
   opacity: 0;
-  transition: border-width 50ms ease-out, height 300ms ease-out, width 350ms ease-in, opacity 150ms ease-in-out 200ms, background 220ms ease-in 100ms;
+  transition: border-width 50ms ease-out, height 310ms ease-out, width 350ms ease-in, opacity 150ms ease-in-out 200ms, background 220ms ease-in 100ms;
 }
 
 /* Paddle */
@@ -46,9 +46,9 @@
   position: absolute;
   top: 0;
   left: 0;
-  border-radius: 8px 8px 5px 5px;
+  border-radius: var(--paddle-radius, 0);
   will-change: transform;
-  transition: all 17ms;
+  transition: transfrom 17ms, background 100ms;
 }
 
 /* Bricks */
@@ -143,4 +143,29 @@
   100% {
     opacity: 1;
   }
+}
+
+/* Bonuses */
+.paddle.grip-1 {
+  background: 
+    radial-gradient(at 50% 100%, var(--paddle-bg), var(--paddle-bg) 63%, transparent 75%, transparent 100%),
+    repeating-radial-gradient(circle at 50% -130%, var(--paddle-bg), var(--paddle-bg) 8%, var(--paddle-border) 8%, var(--paddle-border) 13%);
+}
+.paddle.grip-2 {
+  background: 
+    radial-gradient(at 50% 110%, var(--paddle-bg), var(--paddle-bg) 55%, transparent 65%, transparent 100%),
+    repeating-radial-gradient(circle at 50% -280%, var(--paddle-bg), var(--paddle-bg) 5%, var(--paddle-border) 8%, var(--paddle-border) 13%, var(--paddle-bg) 16%);
+}
+
+.ball.speeddown-1 {
+  box-shadow: calc(var(--dx, 0) * -12) calc(var(--dy, 0) * -12) calc(var(--diameter, 0) / 3) calc(var(--diameter, 0) / -5) var(--ball-border);
+}
+.ball.speeddown-2 {
+  box-shadow: calc(var(--dx, 0) * -12) calc(var(--dy, 0) * -12) calc(var(--diameter, 0) / 2) calc(var(--diameter, 0) / 6) var(--ball-border);
+}
+.ball.speedup-1 {
+  box-shadow: calc(var(--dx, 0) * -5) calc(var(--dy, 0) * -5) calc(var(--diameter, 0) / 2) calc(var(--diameter, 0) / -3) var(--ball-bg);
+}
+.ball.speedup-2 {
+  box-shadow: calc(var(--dx, 0) * -3) calc(var(--dy, 0) * -3) calc(var(--diameter, 0) / 2) calc(var(--diameter, 0) / 6) var(--ball-bg);
 }
