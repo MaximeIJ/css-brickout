@@ -124,11 +124,20 @@ export default class Ball extends GameObject {
           this.angle = Math.PI / 8;
         }
       }
+      // Correct positions
+      if (this.x - this.radius <= 0) {
+        this.x = this.radius;
+      } else {
+        this.x = 100 - this.radius;
+      }
       return true;
     }
 
     if (this.y - this.radius <= 0) {
       this.angle = -this.angle;
+      if (this.y - this.radius < 0) {
+        this.y = this.radius;
+      }
       return true;
     }
 
