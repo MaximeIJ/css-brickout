@@ -5,7 +5,7 @@ import {BONUSES, LAYOUTS} from './util/presets';
 
 // Start the game loop
 const ng = -Math.PI / 2;
-const ballBase = {x: 50, y: 20, radius: 0.75, speed: 0.5, startingBonuses: [BONUSES.speedup1]};
+const ballBase = {x: 50, y: 20, radius: 0.75, speed: 0.8, startingBonuses: [BONUSES.speedup1]};
 const paddleConfig = {
   width: 8.9,
   height: 1.8,
