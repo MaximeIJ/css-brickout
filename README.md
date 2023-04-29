@@ -1,7 +1,7 @@
 # css-brickout [![npm (scoped)](https://img.shields.io/npm/v/@maximeij/css-brickout?color=green&label=npm%20package&logo=logo)](https://www.npmjs.com/package/@maximeij/css-brickout)
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/5600516/233820243-b3b23fbf-7ee6-44fe-becd-d74f74b42d9a.png" height=230 align="center" />
+  <img src="https://user-images.githubusercontent.com/5600516/235283782-248e9fd2-e7ad-489a-8f78-8badbce15e4b.png" height=230 align="center" />
 </p>
 
 ## A timeless favorite...

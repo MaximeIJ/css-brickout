@@ -55,7 +55,7 @@ export default class Game {
       parent: this.element,
       elementId: 'paddle',
       x: 50,
-      y: 89,
+      y: 83,
     });
     this.debug = null;
     this.paused = null;
