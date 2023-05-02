@@ -156,15 +156,17 @@ export const LAYOUTS: Record<string, LayoutDefinitionConfig> = {
       {x: 25, y: 27, width: 2, height: 12, className: 'hello-h'},
       // E
       {x: 31, y: 24, width: 2, height: 12, className: 'hello-e'},
-      {x: 34.5, y: 19.25, width: 5, height: 2.5, className: 'hello-e'},
-      {x: 33.5, y: 24, width: 3, height: 2, className: 'hello-e'},
-      {x: 34.5, y: 28.5, width: 5, height: 2.5, className: 'hello-e'},
+      {x: 34, y: 19, width: 4, height: 2, className: 'hello-e'},
+      {x: 33, y: 24, width: 2, height: 2, className: 'hello-e'},
+      {x: 34, y: 29, width: 4, height: 2, className: 'hello-e'},
       // L1
-      {x: 42, y: 28, width: 2, height: 12, className: 'hello-l1'},
-      {x: 45.33, y: 32.5, width: 5, height: 2.5, className: 'hello-l1'},
+      {x: 42, y: 28, width: 2, height: 14, className: 'hello-l1'},
+      {x: 44, y: 33.5, width: 2, height: 3, className: 'hello-l1'},
+      {x: 46, y: 33.5, width: 2, height: 3, className: 'hello-l1'},
       // L2
-      {x: 52, y: 24, width: 2, height: 12, className: 'hello-l2'},
-      {x: 55.33, y: 28.5, width: 5, height: 2.5, className: 'hello-l2'},
+      {x: 52, y: 21, width: 2, height: 6, className: 'hello-l2'},
+      {x: 52, y: 27, width: 2, height: 6, className: 'hello-l2'},
+      {x: 54, y: 31.5, width: 6, height: 3, className: 'hello-l2'},
       // O
       {x: 62, y: 28, width: 2, height: 12, className: 'hello-o'},
       {x: 65, y: 23.25, width: 4, height: 2.5, className: 'hello-o'},

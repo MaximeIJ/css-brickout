@@ -5,7 +5,7 @@ import {BONUSES, LAYOUTS} from './util/presets';
 
 // Start the game loop
 const ng = -Math.PI / 2;
-const ballBase = {x: 50, y: 20, radius: 0.75, speed: 0.8, startingBonuses: [BONUSES.speedup1]};
+const ballBase = {x: 50, y: 20, radius: 0.75, speed: 0.7, startingBonuses: [BONUSES.speedup1]};
 const paddleConfig = {
   width: 8.9,
   height: 1.8,
@@ -14,7 +14,18 @@ const paddleConfig = {
 const playerConfig = {
   lives: 3,
 };
-const inputMap: Record<'even' | 'random' | 'mixed', GameParams> = {
+const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
+  hello: {
+    ballConfigs: [
+      {
+        ...ballBase,
+        angle: ng,
+      },
+    ],
+    levelConfig: {layout: LAYOUTS.hello},
+    paddleConfig,
+    playerConfig,
+  },
   even: {
     ballConfigs: [
       {
@@ -47,6 +58,24 @@ const inputMap: Record<'even' | 'random' | 'mixed', GameParams> = {
         y: 45,
         angle: (3 * ng) / 4,
       },
+      {
+        ...ballBase,
+        x: 50,
+        y: 45,
+        angle: (3.05 * ng) / 4,
+      },
+      {
+        ...ballBase,
+        x: 50,
+        y: 45,
+        angle: (3.1 * ng) / 4,
+      },
+      {
+        ...ballBase,
+        x: 50,
+        y: 45,
+        angle: (3.15 * ng) / 4,
+      },
     ],
     levelConfig: {
       layout: [
@@ -63,7 +92,7 @@ const inputMap: Record<'even' | 'random' | 'mixed', GameParams> = {
 };
 
 // Create game loop instance and start the game
-let gameLoop = new Game(inputMap.mixed);
+let gameLoop = new Game(inputMap.hello);
 gameLoop.start();
 
 function onDisplayChange(e: any) {
