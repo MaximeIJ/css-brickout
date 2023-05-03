@@ -18,17 +18,21 @@ export type BonusConfig = {
 type StyleKey = 'top' | 'left' | 'transform';
 
 export default class GameObject {
-  x: number;
-  y: number;
+  x = 0;
+  y = 0;
   width: number;
   height: number;
   bonuses: Array<BonusConfig>;
   element: HTMLDivElement;
   parent: HTMLDivElement;
+  boundingBox: {top: number; right: number; bottom: number; left: number} = {
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  };
 
   constructor({parent, elementId, className, x, y, width = 0, height = 0, startingBonuses = []}: GameObjectConfig) {
-    this.x = x;
-    this.y = y;
     this.width = width;
     this.height = height;
     this.parent = parent;
@@ -37,16 +41,26 @@ export default class GameObject {
     if (elementId) {
       this.element.id = elementId;
     }
-    if (width) {
-      this.element.style.width = `${width}%`;
-    }
-    if (height) {
-      this.element.style.height = `${height}%`;
-    }
     if (className) {
       this.element.classList.add(...className.split(' '));
     }
     parent.appendChild(this.element);
+    this.updatePosition(x, y);
+    this.updateElement();
+  }
+
+  updateElementSize(): void {
+    const {offsetWidth, offsetHeight} = this.parent;
+    if (this.width) {
+      this.element.style.width = `${Math.round(offsetWidth * (this.width / 100.0))}px`;
+    }
+    if (this.height) {
+      this.element.style.height = `${offsetHeight * (this.height / 100.0)}px`;
+    }
+  }
+
+  updateElement(): void {
+    this.updateElementSize();
     this.updateElementPosition();
   }
 
@@ -62,19 +76,26 @@ export default class GameObject {
           this.bonuses.splice(this.bonuses.indexOf(bonus), 1);
         }, bonus.duration);
       }
-      // bonus.effect(this);
     });
   }
 
   updatePosition(x?: number, y?: number) {
     this.x = x ?? this.x;
     this.y = y ?? this.y;
+    if (this.width && this.height) {
+      this.boundingBox = {
+        top: this.y - this.height / 2,
+        right: this.x + this.width / 2,
+        bottom: this.y + this.height / 2,
+        left: this.x - this.width / 2,
+      };
+    }
   }
 
   updateElementPosition() {
     const {offsetWidth, offsetHeight} = this.parent;
-    const absX = Math.round((this.x / 100.0) * offsetWidth);
-    const absY = Math.round((this.y / 100.0) * offsetHeight);
+    const absX = (this.x / 100.0) * offsetWidth;
+    const absY = (this.y / 100.0) * offsetHeight;
     this.element.style.transform = `translateX(calc(${absX}px - 50%)) translateY(calc(${absY}px - 50%))`;
   }
 

@@ -1,3 +1,4 @@
+import Ball from './Ball';
 import Brick from './Brick';
 
 type LayoutDefinitionType = 'even' | 'custom';
@@ -51,18 +52,46 @@ type InternalLevelConfig = LevelConfig & {
 
 export default class Level {
   bricks: Array<Brick>;
-  left: number;
+  left = 0;
   onBallLost: () => void;
   onBrickDestroyed: (brick: Brick) => void;
+  _strips: Array<Array<Brick>>;
+  _stripW: number;
 
   constructor({layout, parent, onBallLost, onBrickDestroyed}: InternalLevelConfig) {
     this.bricks = [];
-    this.left = 0;
+    this._strips = [];
+
     if (layout instanceof Array) {
       layout.forEach(l => this.layBricks(l, parent));
     } else {
       this.layBricks(layout, parent);
     }
+    this.left = this.bricks.length;
+
+    // Use the widest brick size to determine the strip size
+    let maxBrickWidth = 0;
+    this.bricks.forEach(brick => {
+      if (brick.width > maxBrickWidth) {
+        maxBrickWidth = brick.width;
+      }
+    });
+    // We want a round number of strips across the screen of width 100. What's the closest we can get?
+    const stripCount = Math.floor(100 / (maxBrickWidth + 1)); // +1 buffer to be sure
+    this._stripW = 100 / stripCount;
+    // Create the strips
+    for (let i = 0; i < stripCount; i++) {
+      this._strips.push([]);
+    }
+    // Assign bricks to strips
+    this.bricks.forEach(brick => {
+      const leftStrip = Math.floor((brick.x - brick.width / 2) / this._stripW);
+      const rightStrip = Math.floor((brick.x + brick.width / 2) / this._stripW);
+      this._strips[leftStrip].push(brick);
+      if (rightStrip !== leftStrip && rightStrip < stripCount) {
+        this._strips[rightStrip].push(brick);
+      }
+    });
 
     this.onBallLost = onBallLost;
     this.onBrickDestroyed = (brick: Brick) => {
@@ -71,14 +100,23 @@ export default class Level {
     };
   }
 
-  updateElementPositions() {
+  getNearbyBricks(ball: Ball): Array<Brick> {
+    const res = [];
+    const left = Math.floor((ball.x - ball.radius) / this._stripW);
+    const right = Math.floor((ball.x + ball.radius) / this._stripW);
+    for (let i = left; i <= right && i < this._strips.length; i++) {
+      res.push(...this._strips[i]);
+    }
+    return res;
+  }
+
+  updateElements() {
     this.bricks.forEach(brick => {
-      brick.updateElementPosition();
+      brick.updateElement();
     });
   }
 
   layBricks(layout: LayoutDefinitionConfig, parent: HTMLDivElement) {
-    let total = 0;
     if (layout instanceof Array) {
       layout.forEach(layout => this.layBricks(layout, parent));
     }
@@ -97,16 +135,13 @@ export default class Level {
               elementId: `brick-${this.left + i * cols + j}`,
             }),
           );
-          total++;
         }
       }
     } else if (layout.type === 'custom') {
       layout.bricks.forEach((brick, idx) => {
         this.bricks.push(new Brick({...brick, parent, elementId: `brick-${this.left + idx}`}));
-        total++;
       });
     }
-    this.left += total;
   }
 
   isDone() {

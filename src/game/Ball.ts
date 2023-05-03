@@ -11,9 +11,9 @@ export type BallConfig = Omit<GameObjectConfig, 'elementId'> & {
 
 export default class Ball extends GameObject {
   destroyed = false;
-  radius: number;
-  speed: number;
-  angle: number;
+  radius = 0;
+  speed = 0;
+  angle = 0;
   dx = 0;
   dy = 0;
 
@@ -22,13 +22,10 @@ export default class Ball extends GameObject {
     this.radius = radius;
     this.angle = angle;
     this.speed = speed;
+    this.width = radius * 2;
+    this.height = radius * 2;
     this.applyBonuses();
     this.updateElementSize();
-  }
-
-  updateElement(): void {
-    this.updateElementSize();
-    this.updateElementPosition();
   }
 
   updateElementSize(): void {
@@ -36,26 +33,28 @@ export default class Ball extends GameObject {
     this.element.style.setProperty('--diameter', pxRadius * 2 + 'px');
   }
 
-  updatePosition() {
-    this.dx = this.speed * Math.cos(this.angle);
-    this.dy = -this.speed * Math.sin(this.angle);
-    this.element.style.setProperty('--dx', this.dx + 'px');
+  updatePosition(x?: number, y?: number) {
+    this.dx = this.speed * Math.cos(this.angle) || 0;
+    this.dy = -this.speed * Math.sin(this.angle) || 0;
+    this.element.style.setProperty('--dx', Math.round(this.dx) + 'px');
     this.element.style.setProperty('--dy', this.dy + 'px');
-    super.updatePosition(this.x + this.dx, this.y + this.dy);
+    super.updatePosition((x ?? this.x ?? 0) + this.dx, (y ?? this.y ?? 0) + this.dy);
   }
 
+  /**
+   * Detects collisions between this ball and the boundaries, level bricks, and paddle (in that order)
+   * @param level The level with the bricks and strips
+   * @param paddle The player's paddle
+   */
   handleLevelCollision(level: Level, paddle: Paddle) {
     const hitBoundary = this.handleBoundaryCollision(level);
-    if (hitBoundary) {
-      // If no balls, lose a life (todo: destroy ball on boundary collision bottom)
-      // If no lives, game over
-    }
 
     let hitBrick = false;
     let i = 0;
+    const nearby = level.getNearbyBricks(this);
 
-    while (i < level.bricks.length && !hitBrick) {
-      const brick = level.bricks[i];
+    while (i < nearby.length && !hitBrick) {
+      const brick = nearby[i];
       i++;
       if (brick.destroyed) continue;
 
@@ -109,9 +108,6 @@ export default class Ball extends GameObject {
       // Bounce hard!
       // this.updatePosition();
     }
-
-    this.updatePosition();
-    this.updateElementPosition();
   }
 
   handleBoundaryCollision(level: Level) {
@@ -150,7 +146,7 @@ export default class Ball extends GameObject {
   }
 
   handlePaddleCollision(paddle: Paddle) {
-    const paddleTop = paddle.y - paddle.height / 2;
+    const paddleTop = paddle.boundingBox.top;
 
     if (this.isColliding(paddle)) {
       // Calculate the hit position on the paddle
@@ -173,18 +169,20 @@ export default class Ball extends GameObject {
   }
 
   isColliding(object: GameObject) {
-    const top = object.y - object.height / 2;
-    const bottom = object.y + object.height / 2;
-    const left = object.x - object.width / 2;
-    const right = object.x + object.width / 2;
+    const {top, left, right, bottom} = object.boundingBox;
 
     // Check for collision
     return (
-      this.x + this.radius > left && // left
-      this.x - this.radius < right && // right
-      this.y + this.radius > top && // top
-      this.y - this.radius < bottom // bottom
+      this.boundingBox.right >= left &&
+      this.boundingBox.left <= right &&
+      this.boundingBox.bottom >= top &&
+      this.boundingBox.top <= bottom
     );
+  }
+
+  update() {
+    this.updatePosition();
+    this.updateElementPosition();
   }
 
   destroy() {

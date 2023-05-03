@@ -117,6 +117,8 @@ function onLayoutChange(e: any) {
     gameLoop = new Game(inputMap.random);
   } else if (layout === 'mixed') {
     gameLoop = new Game(inputMap.mixed);
+  } else if (layout === 'hello') {
+    gameLoop = new Game(inputMap.hello);
   }
   gameLoop.start();
 }

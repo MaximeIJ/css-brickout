@@ -117,6 +117,7 @@ export default class Game {
       this.paddle.updateElementPosition();
 
       for (const ball of this.balls) {
+        ball.update();
         ball.handleLevelCollision(this.level, this.paddle);
         // autoplay lol
         if (this.debug && ball.y > this.paddle.y - this.paddle.height && ball.y < this.paddle.y) {
@@ -174,7 +175,7 @@ export default class Game {
   handleResize() {
     this.paddle.updateElementPosition();
     this.balls.forEach(ball => ball.updateElement());
-    this.level.updateElementPositions();
+    this.level.updateElements();
     this.paused?.updateElementPosition();
     this.resumeLink?.updateElementPosition();
     this.debug?.updateElementPosition();
