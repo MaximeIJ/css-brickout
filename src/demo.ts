@@ -109,7 +109,6 @@ document.getElementById('display')?.addEventListener('change', onDisplayChange);
 
 function onLayoutChange(e: any) {
   const layout = e.target.value;
-  gameLoop.pause();
   gameLoop.destroy();
   if (layout === 'even') {
     gameLoop = new Game(inputMap.even);

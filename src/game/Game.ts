@@ -180,7 +180,6 @@ export default class Game {
     this.resumeLink?.updateElementPosition();
     this.debug?.updateElementPosition();
     this.hud?.updateElementPosition();
-    console.log('resize');
   }
 
   handleVisibilityChange() {
@@ -212,7 +211,7 @@ export default class Game {
           if (this.state === 'debug') {
             this.state = 'playing';
           }
-        } else {
+        } else if (this.state === 'playing') {
           this.debug = new Debug({
             parent: this.element,
           });
@@ -271,6 +270,8 @@ export default class Game {
     document.removeEventListener('keydown', e => this.handleKeyPress(e));
     this.element.removeEventListener('mouseenter', () => this.handleMouseEnter());
     this.element.removeEventListener('mouseleave', () => this.handleMouseLeave());
+    this.element.innerHTML = '';
+    this.state = 'lost';
     this.debug?.destroy();
     this.paused?.destroy();
     this.resumeLink?.destroy();
@@ -278,7 +279,5 @@ export default class Game {
     this.balls.forEach(ball => ball.destroy());
     this.level.destroy();
     this.hud?.destroy();
-    this.element.innerHTML = '';
-    this.state = 'lost';
   }
 }

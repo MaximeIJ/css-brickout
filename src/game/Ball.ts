@@ -79,7 +79,7 @@ export default class Ball extends GameObject {
           // Update ball pos and check if it's still colliding, if yes, revert and treat as vertical collision
           this.updatePosition();
           if (this.isColliding(brick)) {
-            console.warn('side hit was wrong, switching to vertical', this.angle);
+            // console.warn('side hit was wrong, switching to vertical', this.angle);
             this.angle = Math.atan2(-this.speed * Math.sin(prevAngle), this.speed * Math.cos(prevAngle));
           }
           this.x = prevX;
@@ -90,7 +90,7 @@ export default class Ball extends GameObject {
 
           this.updatePosition();
           if (this.isColliding(brick)) {
-            console.warn('vertical hit was wrong, switching to side', this.angle);
+            // console.warn('vertical hit was wrong, switching to side', this.angle);
             this.angle = Math.atan2(this.speed * Math.sin(prevAngle), -this.speed * Math.cos(prevAngle));
           }
           this.x = prevX;
