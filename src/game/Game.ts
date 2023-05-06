@@ -14,6 +14,7 @@ export type GameParams = {
   paddleConfig: Partial<GameObjectConfig>;
   playerConfig?: PlayerParams;
   parentId?: string;
+  fps?: number;
 };
 
 type PlayerParams = {
@@ -36,6 +37,7 @@ export default class Game {
   lastFrameTime: number = Date.now();
   lastFpsUpdate: number = Date.now();
   // Gameplay
+  fpsInterval: number;
   balls: Ball[] = [];
   level: Level;
   paddle: Paddle;
@@ -83,6 +85,8 @@ export default class Game {
     this.element.addEventListener('mouseenter', () => this.handleMouseEnter());
     this.element.addEventListener('mouseleave', () => this.handleMouseLeave());
     new ResizeObserver(() => this.handleResize()).observe(this.element);
+
+    this.fpsInterval = Math.floor(1000.0 / (params.fps || 60));
   }
 
   // Create Ball objects based on ballConfig
@@ -109,21 +113,30 @@ export default class Game {
   }
 
   update() {
+    const now = Date.now();
+    const msSinceLastFrame = now - this.lastFrameTime;
     if (PAUSABLE.includes(this.state)) {
-      if (this.debug) {
-        this.updateDebug();
-      }
-
-      this.paddle.updateElementPosition();
-
-      for (const ball of this.balls) {
-        ball.update();
-        ball.handleLevelCollision(this.level, this.paddle);
-        // autoplay lol
-        if (this.debug && ball.y > this.paddle.y - this.paddle.height && ball.y < this.paddle.y) {
-          const semiR = Math.round(ball.x - this.paddle.width / 2 + (Math.random() * this.paddle.width) / 2);
-          this.paddle.updatePosition(semiR);
+      if (msSinceLastFrame >= this.fpsInterval) {
+        this.lastFrameTime = now;
+        if (this.debug && now > this.lastFpsUpdate + 1000) {
+          const fps = 1 + Math.round(1000.0 / msSinceLastFrame);
+          this.debug?.setContent(`FPS: ${fps.toFixed(0)} | ${this.state}`);
+          this.lastFpsUpdate = now;
         }
+
+        this.paddle.updateElementPosition();
+
+        for (const ball of this.balls) {
+          ball.update();
+          ball.handleLevelCollision(this.level, this.paddle);
+          // autoplay lol
+          if (this.debug && ball.y > this.paddle.y - this.paddle.height && ball.y < this.paddle.y) {
+            const semiR = Math.round(ball.x - this.paddle.width / 2 + (Math.random() * this.paddle.width) / 2);
+            this.paddle.updatePosition(semiR);
+          }
+        }
+      } else {
+        console.debug('skipping frame', msSinceLastFrame, this.fpsInterval);
       }
 
       requestAnimationFrame(() => this.update());
@@ -151,16 +164,6 @@ export default class Game {
     if (this.level.isDone()) {
       this.state = 'won';
       this.createdPausedElement('Victory!', 'final');
-    }
-  }
-
-  updateDebug() {
-    const now = Date.now();
-    const fps = 1000 / (now - this.lastFrameTime);
-    this.lastFrameTime = now;
-    if (now > this.lastFpsUpdate + 1000) {
-      this.debug?.setContent(`FPS: ${fps.toFixed(0)} | ${this.state}`);
-      this.lastFpsUpdate = now;
     }
   }
 
