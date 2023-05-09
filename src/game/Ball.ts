@@ -34,11 +34,14 @@ export default class Ball extends GameObject {
   }
 
   updatePosition(x?: number, y?: number) {
-    this.dx = this.speed * Math.cos(this.angle) || 0;
-    this.dy = -this.speed * Math.sin(this.angle) || 0;
-    this.element.style.setProperty('--dx', Math.round(this.dx) + 'px');
+    super.updatePosition((x ?? this.x ?? 0) + (this.dx ?? 0), (y ?? this.y ?? 0) + (this.dy ?? 0));
+  }
+
+  setD(fraction = 1) {
+    this.dx = fraction * this.speed * Math.cos(this.angle) || 0;
+    this.dy = fraction * -this.speed * Math.sin(this.angle) || 0;
+    this.element.style.setProperty('--dx', this.dx + 'px');
     this.element.style.setProperty('--dy', this.dy + 'px');
-    super.updatePosition((x ?? this.x ?? 0) + this.dx, (y ?? this.y ?? 0) + this.dy);
   }
 
   /**
@@ -77,6 +80,7 @@ export default class Ball extends GameObject {
           this.angle = Math.atan2(this.speed * Math.sin(this.angle), -this.speed * Math.cos(this.angle));
 
           // Update ball pos and check if it's still colliding, if yes, revert and treat as vertical collision
+          this.setD();
           this.updatePosition();
           if (this.isColliding(brick)) {
             // console.warn('side hit was wrong, switching to vertical', this.angle);
@@ -88,6 +92,7 @@ export default class Ball extends GameObject {
           // Vertical collision
           this.angle = Math.atan2(-this.speed * Math.sin(this.angle), this.speed * Math.cos(this.angle));
 
+          this.setD();
           this.updatePosition();
           if (this.isColliding(brick)) {
             // console.warn('vertical hit was wrong, switching to side', this.angle);
@@ -180,7 +185,11 @@ export default class Ball extends GameObject {
     );
   }
 
-  update() {
+  update(frameFraction = 1) {
+    if (frameFraction > 1.1 || frameFraction < 0.9) {
+      console.warn('frameFraction is weird', frameFraction);
+    }
+    this.setD(frameFraction);
     this.updatePosition();
     this.updateElementPosition();
   }

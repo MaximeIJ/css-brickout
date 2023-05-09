@@ -86,7 +86,7 @@ export default class Game {
     this.element.addEventListener('mouseleave', () => this.handleMouseLeave());
     new ResizeObserver(() => this.handleResize()).observe(this.element);
 
-    this.fpsInterval = Math.floor(1000.0 / (params.fps || 60));
+    this.fpsInterval = Math.floor(1000.0 / (params.fps || 60)) || 1;
   }
 
   // Create Ball objects based on ballConfig
@@ -127,7 +127,7 @@ export default class Game {
         this.paddle.updateElementPosition();
 
         for (const ball of this.balls) {
-          ball.update();
+          ball.update(msSinceLastFrame / this.fpsInterval);
           ball.handleLevelCollision(this.level, this.paddle);
           // autoplay lol
           if (this.debug && ball.y > this.paddle.y - this.paddle.height && ball.y < this.paddle.y) {
@@ -264,6 +264,7 @@ export default class Game {
       this.paused?.destroy();
       this.paused = null;
       this.state = this.debug ? 'debug' : 'playing';
+      this.lastFrameTime = Date.now();
       this.update();
     }
   }
