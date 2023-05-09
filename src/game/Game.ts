@@ -51,6 +51,7 @@ export default class Game {
   constructor(params: GameParams) {
     this.ogParams = {...params};
     this.element = document.getElementById(params.parentId ?? 'game') as HTMLDivElement;
+    this.element.classList.add('game');
 
     this.paddle = new Paddle({
       ...params.paddleConfig,

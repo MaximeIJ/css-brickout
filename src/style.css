@@ -1,7 +1,4 @@
-#game {
-  /* Default theme */
-  --dark: var(--cb-dark, hsl(0, 0%, 20%));
-
+.game {
   background: var(--game-bg, hsl(0, 0%, 45%));
   height: 100%;
   width: 100%;
@@ -15,7 +12,6 @@
 }
 
 /* Ball */
-
 .ball {
   height: var(--diameter, 10px);
   width: var(--diameter, 10px);
