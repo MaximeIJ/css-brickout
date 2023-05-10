@@ -19,6 +19,7 @@ export default class Ball extends GameObject {
 
   constructor({idx, radius, angle, speed, ...objConfig}: BallConfig) {
     super({...objConfig, className: [...(objConfig.className ?? []), 'ball'].join(' '), elementId: `ball-${idx}`});
+    this.element.title = this.element.id;
     this.radius = radius;
     this.angle = angle;
     this.speed = speed;

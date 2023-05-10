@@ -4,11 +4,23 @@
   width: 100%;
   position: relative;
   overflow: hidden;
-  cursor: none;
   font-size: 1.75rem;
   font-family: system-ui;
   font-weight: bold;
   color: var(--text, hsl(0, 0%, 90%));
+}
+
+.game:not(.paused) {
+  cursor: none;
+}
+
+.game:not(.paused) * {
+  pointer-events: none;
+}
+
+.game.paused {
+  cursor: crosshair;
+  background: radial-gradient(hsl(0, 0%, 5%, 30%) 10%, hsl(0, 0%, 5%, 60%) 65%, hsl(0, 0%, 5%, 90%)), var(--game-bg, hsl(0, 0%, 45%));
 }
 
 /* Ball */
@@ -100,19 +112,15 @@
 /* Pause */
 
 #pause {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
   text-align: center;
   font-size: 3.5rem;
   font-family: system-ui;
   font-weight: bold;
-  background: #0008;
   letter-spacing: 0.5rem;
   cursor: default;
   white-space: pre;
+  width: fit-content;
+  height: fit-content;
 }
 
 #pause.final {

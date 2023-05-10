@@ -111,6 +111,7 @@ export default class Game {
 
   start() {
     this.createdPausedElement('Start');
+    this.element.classList.add('paused');
   }
 
   update() {
@@ -250,6 +251,7 @@ export default class Game {
       onClick: () => this.resume(this.state === 'starting' ? 'starting' : undefined),
     });
     this.resumeLink.setContent(content);
+    this.resumeLink.updateElementPosition();
   }
 
   pause(to?: State) {
@@ -257,6 +259,7 @@ export default class Game {
       this.createdPausedElement(to === 'away' ? 'Away' : `Resume`);
       this.state = to ?? 'paused';
       this.debug?.setContent(this.state);
+      this.element.classList.add('paused');
     }
   }
 
@@ -265,6 +268,7 @@ export default class Game {
       this.paused?.destroy();
       this.paused = null;
       this.state = this.debug ? 'debug' : 'playing';
+      this.element.classList.remove('paused');
       this.lastFrameTime = Date.now();
       this.update();
     }

@@ -6,6 +6,7 @@ export default class Paddle extends GameObject {
 
   constructor(config: GameObjectConfig) {
     super({...config, className: [...(config.className ?? []), 'paddle'].join(' ')});
+    this.element.title = this.element.id;
     this.applyBonuses();
     this.parent.addEventListener('mousemove', e => this.handleMouseMove(e));
     this.parent.addEventListener('touchmove', e => this.handleTouchMove(e), {passive: true});
