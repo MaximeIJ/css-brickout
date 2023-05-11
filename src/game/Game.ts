@@ -15,6 +15,7 @@ export type GameParams = {
   playerConfig?: PlayerParams;
   parentId?: string;
   fps?: number;
+  capFps?: boolean;
 };
 
 type PlayerParams = {
@@ -38,6 +39,7 @@ export default class Game {
   lastFpsUpdate: number = Date.now();
   // Gameplay
   fpsInterval: number;
+  fpsCap: number;
   balls: Ball[] = [];
   level: Level;
   paddle: Paddle;
@@ -88,6 +90,7 @@ export default class Game {
     new ResizeObserver(() => this.handleResize()).observe(this.element);
 
     this.fpsInterval = Math.floor(1000.0 / (params.fps || 60)) || 1;
+    this.fpsCap = params.capFps ? this.fpsInterval : 1;
   }
 
   // Create Ball objects based on ballConfig
@@ -118,7 +121,7 @@ export default class Game {
     const now = Date.now();
     const msSinceLastFrame = now - this.lastFrameTime;
     if (PAUSABLE.includes(this.state)) {
-      if (msSinceLastFrame >= this.fpsInterval) {
+      if (msSinceLastFrame >= this.fpsCap) {
         this.lastFrameTime = now;
         if (this.debug && now > this.lastFpsUpdate + 1000) {
           const fps = 1 + Math.round(1000.0 / msSinceLastFrame);
@@ -138,7 +141,7 @@ export default class Game {
           }
         }
       } else {
-        console.debug('skipping frame', msSinceLastFrame, this.fpsInterval);
+        console.debug('skipping frame', msSinceLastFrame, this.fpsCap);
       }
 
       requestAnimationFrame(() => this.update());

@@ -4,8 +4,11 @@ import Level from './Level';
 
 export type BallConfig = Omit<GameObjectConfig, 'elementId'> & {
   idx: number;
+  // % of the game's height (see updateElementSize)
   radius: number;
+  // Angle in radians
   angle: number;
+  // % of the game's height per frame (see GameConfig.fps)
   speed: number;
 };
 
@@ -23,6 +26,7 @@ export default class Ball extends GameObject {
     this.radius = radius;
     this.angle = angle;
     this.speed = speed;
+    // unused
     this.width = radius * 2;
     this.height = radius * 2;
     this.applyBonuses();
@@ -187,8 +191,8 @@ export default class Ball extends GameObject {
   }
 
   update(frameFraction = 1) {
-    if (frameFraction > 1.1 || frameFraction < 0.9) {
-      console.warn('frameFraction is weird', frameFraction);
+    if (frameFraction > 2 || frameFraction < 0.1) {
+      console.warn('frameFraction', frameFraction);
     }
     this.setD(frameFraction);
     this.updatePosition();
