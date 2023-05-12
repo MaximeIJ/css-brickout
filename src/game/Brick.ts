@@ -4,8 +4,7 @@ export default class Brick extends GameObject {
   destroyed = false;
 
   constructor(config: GameObjectConfig) {
-    super({...config, className: [config.className ?? '', 'brick'].filter(Boolean).join(' ')});
-    this.element.title = this.element.id;
+    super({...config, className: [config.className ?? '', 'brick'].filter(Boolean).join(' '), showTitle: true});
   }
 
   destroy() {

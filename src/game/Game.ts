@@ -181,7 +181,7 @@ export default class Game {
   }
 
   handleResize() {
-    this.paddle.updateElementPosition();
+    this.paddle.updateElement();
     this.balls.forEach(ball => ball.updateElement());
     this.level.updateElements();
     this.paused?.updateElementPosition();

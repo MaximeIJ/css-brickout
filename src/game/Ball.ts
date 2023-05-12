@@ -21,8 +21,12 @@ export default class Ball extends GameObject {
   dy = 0;
 
   constructor({idx, radius, angle, speed, ...objConfig}: BallConfig) {
-    super({...objConfig, className: [...(objConfig.className ?? []), 'ball'].join(' '), elementId: `ball-${idx}`});
-    this.element.title = this.element.id;
+    super({
+      ...objConfig,
+      className: [...(objConfig.className ?? []), 'ball'].join(' '),
+      elementId: `ball-${idx}`,
+      showTitle: true,
+    });
     this.radius = radius;
     this.angle = angle;
     this.speed = speed;
@@ -125,7 +129,7 @@ export default class Ball extends GameObject {
       this.angle = Math.PI - this.angle;
       // Adjust angle if it's too flat
       if (Math.abs(this.angle) < Math.PI / 8) {
-        this.angle *= 1.5;
+        this.angle *= 2.5;
         if (this.angle === 0) {
           this.angle = Math.PI / 8;
         }

@@ -1,3 +1,5 @@
+import {formatObjectTitle} from '../util/format';
+
 export type GameObjectConfig = {
   parent: HTMLDivElement;
   elementId?: string;
@@ -7,6 +9,7 @@ export type GameObjectConfig = {
   width?: number;
   height?: number;
   startingBonuses?: Array<BonusConfig>;
+  showTitle?: boolean;
 };
 
 export type BonusConfig = {
@@ -32,12 +35,25 @@ export default class GameObject {
     left: 0,
   };
 
-  constructor({parent, elementId, className, x, y, width = 0, height = 0, startingBonuses = []}: GameObjectConfig) {
+  constructor({
+    parent,
+    elementId,
+    className,
+    x,
+    y,
+    width = 0,
+    height = 0,
+    startingBonuses = [],
+    showTitle = false,
+  }: GameObjectConfig) {
     this.width = width;
     this.height = height;
     this.parent = parent;
     this.bonuses = startingBonuses;
     this.element = document.createElement('div');
+    if (showTitle) {
+      this.element.title = formatObjectTitle(this);
+    }
     if (elementId) {
       this.element.id = elementId;
     }
@@ -62,6 +78,13 @@ export default class GameObject {
   updateElement(): void {
     this.updateElementSize();
     this.updateElementPosition();
+  }
+
+  updateTitle(): void {
+    // Update only if it exists
+    if (this.element.title) {
+      this.element.title = formatObjectTitle(this);
+    }
   }
 
   applyBonuses() {
@@ -97,6 +120,7 @@ export default class GameObject {
     const absX = (this.x / 100.0) * offsetWidth;
     const absY = (this.y / 100.0) * offsetHeight;
     this.element.style.transform = `translateX(calc(${absX}px - 50%)) translateY(calc(${absY}px - 50%))`;
+    this.updateTitle();
   }
 
   setStyle(style: StyleKey, value: string) {
