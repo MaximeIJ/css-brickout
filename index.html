@@ -20,18 +20,6 @@
     <meta name="author" content="Maxime IJ" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-      :root {
-        --game-bg: linear-gradient(213deg, hsl(198, 82%, 55%) 30%, hsl(221, 100%, 63%) 60%);
-        --ball-bg: hsl(334, 96%, 43%);
-        --paddle-bg: hsl(121, 60%, 47%);
-        --brick-bg: hsl(110, 2%, 35%, 69%);
-        --paddle-border: hsl(20, 49%, 18%, 77%);
-        --paddle-radius: 8px 8px 0 0;
-        --ball-border: hsl(0, 0%, 14%);
-        --brick-border: hsl(20, 49%, 18%, 77%);
-        --text: hsl(334, 54%, 85%);
-        --hud-text: hsl(334, 64%, 85%, 90%);
-      }
       html {
         color-scheme: dark light;
         font-size: 16px;
@@ -85,7 +73,7 @@
     <main>
       <article id="intro">
         <h1>CSS Brickout Demo</h1>
-        <section id="demo-screen" class="windowed"><div id="game"></div></section>
+        <section id="demo-screen" class="windowed classic"><div id="game"></div></section>
         <section id="instructions">
           <div>
             <ul>
@@ -110,12 +98,20 @@
               <select id="display">
                 <option value="windowed">Windowed</option>
                 <option value="fullscreen">Full Screen</option>
-              </select></label
-            >
+              </select>
+            </label>
+
+            <label for="theme"
+              >Theme
+              <select id="theme">
+                <option value="classic">Classic</option>
+                <option value="lava">Lava</option>
+              </select>
+            </label>
           </div>
         </section>
       </article>
     </main>
-    <script src="src/demo.ts" type="module"></script>
+    <script src="src/demo/demo.ts" type="module"></script>
   </body>
 </html>

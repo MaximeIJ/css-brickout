@@ -1,7 +1,8 @@
-import Game, {GameParams} from '../src/game/Game';
+import Game, {GameParams} from '../game/Game';
 
-import '../src/style.css';
-import {BONUSES, LAYOUTS} from './util/presets';
+import '../style.css';
+import './demo.css';
+import {BONUSES, LAYOUTS} from './presets';
 
 // Start the game loop
 const ng = -Math.PI / 2;
@@ -95,20 +96,25 @@ const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
 let gameLoop = new Game(inputMap.hello);
 gameLoop.start();
 
-function onDisplayChange(e: any) {
-  const className = e.target.value;
+let lastDisplay = 'windowed';
+let lastTheme = 'classic';
+
+function onDisplayChange({target}: Event) {
+  const className = (target as HTMLSelectElement)?.value;
   gameLoop.pause();
   const gameScreenElement = document.getElementById('demo-screen');
   if (gameScreenElement) {
-    gameScreenElement.className = className;
+    gameScreenElement.classList.remove(lastDisplay);
+    gameScreenElement.classList.add(className);
+    lastDisplay = className;
   }
   gameLoop.start();
 }
 
 document.getElementById('display')?.addEventListener('change', onDisplayChange);
 
-function onLayoutChange(e: any) {
-  const layout = e.target.value;
+function onLayoutChange({target}: Event) {
+  const layout = (target as HTMLSelectElement)?.value;
   gameLoop.destroy();
   if (layout === 'even') {
     gameLoop = new Game(inputMap.even);
@@ -123,3 +129,17 @@ function onLayoutChange(e: any) {
 }
 
 document.getElementById('layout-type')?.addEventListener('change', onLayoutChange);
+
+function onThemeChange({target}: Event) {
+  const className = (target as HTMLSelectElement)?.value;
+  gameLoop.pause();
+  const gameScreenElement = document.getElementById('demo-screen');
+  if (gameScreenElement) {
+    gameScreenElement.classList.remove(lastTheme);
+    gameScreenElement.classList.add(className);
+    lastTheme = className;
+  }
+  gameLoop.start();
+}
+
+document.getElementById('theme')?.addEventListener('change', onThemeChange);

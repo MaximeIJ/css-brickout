@@ -1,0 +1,172 @@
+/* Bonuses */
+.paddle.grip-1 {
+  background: radial-gradient(at 50% 100%, var(--paddle-bg), var(--paddle-bg) 63%, transparent 75%, transparent 100%),
+    repeating-radial-gradient(
+      circle at 50% -130%,
+      var(--paddle-bg),
+      var(--paddle-bg) 8%,
+      var(--paddle-border) 8%,
+      var(--paddle-border) 13%
+    );
+}
+.paddle.grip-2 {
+  background: radial-gradient(at 50% 110%, var(--paddle-bg), var(--paddle-bg) 55%, transparent 65%, transparent 100%),
+    repeating-radial-gradient(
+      circle at 50% -280%,
+      var(--paddle-bg),
+      var(--paddle-bg) 5%,
+      var(--paddle-border) 8%,
+      var(--paddle-border) 13%,
+      var(--paddle-bg) 16%
+    );
+}
+
+.ball.speeddown-1 {
+  box-shadow: calc(var(--dx, 0) * -12) calc(var(--dy, 0) * -12) calc(var(--diameter, 0) / 3)
+    calc(var(--diameter, 0) / -5) var(--ball-border);
+}
+.ball.speeddown-2 {
+  box-shadow: calc(var(--dx, 0) * -12) calc(var(--dy, 0) * -12) calc(var(--diameter, 0) / 2)
+    calc(var(--diameter, 0) / 6) var(--ball-border);
+}
+.ball.speedup-1 {
+  box-shadow: calc(var(--dx, 0) * -5) calc(var(--dy, 0) * -5) calc(var(--diameter, 0) / 2) calc(var(--diameter, 0) / -3)
+    var(--ball-bg);
+}
+.ball.speedup-2 {
+  box-shadow: calc(var(--dx, 0) * -3) calc(var(--dy, 0) * -3) calc(var(--diameter, 0) / 2) calc(var(--diameter, 0) / 6)
+    var(--ball-bg);
+}
+
+/* Themes */
+/* Classic */
+
+.classic {
+  --game-bg: linear-gradient(213deg, hsl(198, 82%, 55%) 30%, hsl(221, 100%, 63%) 60%);
+  --ball-bg: hsl(334, 96%, 43%);
+  --paddle-bg: hsl(121, 60%, 47%);
+  --brick-bg: hsl(110, 2%, 35%, 69%);
+  --paddle-border: hsl(20, 49%, 18%, 77%);
+  --paddle-radius: 8px 8px 0 0;
+  --ball-border: hsl(0, 0%, 14%);
+  --brick-border: hsl(20, 49%, 18%, 77%);
+  --text: hsl(212, 64%, 85%);
+  --hud-text: hsl(212, 64%, 85%, 90%);
+}
+
+.classic .hello-h {
+  --brick-bg: hsl(0, 100%, 71%, 45%);
+  --brick-border: hsl(0, 74%, 68%);
+}
+.classic .hello-e {
+  --brick-bg: hsl(60, 100%, 71%, 90%);
+  border: none;
+}
+.classic .hello-l1 {
+  --brick-bg: repeating-radial-gradient(
+    circle,
+    transparent 13px,
+    hsl(120, 74%, 68%, 100%) 14px,
+    hsl(120, 74%, 68%, 100%) 19px
+  );
+  border: none;
+}
+.classic .hello-l2 {
+  --brick-bg: repeating-linear-gradient(
+    45deg,
+    transparent 13px,
+    hsl(180, 74%, 68%, 100%) 14px,
+    hsl(180, 74%, 68%, 100%) 19px
+  );
+  border: none;
+}
+.classic .hello-o {
+  --brick-bg: hsl(240, 100%, 71%, 80%);
+  --brick-border: hsl(240, 100%, 90%);
+  box-shadow: 0px 3px 5px 1px hsl(240, 40%, 31%);
+}
+.classic .hello-bang {
+  --brick-bg: linear-gradient(
+    180deg,
+    hsl(0, 74%, 68%),
+    hsl(60, 74%, 68%),
+    hsl(120, 74%, 68%),
+    hsl(180, 74%, 68%),
+    hsl(240, 74%, 68%),
+    hsl(300, 74%, 68%)
+  );
+  --brick-border: hsl(300, 74%, 68%);
+  border-width: 2px;
+  border-radius: 10px 5%;
+  box-shadow: 0 0 10px 10px hsla(300, 100%, 88%, 0.477);
+}
+
+/* Lava */
+
+.lava {
+  --game-bg: linear-gradient(to bottom, hsl(13, 8%, 5%, 0%) 60%, hsl(13, 73%, 13%, 75%) 89%, hsl(13, 89%, 23%, 90%) 90%),
+    hsl(13, 8%, 5%);
+  --ball-bg: hsl(220, 66%, 64%);
+  --paddle-bg: hsl(220, 100%, 67%);
+  --brick-bg: hsl(33, 37%, 28%);
+  --paddle-border: hsl(220, 63%, 85%);
+  --paddle-radius: 5px 5px 16px 16px / 3px 3px 15px 15px;
+  --ball-border: hsl(220, 63%, 85%);
+  --brick-border: hsl(33, 49%, 5%, 100%);
+  --text: hsl(13, 64%, 85%);
+  --hud-text: hsl(13, 64%, 85%, 90%);
+}
+
+.lava .ball.ball--destroyed {
+  background: hsl(13, 89%, 23%, 95%);
+  border: none;
+  height: 27%;
+  width: 32%;
+  opacity: 0;
+  box-shadow: none;
+  transform: perspective(10px) rotateX(55deg);
+  transition: height 120ms ease-out, width 330ms ease-in, opacity 200ms ease-in-out 150ms;
+}
+
+.lava .hello-o:not(.brick--destroyed) {
+  --brick-bg: hsl(193, 100%, 77%);
+  border: none;
+  /* opacity pulse animation */
+  animation: ghost 25s infinite;
+}
+
+@keyframes ghost {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 0;
+  }
+  33% {
+    opacity: 0.05;
+  }
+  35% {
+    opacity: 0.15;
+  }
+  38% {
+    opacity: 0;
+  }
+  65% {
+    opacity: 0;
+  }
+  75% {
+    opacity: 0.05;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.lava .hello-h,
+.lava .hello-e,
+.lava .hello-l1,
+.lava .hello-l2,
+.lava .hello-bang {
+  --brick-bg: hsl(13, 100%, 37%);
+  --brick-border: hsl(13, 100%, 37%);
+}

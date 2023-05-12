@@ -20,10 +20,12 @@
 
 .game.paused {
   cursor: crosshair;
-  background: radial-gradient(hsl(0, 0%, 5%, 30%) 10%, hsl(0, 0%, 5%, 60%) 65%, hsl(0, 0%, 5%, 90%)), var(--game-bg, hsl(0, 0%, 45%));
+  background: radial-gradient(hsl(0, 0%, 5%, 30%) 10%, hsl(0, 0%, 5%, 60%) 65%, hsl(0, 0%, 5%, 90%)),
+    var(--game-bg, hsl(0, 0%, 45%));
 }
 
 /* Ball */
+
 .ball {
   height: var(--diameter, 10px);
   width: var(--diameter, 10px);
@@ -148,91 +150,4 @@
   100% {
     opacity: 1;
   }
-}
-
-/* Bonuses */
-.paddle.grip-1 {
-  background: radial-gradient(at 50% 100%, var(--paddle-bg), var(--paddle-bg) 63%, transparent 75%, transparent 100%),
-    repeating-radial-gradient(
-      circle at 50% -130%,
-      var(--paddle-bg),
-      var(--paddle-bg) 8%,
-      var(--paddle-border) 8%,
-      var(--paddle-border) 13%
-    );
-}
-.paddle.grip-2 {
-  background: radial-gradient(at 50% 110%, var(--paddle-bg), var(--paddle-bg) 55%, transparent 65%, transparent 100%),
-    repeating-radial-gradient(
-      circle at 50% -280%,
-      var(--paddle-bg),
-      var(--paddle-bg) 5%,
-      var(--paddle-border) 8%,
-      var(--paddle-border) 13%,
-      var(--paddle-bg) 16%
-    );
-}
-
-.ball.speeddown-1 {
-  box-shadow: calc(var(--dx, 0) * -12) calc(var(--dy, 0) * -12) calc(var(--diameter, 0) / 3)
-    calc(var(--diameter, 0) / -5) var(--ball-border);
-}
-.ball.speeddown-2 {
-  box-shadow: calc(var(--dx, 0) * -12) calc(var(--dy, 0) * -12) calc(var(--diameter, 0) / 2)
-    calc(var(--diameter, 0) / 6) var(--ball-border);
-}
-.ball.speedup-1 {
-  box-shadow: calc(var(--dx, 0) * -5) calc(var(--dy, 0) * -5) calc(var(--diameter, 0) / 2) calc(var(--diameter, 0) / -3)
-    var(--ball-bg);
-}
-.ball.speedup-2 {
-  box-shadow: calc(var(--dx, 0) * -3) calc(var(--dy, 0) * -3) calc(var(--diameter, 0) / 2) calc(var(--diameter, 0) / 6)
-    var(--ball-bg);
-}
-
-.hello-h {
-  --brick-bg: hsl(0, 100%, 71%, 45%);
-  --brick-border: hsl(0, 74%, 68%);
-}
-.hello-e {
-  --brick-bg: hsl(60, 100%, 71%, 90%);
-  border: none;
-}
-.hello-l1 {
-  --brick-bg: repeating-radial-gradient(
-    circle,
-    transparent 13px,
-    hsl(120, 74%, 68%, 100%) 14px,
-    hsl(120, 74%, 68%, 100%) 19px
-  );
-  border: none;
-}
-.hello-l2 {
-  --brick-bg: repeating-linear-gradient(
-    45deg,
-    transparent 13px,
-    hsl(180, 74%, 68%, 100%) 14px,
-    hsl(180, 74%, 68%, 100%) 19px
-  );
-  border: none;
-}
-.hello-o {
-  --brick-bg: hsl(240, 100%, 71%, 80%);
-  --brick-border: hsl(240, 100%, 90%);
-  box-shadow: 0px 3px 5px 1px hsl(240, 40%, 31%) ;
-}
-.hello-bang {
-  --brick-bg: linear-gradient(
-    180deg,
-    hsl(0, 74%, 68%),
-    hsl(60, 74%, 68%),
-    hsl(120, 74%, 68%),
-    hsl(180, 74%, 68%),
-    hsl(240, 74%, 68%),
-    hsl(300, 74%, 68%)
-  );
-  --brick-border: hsl(300, 74%, 68%);
-  border-width: 2px;
-  border-radius: 10px 5%;
-  box-shadow: 0 0 10px 10px hsla(300, 100%, 88%, 0.477);
 }
