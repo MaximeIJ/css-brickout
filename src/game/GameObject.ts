@@ -120,7 +120,7 @@ export default class GameObject {
     const absX = (this.x / 100.0) * offsetWidth;
     const absY = (this.y / 100.0) * offsetHeight;
     this.element.style.transform = `translateX(calc(${absX}px - 50%)) translateY(calc(${absY}px - 50%))`;
-    this.updateTitle();
+    this.updateTitle(); // todo move to onPause
   }
 
   setStyle(style: StyleKey, value: string) {

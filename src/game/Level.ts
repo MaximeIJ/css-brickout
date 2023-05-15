@@ -87,9 +87,9 @@ export default class Level {
     this.bricks.forEach(brick => {
       const leftStrip = Math.floor((brick.x - brick.width / 2) / this._stripW);
       const rightStrip = Math.floor((brick.x + brick.width / 2) / this._stripW);
-      this._strips[leftStrip].push(brick);
+      this._strips[leftStrip]?.push(brick);
       if (rightStrip !== leftStrip && rightStrip < stripCount) {
-        this._strips[rightStrip].push(brick);
+        this._strips[rightStrip]?.push(brick);
       }
     });
 

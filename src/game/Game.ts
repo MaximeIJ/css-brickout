@@ -59,8 +59,8 @@ export default class Game {
       ...params.paddleConfig,
       parent: this.element,
       elementId: 'paddle',
-      x: 50,
-      y: 83,
+      x: params.paddleConfig?.x ?? 50,
+      y: params.paddleConfig?.y ?? 83,
     });
     this.debug = null;
     this.paused = null;
