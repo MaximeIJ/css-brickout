@@ -1,2 +1,2 @@
-export * as Game from './game/Game';
+export * from './game/Game';
 import './style.css';

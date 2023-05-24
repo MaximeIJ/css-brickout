@@ -1,4 +1,4 @@
-import {formatObjectTitle} from '../util/format';
+import {formatObjectTitle} from '../util';
 
 export type GameObjectConfig = {
   parent: HTMLDivElement;
@@ -20,7 +20,7 @@ export type BonusConfig = {
 
 type StyleKey = 'top' | 'left' | 'transform';
 
-export default class GameObject {
+export class GameObject {
   x = 0;
   y = 0;
   width: number;

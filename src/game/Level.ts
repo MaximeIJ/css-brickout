@@ -1,5 +1,4 @@
-import Ball from './Ball';
-import Brick from './Brick';
+import {Ball, Brick} from './';
 
 type LayoutDefinitionType = 'even' | 'custom';
 type LayoutDefinition = {
@@ -45,20 +44,13 @@ export type LevelConfig = {
   layout: LayoutDefinitionConfig | Array<LayoutDefinitionConfig>;
 };
 
-type InternalLevelConfig = LevelConfig & {
-  onBallLost: () => void;
-  onBrickDestroyed: (brick: Brick) => void;
-};
-
-export default class Level {
+export class Level {
   bricks: Array<Brick>;
   left = 0;
-  onBallLost: () => void;
-  onBrickDestroyed: (brick: Brick) => void;
   _strips: Array<Array<Brick>>;
   _stripW: number;
 
-  constructor({layout, parent, onBallLost, onBrickDestroyed}: InternalLevelConfig) {
+  constructor({layout, parent}: LevelConfig) {
     this.bricks = [];
     this._strips = [];
 
@@ -93,11 +85,9 @@ export default class Level {
       }
     });
 
-    this.onBallLost = onBallLost;
-    this.onBrickDestroyed = (brick: Brick) => {
+    parent.addEventListener('brickdestroyed', () => {
       this.left--;
-      onBrickDestroyed(brick);
-    };
+    });
   }
 
   getNearbyBricks(ball: Ball): Array<Brick> {
@@ -150,5 +140,8 @@ export default class Level {
 
   destroy() {
     this.bricks.forEach(brick => brick.destroy());
+    parent.removeEventListener('brickdestroyed', () => {
+      this.left--;
+    });
   }
 }

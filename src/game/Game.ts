@@ -1,12 +1,19 @@
-import Ball, {BallConfig} from './Ball';
-import Brick from './Brick';
-import Clickable from './Clickable';
-import Debug from './Debug';
-import {GameObjectConfig} from './GameObject';
-import HUD from './HUD';
-import Level, {LevelConfig} from './Level';
-import Paddle from './Paddle';
-import Pause from './Pause';
+import {createEvent} from '../util';
+
+import {
+  Ball,
+  BallConfig,
+  Brick,
+  Clickable,
+  Debug,
+  GameObject,
+  GameObjectConfig,
+  HUD,
+  Level,
+  LevelConfig,
+  Paddle,
+  Pause,
+} from './';
 
 export type GameParams = {
   ballConfigs: Array<Omit<BallConfig, 'idx' | 'parent'>>;
@@ -27,7 +34,7 @@ const PAUSABLE: Array<State> = ['playing', 'debug'];
 const RESUMABLE: Array<State> = ['paused', 'away'];
 
 // GameLoop class
-export default class Game {
+export class Game {
   // Internals
   element: HTMLDivElement;
   state: State = 'starting';
@@ -68,8 +75,6 @@ export default class Game {
     this.level = new Level({
       ...params.levelConfig,
       parent: this.element,
-      onBallLost: () => this.onBallLost(),
-      onBrickDestroyed: (brick: Brick) => this.onBrickDestroyed(brick),
     });
 
     this.setBalls();
@@ -85,6 +90,9 @@ export default class Game {
     // Event listeners
     document.addEventListener('visibilitychange', () => this.handleVisibilityChange());
     document.addEventListener('keydown', e => this.handleKeyPress(e));
+    this.element.addEventListener('balldestroyed', e => this.handleBallLost(e));
+    this.element.addEventListener('ballcollision', e => this.handleBallCollision(e));
+    this.element.addEventListener('brickdestroyed', e => this.handleBrickDestroyed(e));
     this.element.addEventListener('mouseenter', () => this.handleMouseEnter());
     this.element.addEventListener('mouseleave', () => this.handleMouseLeave());
     new ResizeObserver(() => this.handleResize()).observe(this.element);
@@ -115,6 +123,7 @@ export default class Game {
   start() {
     this.createdPausedElement('Start');
     this.element.classList.add('paused');
+    this.dispatchEvent('gamestarted');
   }
 
   update() {
@@ -132,6 +141,9 @@ export default class Game {
         this.paddle.updateElementPosition();
 
         for (const ball of this.balls) {
+          if (ball.destroyed) {
+            continue;
+          }
           ball.update(msSinceLastFrame / this.fpsInterval);
           ball.handleLevelCollision(this.level, this.paddle);
           // autoplay lol
@@ -148,7 +160,8 @@ export default class Game {
     }
   }
 
-  onBallLost() {
+  handleBallLost(event: Event) {
+    console.debug('BallLost', (event as CustomEvent<Ball>).detail);
     this.balls = this.balls.filter(ball => !ball.destroyed);
     if (this.balls.length === 0) {
       this.lives--;
@@ -158,17 +171,31 @@ export default class Game {
       } else {
         this.state = 'lost';
         this.createdPausedElement('Game Over', 'final');
+        this.dispatchEvent('gamelost');
       }
     }
   }
 
-  onBrickDestroyed(brick: Brick) {
-    // todo: add score from brick params if they exist
-    this.score += 1;
-    this.updateHUDScore();
+  handleBallCollision(event: Event) {
+    const {ball, object} = (event as CustomEvent<{ball: Ball; object: GameObject}>).detail;
+    let type = 'BallCollision';
+    if (object instanceof Brick) {
+      type = 'BallBrickCollision';
+      // todo: add score from brick params if they exist
+      this.score += 1;
+      this.updateHUDScore();
+    } else if (object instanceof Paddle) {
+      type = 'BallPaddleCollision';
+    }
+    console.debug(type, ball, object);
+  }
+
+  handleBrickDestroyed(event: Event) {
+    console.debug('BrickDestroyed', (event as CustomEvent<Brick>).detail);
     if (this.level.isDone()) {
       this.state = 'won';
       this.createdPausedElement('Victory!', 'final');
+      this.dispatchEvent('gamewon');
     }
   }
 
@@ -263,6 +290,7 @@ export default class Game {
       this.state = to ?? 'paused';
       this.debug?.setContent(this.state);
       this.element.classList.add('paused');
+      this.dispatchEvent('gamepaused');
     }
   }
 
@@ -273,13 +301,22 @@ export default class Game {
       this.state = this.debug ? 'debug' : 'playing';
       this.element.classList.remove('paused');
       this.lastFrameTime = Date.now();
+      this.dispatchEvent('gameresumed');
       this.update();
     }
+  }
+
+  dispatchEvent(name: string) {
+    const event = createEvent<Game>(name, this);
+    this.element.dispatchEvent(event);
   }
 
   destroy() {
     document.removeEventListener('visibilitychange', () => this.handleVisibilityChange());
     document.removeEventListener('keydown', e => this.handleKeyPress(e));
+    this.element.removeEventListener('balldestroyed', e => this.handleBallLost(e));
+    this.element.removeEventListener('ballcollision', e => this.handleBallCollision(e));
+    this.element.removeEventListener('brickdestroyed', e => this.handleBrickDestroyed(e));
     this.element.removeEventListener('mouseenter', () => this.handleMouseEnter());
     this.element.removeEventListener('mouseleave', () => this.handleMouseLeave());
     this.element.innerHTML = '';

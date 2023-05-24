@@ -1,8 +1,10 @@
 import {defineConfig} from 'vite';
+import removeConsole from 'vite-plugin-remove-console';
 
 export default defineConfig({
   base: '',
   build: {
+    minify: true,
     outDir: 'demo-pages',
     rollupOptions: {
       output: {
@@ -14,4 +16,5 @@ export default defineConfig({
       },
     },
   },
+  plugins: [removeConsole()],
 });

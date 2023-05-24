@@ -1,6 +1,6 @@
-import Paddle from './Paddle';
-import GameObject, {GameObjectConfig} from './GameObject';
-import Level from './Level';
+import {createEvent} from '../util';
+
+import {GameObject, GameObjectConfig, Level, Paddle} from './';
 
 export type BallConfig = Omit<GameObjectConfig, 'elementId'> & {
   idx: number;
@@ -10,17 +10,20 @@ export type BallConfig = Omit<GameObjectConfig, 'elementId'> & {
   angle: number;
   // % of the game's height per frame (see GameConfig.fps)
   speed: number;
+  // damage inflicted on bricks
+  damage?: number;
 };
 
-export default class Ball extends GameObject {
+export class Ball extends GameObject {
   destroyed = false;
   radius = 0;
   speed = 0;
   angle = 0;
+  damage = 1;
   dx = 0;
   dy = 0;
 
-  constructor({idx, radius, angle, speed, ...objConfig}: BallConfig) {
+  constructor({idx, radius, angle, speed, damage = 1, ...objConfig}: BallConfig) {
     super({
       ...objConfig,
       className: [...(objConfig.className ?? []), 'ball'].join(' '),
@@ -30,6 +33,7 @@ export default class Ball extends GameObject {
     this.radius = radius;
     this.angle = angle;
     this.speed = speed;
+    this.damage = damage;
     // unused
     this.width = radius * 2;
     this.height = radius * 2;
@@ -59,7 +63,7 @@ export default class Ball extends GameObject {
    * @param paddle The player's paddle
    */
   handleLevelCollision(level: Level, paddle: Paddle) {
-    const hitBoundary = this.handleBoundaryCollision(level);
+    const hitBoundary = this.handleBoundaryCollision();
 
     let hitBrick = false;
     let i = 0;
@@ -111,8 +115,8 @@ export default class Ball extends GameObject {
           this.y = prevY;
         }
 
-        brick.destroy();
-        level.onBrickDestroyed(brick);
+        this.dispatchCollisionEvent(brick);
+        brick.takeHit(this);
       }
     }
 
@@ -124,7 +128,7 @@ export default class Ball extends GameObject {
     }
   }
 
-  handleBoundaryCollision(level: Level) {
+  handleBoundaryCollision() {
     if (this.x - this.radius <= 0 || this.x + this.radius >= 100) {
       this.angle = Math.PI - this.angle;
       // Adjust angle if it's too flat
@@ -152,9 +156,8 @@ export default class Ball extends GameObject {
     }
 
     if (this.y + this.radius >= 100) {
-      this.speed /= 1.5;
+      this.speed = 0;
       this.destroy();
-      level.onBallLost();
       return true;
     }
   }
@@ -178,6 +181,7 @@ export default class Ball extends GameObject {
       // console.log('Paddle collision new angle', this.angle, angle);
       this.y = paddleTop - this.radius;
       this.angle = angle;
+      this.dispatchCollisionEvent(paddle);
       return true;
     }
   }
@@ -203,11 +207,18 @@ export default class Ball extends GameObject {
     this.updateElementPosition();
   }
 
+  dispatchCollisionEvent(object: GameObject) {
+    const event = createEvent<{ball: Ball; object: GameObject}>('ballcollision', {ball: this, object});
+    this.parent.dispatchEvent(event);
+  }
+
   destroy() {
     setTimeout(() => {
       super.destroy();
     }, 350);
     this.element.classList.add('ball--destroyed');
     this.destroyed = true;
+    const event = createEvent<Ball>('balldestroyed', this);
+    this.parent.dispatchEvent(event);
   }
 }

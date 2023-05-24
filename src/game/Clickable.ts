@@ -1,11 +1,11 @@
-import GameObject, {GameObjectConfig} from './GameObject';
+import {GameObject, GameObjectConfig} from './GameObject';
 
 type Config = Required<Pick<GameObjectConfig, 'parent'>> &
   Partial<GameObjectConfig> & {
     onClick: () => void;
   };
 
-export default class Clickable extends GameObject {
+export class Clickable extends GameObject {
   onClick: () => void;
 
   constructor({x = 50, y = 50, onClick, ...rest}: Config) {

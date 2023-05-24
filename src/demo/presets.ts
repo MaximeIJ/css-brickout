@@ -1,7 +1,4 @@
-import Ball from '@/game/Ball';
-import GameObject, {BonusConfig} from '@/game/GameObject';
-import {LayoutDefinitionConfig} from '@/game/Level';
-import Paddle from '@/game/Paddle';
+import {Ball, BonusConfig, GameObject, LayoutDefinitionConfig, Paddle} from '../game';
 
 const gripFactorEffect = (amount: number) => (paddle: GameObject) => {
   (paddle as Paddle).gripFactor += amount;

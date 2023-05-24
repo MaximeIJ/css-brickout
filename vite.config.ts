@@ -2,6 +2,7 @@ import {resolve} from 'path';
 
 import {defineConfig} from 'vite';
 import dts from 'vite-plugin-dts';
+import removeConsole from 'vite-plugin-remove-console';
 
 const config = {
   build: {
@@ -23,5 +24,6 @@ export default defineConfig({
     dts({
       insertTypesEntry: true,
     }),
+    removeConsole({includes: ['log', 'warn', 'error', 'info', 'debug']}),
   ],
 });

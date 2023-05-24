@@ -1,6 +1,6 @@
-import GameObject, {GameObjectConfig} from './GameObject';
+import {GameObject, GameObjectConfig} from './GameObject';
 
-export default class Debug extends GameObject {
+export class Debug extends GameObject {
   constructor({
     elementId = 'debug',
     x = 50,

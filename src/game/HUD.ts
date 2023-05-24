@@ -1,6 +1,6 @@
-import GameObject, {GameObjectConfig} from './GameObject';
+import {GameObject, GameObjectConfig} from './GameObject';
 
-export default class HUD extends GameObject {
+export class HUD extends GameObject {
   lives: GameObject;
   score: GameObject;
 

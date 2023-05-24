@@ -1,6 +1,6 @@
-import GameObject, {GameObjectConfig} from './GameObject';
+import {GameObject, GameObjectConfig} from './GameObject';
 
-export default class Pause extends GameObject {
+export class Pause extends GameObject {
   constructor({
     elementId = 'pause',
     x = 50,

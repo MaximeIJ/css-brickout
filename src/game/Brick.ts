@@ -1,10 +1,25 @@
-import GameObject, {GameObjectConfig} from './GameObject';
+import {createEvent} from '../util';
 
-export default class Brick extends GameObject {
+import {Ball, GameObject, GameObjectConfig} from './';
+
+export type BrickConfig = GameObjectConfig & {
+  hp?: number;
+};
+
+export class Brick extends GameObject {
   destroyed = false;
+  hp: number;
 
-  constructor(config: GameObjectConfig) {
+  constructor({hp = 1, ...config}: BrickConfig) {
     super({...config, className: [config.className ?? '', 'brick'].filter(Boolean).join(' '), showTitle: true});
+    this.hp = hp;
+  }
+
+  takeHit(ball: Ball) {
+    this.hp -= ball.damage;
+    if (this.hp <= 0) {
+      this.destroy();
+    }
   }
 
   destroy() {
@@ -13,5 +28,7 @@ export default class Brick extends GameObject {
     }, 300);
     this.element.classList.add('brick--destroyed');
     this.destroyed = true;
+    const event = createEvent<Brick>('brickdestroyed', this);
+    this.parent.dispatchEvent(event);
   }
 }

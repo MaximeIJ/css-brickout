@@ -48,9 +48,11 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.7",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.0.4",
     "vite": "^4.2.1",
-    "vite-plugin-dts": "^2.3.0"
+    "vite-plugin-dts": "^2.3.0",
+    "vite-plugin-remove-console": "^2.1.1"
   },
   "scripts": {
     "build": "vite build",

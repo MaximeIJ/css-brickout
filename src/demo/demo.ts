@@ -1,4 +1,4 @@
-import Game, {GameParams} from '../game/Game';
+import {Game, GameParams} from '../game/Game';
 
 import '../style.css';
 import './demo.css';

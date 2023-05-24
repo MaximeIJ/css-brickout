@@ -12,7 +12,7 @@ CSS Brickout (sometimes typo'd as _CSS Breakout_) exposes a responsive, customiz
 
 ### Quick start
 
-No time for a chat, here's the copy pastable stuff:
+No time to chat, here's the copy pastable stuff:
 
 ```npm
 npm i @maximeij/css-brickout
@@ -46,6 +46,31 @@ Anything not covered by that can be easily styled with static class names expose
 }
 ```
 
+### Easy extension 🔨
+
+The game emits custom events as they occur, allowing you to set up handlers that will customize the gameplay endlessly!
+These events are currently available and include the GameObject emitting it unless stated otherwise:
+
+#### Game events:
+
+- `'gamestarted'`, `'gamepaused'`, `'gameresumed'`
+- `'gamewon'`, `'gamelost'`
+
+#### Ball events:
+
+- `'ballcollision'` (includes both the Ball and the GameObject it collided with)
+- `'balldestroyed'`
+
+#### Brick events:
+
+- `'brickdestroyed'`
+
+Example use:
+
+```typescript
+element.addEventListener('ballcollision', ({detail}) => console.log(detail.ball, 'bonk', detail.object));
+```
+
 ### Still though... CSS for 60 FPS?
 
 Yep! There's really only thing moving at 60FPS (the balls), and positioning them and other objects in a way consistent with the underlying model is pretty straightforward:
@@ -59,3 +84,9 @@ The movement of the ball is not very smooth and the game does consume more power
 ## Recent changes
 
 - [Changelog](CHANGELOG.md)
+
+## Coming soon
+
+- Bonus Drops + Effect Duration
+- Built-in fullscreen
+- Object properties as CSS variables
