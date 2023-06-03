@@ -269,8 +269,8 @@ export class Game {
   }
 
   createdPausedElement(content: string, classes = '') {
-    this.paused?.destroy();
     this.resumeLink?.destroy();
+    this.paused?.destroy();
     this.paused = new Pause({
       parent: this.element,
       className: classes,
@@ -320,13 +320,14 @@ export class Game {
     this.element.removeEventListener('mouseenter', () => this.handleMouseEnter());
     this.element.removeEventListener('mouseleave', () => this.handleMouseLeave());
     this.element.innerHTML = '';
-    this.state = 'lost';
-    this.debug?.destroy();
-    this.paused?.destroy();
-    this.resumeLink?.destroy();
     this.paddle.destroy();
-    this.balls.forEach(ball => ball.destroy());
     this.level.destroy();
     this.hud?.destroy();
+    this.state = 'lost';
+    this.lives = 0;
+    this.balls.forEach(ball => ball.destroy());
+    this.debug?.destroy();
+    this.resumeLink?.destroy();
+    this.paused?.destroy();
   }
 }

@@ -139,9 +139,9 @@ export class Level {
   }
 
   destroy() {
-    this.bricks.forEach(brick => brick.destroy());
     parent.removeEventListener('brickdestroyed', () => {
       this.left--;
     });
+    this.bricks.forEach(brick => brick.destroy());
   }
 }
