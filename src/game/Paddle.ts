@@ -7,20 +7,20 @@ export class Paddle extends GameObject {
   constructor(config: GameObjectConfig) {
     super({...config, className: [...(config.className ?? []), 'paddle'].join(' '), showTitle: true});
     this.applyBonuses();
-    this.parent.addEventListener('mousemove', e => this.handleMouseMove(e));
-    this.parent.addEventListener('touchmove', e => this.handleTouchMove(e), {passive: true});
+    this.parent.addEventListener('mousemove', this.handleMouseMove);
+    this.parent.addEventListener('touchmove', this.handleTouchMove, {passive: true});
   }
 
-  handleMouseMove({clientX, currentTarget}: MouseEvent) {
+  handleMouseMove = ({clientX, currentTarget}: MouseEvent) => {
     if (currentTarget instanceof HTMLElement) {
       const rect = currentTarget.getBoundingClientRect();
       const mouseX = clientX - rect.left;
       const paddleX = (mouseX / this.parent.offsetWidth) * 100;
       this.updatePosition(paddleX);
     }
-  }
+  };
 
-  handleTouchMove(e: TouchEvent) {
+  handleTouchMove = (e: TouchEvent) => {
     // Get the first touch event in the touches list
     const touch = e.touches[0];
 
@@ -30,11 +30,11 @@ export class Paddle extends GameObject {
 
     // Update the paddle position
     this.updatePosition(paddleX);
-  }
+  };
 
   destroy(): void {
-    this.parent.removeEventListener('mouseover', e => this.handleMouseMove(e));
-    this.parent.removeEventListener('touchmove', e => this.handleTouchMove(e));
+    this.parent.removeEventListener('mouseover', this.handleMouseMove);
+    this.parent.removeEventListener('touchmove', this.handleTouchMove);
     super.destroy();
   }
 }

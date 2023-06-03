@@ -16,11 +16,11 @@ export class Clickable extends GameObject {
       className: [...[rest.className ?? ''], 'clickable'].join(' '),
     });
     this.onClick = onClick;
-    this.element.addEventListener('click', () => this.onClick());
+    this.element.addEventListener('click', this.onClick);
   }
 
   destroy(): void {
-    this.parent.removeEventListener('click', () => this.onClick());
+    this.parent.removeEventListener('click', this.onClick);
     super.destroy();
   }
 }

@@ -85,10 +85,12 @@ export class Level {
       }
     });
 
-    parent.addEventListener('brickdestroyed', () => {
-      this.left--;
-    });
+    parent.addEventListener('brickdestroyed', this.handleBrickDestroyed);
   }
+
+  handleBrickDestroyed = () => {
+    this.left--;
+  };
 
   getNearbyBricks(ball: Ball): Array<Brick> {
     const res = [];
@@ -139,9 +141,7 @@ export class Level {
   }
 
   destroy() {
-    parent.removeEventListener('brickdestroyed', () => {
-      this.left--;
-    });
+    parent.removeEventListener('brickdestroyed', this.handleBrickDestroyed);
     this.bricks.forEach(brick => brick.destroy());
   }
 }
