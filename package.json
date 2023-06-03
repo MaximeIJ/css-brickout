@@ -1,6 +1,6 @@
 {
   "name": "@maximeij/css-brickout",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "type": "module",
   "description": "Classic Brickout rendered with CSS",
   "author": "Maxime IJ",
