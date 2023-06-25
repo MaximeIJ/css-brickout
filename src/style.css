@@ -30,7 +30,7 @@
   height: var(--diameter, 10px);
   width: var(--diameter, 10px);
   background: var(--ball-bg, hsl(0, 0%, 90%));
-  border: var(--ball-border, hsl(0, 0%, 20%)) solid 3px;
+  border: var(--ball-border, hsl(0, 0%, 20%) solid 3px);
   border-radius: 50%;
   position: absolute;
   top: 0;
@@ -53,7 +53,7 @@
 
 .paddle {
   background: var(--paddle-bg, hsl(0, 0%, 90%));
-  border: var(--paddle-border, hsl(0, 0%, 20%)) solid 3px;
+  border: var(--paddle-border, hsl(0, 0%, 20%) solid 3px);
   position: absolute;
   top: 0;
   left: 0;
@@ -66,7 +66,7 @@
 
 .brick {
   background: var(--brick-bg, hsl(0, 0%, 90%));
-  border: var(--brick-border, hsl(0, 0%, 20%)) solid 3px;
+  border: var(--brick-border, hsl(0, 0%, 20%) solid 3px);
   position: absolute;
   box-sizing: border-box;
   top: 0;

@@ -2,7 +2,7 @@
   "name": "@maximeij/css-brickout",
   "version": "0.5.1",
   "type": "module",
-  "description": "Classic Brickout rendered with CSS",
+  "description": "Classic Brickout Game Engine implemented in Typescript and rendered with CSS. No dependencies.",
   "author": "Maxime IJ",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
@@ -65,7 +65,7 @@
     "publish:major": "npm version major && npm run custom:publish",
     "publish:minor": "npm version minor && npm run custom:publish",
     "publish:patch": "npm version patch && npm run custom:publish",
-    "version": "auto-changelog -p && git add CHANGELOG.md"
+    "preversion": "auto-changelog -p && git add CHANGELOG.md"
   },
   "repository": {
     "type": "git",
