@@ -97,19 +97,19 @@
 
 #hud {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5%;
+  box-sizing: border-box;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 1%;
   letter-spacing: 0.5vmin;
   -webkit-text-stroke: 0;
   z-index: 1;
   opacity: 0.95;
   color: var(--hud-text, hsl(0, 0%, 90%));
+}
+
+#hud > #lives {
+  margin-left: 9%;
 }
 
 /* Pause */

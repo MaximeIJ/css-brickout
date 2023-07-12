@@ -49,6 +49,7 @@ export class Game {
   // Gameplay
   fpsInterval: number;
   fpsCap: number;
+  msSinceStart = 0;
   balls: Ball[] = [];
   level: Level;
   paddle: Paddle;
@@ -88,6 +89,7 @@ export class Game {
     this.hud = new HUD({parent: this.element});
     this.updateHUDLives();
     this.updateHUDScore();
+    this.updateHUDTime();
 
     // Event listeners
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
@@ -133,6 +135,8 @@ export class Game {
     const msSinceLastFrame = now - this.lastFrameTime;
     if (PAUSABLE.includes(this.state)) {
       if (msSinceLastFrame >= this.fpsCap) {
+        this.msSinceStart += msSinceLastFrame;
+        this.updateHUDTime();
         this.lastFrameTime = now;
         if (this.debug && now > this.lastFpsUpdate + 1000) {
           const fps = 1 + Math.round(1000.0 / msSinceLastFrame);
@@ -209,14 +213,18 @@ export class Game {
     this.hud?.updateScore(this.score);
   };
 
+  updateHUDTime = () => {
+    this.hud?.updateTime(this.msSinceStart);
+  };
+
   handleResize = () => {
     this.paddle.updateElement();
     this.balls.forEach(ball => ball.updateElement());
     this.level.updateElements();
-    this.paused?.updateElementPosition();
-    this.resumeLink?.updateElementPosition();
-    this.debug?.updateElementPosition();
-    this.hud?.updateElementPosition();
+    this.paused?.updateElement();
+    this.resumeLink?.updateElement();
+    this.debug?.updateElement();
+    this.hud?.updateElement();
   };
 
   handleVisibilityChange = () => {

@@ -93,7 +93,7 @@ export class GameObject {
       this.element.classList.add(bonus.cssClass);
       const undo = bonus.effect(this);
       if (bonus.duration) {
-        // todo: track timeout and pause it when needed?
+        // todo: use msSinceStart from game to determine this
         setTimeout(() => {
           undo(this);
           this.element.classList.remove(bonus.cssClass);

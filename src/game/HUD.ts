@@ -1,7 +1,10 @@
+import {msToString} from '../util';
+
 import {GameObject, GameObjectConfig} from './GameObject';
 
 export class HUD extends GameObject {
   lives: GameObject;
+  time: GameObject;
   score: GameObject;
 
   constructor({
@@ -23,14 +26,20 @@ export class HUD extends GameObject {
     this.lives = new GameObject({
       parent: this.element,
       elementId: 'lives',
-      x: 5,
-      y: 33,
+      x: 0,
+      y: 0,
+    });
+    this.time = new GameObject({
+      parent: this.element,
+      elementId: 'time',
+      x: 0,
+      y: 0,
     });
     this.score = new GameObject({
       parent: this.element,
       elementId: 'score',
       x: 0,
-      y: 33,
+      y: 0,
     });
   }
 
@@ -38,7 +47,10 @@ export class HUD extends GameObject {
     this.lives.element.textContent = `❤ ${lives}`;
   }
   updateScore(score: number) {
-    this.score.element.textContent = score.toString();
+    this.score.element.textContent = '💎' + score.toString();
+  }
+  updateTime(ms: number) {
+    this.time.element.textContent = '⏳' + msToString(ms);
   }
 
   updateElementPositions() {
