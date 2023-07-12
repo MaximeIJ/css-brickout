@@ -44,7 +44,7 @@ export class HUD extends GameObject {
   }
 
   updateLives(lives: number) {
-    this.lives.element.textContent = `❤ ${lives}`;
+    this.lives.element.textContent = `🤍 ${lives}`;
   }
   updateScore(score: number) {
     this.score.element.textContent = '💎' + score.toString();

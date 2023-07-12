@@ -91,6 +91,7 @@
   font-size: 1.5rem;
   border-radius: 5%;
   position: absolute;
+  z-index: 2;
 }
 
 /* HUD */
@@ -105,11 +106,12 @@
   -webkit-text-stroke: 0;
   z-index: 1;
   opacity: 0.95;
+  padding: 0 3%;
   color: var(--hud-text, hsl(0, 0%, 90%));
 }
 
-#hud > #lives {
-  margin-left: 9%;
+#hud > * {
+  transform: none !important;
 }
 
 /* Pause */

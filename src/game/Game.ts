@@ -25,6 +25,7 @@ export type GameParams = {
   parentId?: string;
   fps?: number;
   capFps?: boolean;
+  allowDebug?: boolean;
 };
 
 type PlayerParams = {
@@ -43,6 +44,7 @@ export class Game {
   debounceTimer: NodeJS.Timeout | undefined = undefined;
   ogParams: GameParams;
   // Debug
+  allowDebug = false;
   debug: Debug | null;
   lastFrameTime: number = Date.now();
   lastFpsUpdate: number = Date.now();
@@ -103,6 +105,7 @@ export class Game {
 
     this.fpsInterval = Math.floor(1000.0 / (params.fps || 60)) || 1;
     this.fpsCap = params.capFps ? this.fpsInterval : 1;
+    this.allowDebug = params.allowDebug ?? false;
   }
 
   // Create Ball objects based on ballConfig
@@ -252,6 +255,9 @@ export class Game {
         e.stopPropagation();
         break;
       case 'KeyD':
+        if (!this.allowDebug) {
+          break;
+        }
         if (this.debug) {
           this.debug.destroy();
           this.debug = null;

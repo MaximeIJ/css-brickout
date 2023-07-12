@@ -17,6 +17,7 @@ const playerConfig = {
 };
 const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
   hello: {
+    allowDebug: true,
     ballConfigs: [
       {
         ...ballBase,
@@ -28,6 +29,7 @@ const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
     playerConfig,
   },
   even: {
+    allowDebug: true,
     ballConfigs: [
       {
         ...ballBase,
@@ -39,6 +41,7 @@ const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
     playerConfig,
   },
   random: {
+    allowDebug: true,
     ballConfigs: [
       {
         ...ballBase,
@@ -52,6 +55,7 @@ const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
     playerConfig,
   },
   mixed: {
+    allowDebug: true,
     ballConfigs: [
       {
         ...ballBase,
