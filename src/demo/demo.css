@@ -46,17 +46,17 @@
   --ball-bg: hsl(334, 96%, 43%);
   --paddle-bg: hsl(121, 60%, 47%);
   --brick-bg: hsl(110, 2%, 35%, 69%);
-  --paddle-border: hsl(20, 49%, 18%, 77%);
+  --paddle-border: hsl(20, 49%, 18%, 77%) solid 3px;
   --paddle-radius: 8px 8px 0 0;
-  --ball-border: hsl(0, 0%, 14%);
-  --brick-border: hsl(20, 49%, 18%, 77%);
+  --ball-border: hsl(0, 0%, 14%) solid 2px;
+  --brick-border: hsl(20, 49%, 18%, 77%) solid 3px;
   --text: hsl(212, 64%, 85%);
   --hud-text: hsl(212, 64%, 85%, 90%);
 }
 
 .classic .hello-h {
   --brick-bg: hsl(0, 100%, 71%, 45%);
-  --brick-border: hsl(0, 74%, 68%);
+  --brick-border: hsl(0, 74%, 68%) solid 3px;
 }
 .classic .hello-e {
   --brick-bg: hsl(60, 100%, 71%, 90%);
@@ -82,7 +82,7 @@
 }
 .classic .hello-o {
   --brick-bg: hsl(240, 100%, 71%, 80%);
-  --brick-border: hsl(240, 100%, 90%);
+  --brick-border: hsl(240, 100%, 90%) solid 2px;
   box-shadow: 0px 3px 5px 1px hsl(240, 40%, 31%);
 }
 .classic .hello-bang {
@@ -95,7 +95,7 @@
     hsl(240, 74%, 68%),
     hsl(300, 74%, 68%)
   );
-  --brick-border: hsl(300, 74%, 68%);
+  --brick-border: hsl(300, 74%, 68%) solid 2px;
   border-width: 2px;
   border-radius: 10px 5%;
   box-shadow: 0 0 10px 10px hsla(300, 100%, 88%, 0.477);
@@ -109,10 +109,10 @@
   --ball-bg: hsl(220, 66%, 64%);
   --paddle-bg: hsl(220, 100%, 67%);
   --brick-bg: hsl(33, 37%, 28%);
-  --paddle-border: hsl(220, 63%, 85%);
+  --paddle-border: hsl(220, 63%, 85%) solid 3px;
   --paddle-radius: 5px 5px 16px 16px / 3px 3px 15px 15px;
-  --ball-border: hsl(220, 63%, 85%);
-  --brick-border: hsl(33, 49%, 5%, 100%);
+  --ball-border: hsl(220, 63%, 85%) solid 2px;
+  --brick-border: hsl(33, 49%, 5%, 100%) solid 3px;
   --text: hsl(13, 64%, 85%);
   --hud-text: hsl(13, 64%, 85%, 90%);
 }
@@ -168,5 +168,5 @@
 .lava .hello-l2,
 .lava .hello-bang {
   --brick-bg: hsl(13, 100%, 37%);
-  --brick-border: hsl(13, 100%, 37%);
+  --brick-border: hsl(13, 100%, 24%) solid 3px;
 }

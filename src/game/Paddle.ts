@@ -5,7 +5,7 @@ export class Paddle extends GameObject {
   gripFactor = 0.05;
 
   constructor(config: GameObjectConfig) {
-    super({...config, className: [...(config.className ?? []), 'paddle'].join(' '), showTitle: true});
+    super({...config, className: [...(config.className?.split(' ') ?? []), 'paddle'].join(' '), showTitle: true});
     this.applyBonuses();
     this.parent.addEventListener('mousemove', this.handleMouseMove);
     this.parent.addEventListener('touchmove', this.handleTouchMove, {passive: true});

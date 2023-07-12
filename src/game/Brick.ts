@@ -28,7 +28,9 @@ export class Brick extends GameObject {
     }, 300);
     this.element.classList.add('brick--destroyed');
     this.destroyed = true;
-    const event = createEvent<Brick>('brickdestroyed', this);
+    const event: BrickDestroyedEvent = createEvent<Brick>('brickdestroyed', this);
     this.parent.dispatchEvent(event);
   }
 }
+
+export type BrickDestroyedEvent = CustomEvent<Brick>;

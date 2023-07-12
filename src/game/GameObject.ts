@@ -58,7 +58,8 @@ export class GameObject {
       this.element.id = elementId;
     }
     if (className) {
-      this.element.classList.add(...className.split(' '));
+      const classNames = className.split(' ');
+      this.element.classList.add(...classNames);
     }
     parent.appendChild(this.element);
     this.updatePosition(x, y);
@@ -89,7 +90,6 @@ export class GameObject {
 
   applyBonuses() {
     this.bonuses.forEach(bonus => {
-      this.element.classList.add(bonus.cssClass);
       const undo = bonus.effect(this);
       if (bonus.duration) {
         // todo: track timeout and pause it when needed?

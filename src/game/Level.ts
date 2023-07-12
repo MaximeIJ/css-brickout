@@ -1,4 +1,4 @@
-import {Ball, Brick} from './';
+import {Ball, Brick, BrickConfig} from './';
 
 type LayoutDefinitionType = 'even' | 'custom';
 type LayoutDefinition = {
@@ -26,13 +26,8 @@ type CustomLayoutDefinition = LayoutDefinition & {
   // Array of bricks definitions with custom x, y, width, and height
   bricks: Array<BrickProps>;
 };
-type BrickProps = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  className?: string;
-};
+
+export type BrickProps = Omit<BrickConfig, 'parent'>;
 
 export type LayoutDefinitionConfig = EvenLayoutDefinition | CustomLayoutDefinition;
 

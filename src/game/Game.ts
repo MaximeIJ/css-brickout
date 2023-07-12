@@ -2,11 +2,13 @@ import {createEvent} from '../util';
 
 import {
   Ball,
+  BallCollisionEvent,
   BallConfig,
+  BallDestroyedEvent,
   Brick,
+  BrickDestroyedEvent,
   Clickable,
   Debug,
-  GameObject,
   GameObjectConfig,
   HUD,
   Level,
@@ -123,7 +125,7 @@ export class Game {
   start = () => {
     this.createdPausedElement('Start');
     this.element.classList.add('paused');
-    this.dispatchEvent('gamestarted');
+    this.dispatchGameEvent('gamestarted');
   };
 
   update = () => {
@@ -161,7 +163,7 @@ export class Game {
   };
 
   handleBallLost = (event: Event) => {
-    console.debug('BallLost', (event as CustomEvent<Ball>).detail);
+    console.debug('BallLost', (event as BallDestroyedEvent).detail);
     this.balls = this.balls.filter(ball => !ball.destroyed);
     if (this.balls.length === 0) {
       this.lives--;
@@ -171,13 +173,13 @@ export class Game {
       } else {
         this.state = 'lost';
         this.createdPausedElement('Game Over', 'final');
-        this.dispatchEvent('gamelost');
+        this.dispatchGameEvent('gamelost');
       }
     }
   };
 
   handleBallCollision = (event: Event) => {
-    const {ball, object} = (event as CustomEvent<{ball: Ball; object: GameObject}>).detail;
+    const {ball, object} = (event as BallCollisionEvent).detail;
     let type = 'BallCollision';
     if (object instanceof Brick) {
       type = 'BallBrickCollision';
@@ -191,11 +193,11 @@ export class Game {
   };
 
   handleBrickDestroyed = (event: Event) => {
-    console.debug('BrickDestroyed', (event as CustomEvent<Brick>).detail);
+    console.debug('BrickDestroyed', (event as BrickDestroyedEvent).detail);
     if (this.level.isDone()) {
       this.state = 'won';
       this.createdPausedElement('Victory!', 'final');
-      this.dispatchEvent('gamewon');
+      this.dispatchGameEvent('gamewon');
     }
   };
 
@@ -238,6 +240,8 @@ export class Game {
         } else {
           this.pause();
         }
+        e.preventDefault();
+        e.stopPropagation();
         break;
       case 'KeyD':
         if (this.debug) {
@@ -290,7 +294,7 @@ export class Game {
       this.state = to ?? 'paused';
       this.debug?.setContent(this.state);
       this.element.classList.add('paused');
-      this.dispatchEvent('gamepaused');
+      this.dispatchGameEvent('gamepaused');
     }
   };
 
@@ -301,12 +305,12 @@ export class Game {
       this.state = this.debug ? 'debug' : 'playing';
       this.element.classList.remove('paused');
       this.lastFrameTime = Date.now();
-      this.dispatchEvent('gameresumed');
+      this.dispatchGameEvent('gameresumed');
       this.update();
     }
   };
 
-  dispatchEvent = (name: string) => {
+  dispatchGameEvent = (name: string) => {
     const event = createEvent<Game>(name, this);
     this.element.dispatchEvent(event);
   };
@@ -331,3 +335,9 @@ export class Game {
     this.paused?.destroy();
   };
 }
+
+export type GamePausedEvent = CustomEvent<Game>;
+export type GameResumedEvent = CustomEvent<Game>;
+export type GameLostEvent = CustomEvent<Game>;
+export type GameStartedEvent = CustomEvent<Game>;
+export type GameWonEvent = CustomEvent<Game>;

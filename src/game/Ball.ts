@@ -26,7 +26,7 @@ export class Ball extends GameObject {
   constructor({idx, radius, angle, speed, damage = 1, ...objConfig}: BallConfig) {
     super({
       ...objConfig,
-      className: [...(objConfig.className ?? []), 'ball'].join(' '),
+      className: [...(objConfig.className?.split(' ') ?? []), 'ball'].join(' '),
       elementId: `ball-${idx}`,
       showTitle: true,
     });
@@ -42,7 +42,8 @@ export class Ball extends GameObject {
   }
 
   updateElementSize(): void {
-    const pxRadius = Math.round((this.radius / 100.0) * this.parent.offsetHeight);
+    const hypothenuse = Math.sqrt(Math.pow(this.parent.offsetHeight, 2) + Math.pow(this.parent.offsetWidth, 2));
+    const pxRadius = Math.round((this.radius / 100.0) * hypothenuse);
     this.element.style.setProperty('--diameter', pxRadius * 2 + 'px');
   }
 
@@ -51,8 +52,8 @@ export class Ball extends GameObject {
   }
 
   setD(fraction = 1) {
-    this.dx = fraction * this.speed * Math.cos(this.angle) || 0;
-    this.dy = fraction * -this.speed * Math.sin(this.angle) || 0;
+    this.dx = fraction * this.speed * Math.cos(this.angle);
+    this.dy = fraction * -this.speed * Math.sin(this.angle);
     this.element.style.setProperty('--dx', this.dx + 'px');
     this.element.style.setProperty('--dy', this.dy + 'px');
   }
@@ -178,7 +179,6 @@ export class Ball extends GameObject {
       const hitPositionSkewness = hitPositionNormalized * angleMultiplier;
       const angle = -(incomingAngle + hitPositionSkewness);
 
-      // console.log('Paddle collision new angle', this.angle, angle);
       this.y = paddleTop - this.radius;
       this.angle = angle;
       this.dispatchCollisionEvent(paddle);
@@ -208,7 +208,10 @@ export class Ball extends GameObject {
   }
 
   dispatchCollisionEvent(object: GameObject) {
-    const event = createEvent<{ball: Ball; object: GameObject}>('ballcollision', {ball: this, object});
+    const event: BallCollisionEvent = createEvent<{ball: Ball; object: GameObject}>('ballcollision', {
+      ball: this,
+      object,
+    });
     this.parent.dispatchEvent(event);
   }
 
@@ -218,7 +221,10 @@ export class Ball extends GameObject {
     }, 350);
     this.element.classList.add('ball--destroyed');
     this.destroyed = true;
-    const event = createEvent<Ball>('balldestroyed', this);
+    const event: BallDestroyedEvent = createEvent<Ball>('balldestroyed', this);
     this.parent.dispatchEvent(event);
   }
 }
+
+export type BallDestroyedEvent = CustomEvent<Ball>;
+export type BallCollisionEvent = CustomEvent<{ball: Ball; object: GameObject}>;
