@@ -90,6 +90,7 @@ export class GameObject {
 
   applyBonuses() {
     this.bonuses.forEach(bonus => {
+      this.element.classList.add(bonus.cssClass);
       const undo = bonus.effect(this);
       if (bonus.duration) {
         // todo: track timeout and pause it when needed?

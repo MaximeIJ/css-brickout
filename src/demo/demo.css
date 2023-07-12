@@ -5,8 +5,8 @@
       circle at 50% -130%,
       var(--paddle-bg),
       var(--paddle-bg) 8%,
-      var(--paddle-border) 8%,
-      var(--paddle-border) 13%
+      var(--ball-bg) 8%,
+      var(--ball-bg) 13%
     );
 }
 .paddle.grip-2 {
@@ -15,8 +15,8 @@
       circle at 50% -280%,
       var(--paddle-bg),
       var(--paddle-bg) 5%,
-      var(--paddle-border) 8%,
-      var(--paddle-border) 13%,
+      var(--ball-bg) 8%,
+      var(--ball-bg) 13%,
       var(--paddle-bg) 16%
     );
 }
