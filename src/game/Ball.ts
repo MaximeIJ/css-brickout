@@ -1,4 +1,4 @@
-import {createEvent} from '../util';
+import {createEvent, pythagoras} from '../util';
 
 import {GameObject, GameObjectConfig, Level, Paddle} from './';
 
@@ -22,6 +22,9 @@ export class Ball extends GameObject {
   damage = 1;
   dx = 0;
   dy = 0;
+  hypothenuse = 1;
+  fx = 0;
+  fy = 0;
 
   constructor({idx, radius, angle, speed, damage = 1, ...objConfig}: BallConfig) {
     super({
@@ -38,12 +41,24 @@ export class Ball extends GameObject {
     this.width = radius * 2;
     this.height = radius * 2;
     this.applyBonuses();
+    this.updateSpeedRatios();
     this.updateElementSize();
   }
 
+  updateSpeedRatios() {
+    this.updateHypothenuse();
+    // Account for aspect ratio
+    this.fx = this.parent.offsetWidth / this.hypothenuse;
+    this.fy = this.parent.offsetHeight / this.hypothenuse;
+  }
+
+  updateHypothenuse() {
+    this.hypothenuse = pythagoras(this.parent.offsetWidth, this.parent.offsetHeight);
+  }
+
   updateElementSize(): void {
-    const hypothenuse = Math.sqrt(Math.pow(this.parent.offsetHeight, 2) + Math.pow(this.parent.offsetWidth, 2));
-    const pxRadius = Math.round((this.radius / 100.0) * hypothenuse);
+    this.updateSpeedRatios();
+    const pxRadius = Math.round((this.radius / 100.0) * this.hypothenuse);
     this.element.style.setProperty('--diameter', pxRadius * 2 + 'px');
   }
 
@@ -52,8 +67,9 @@ export class Ball extends GameObject {
   }
 
   setD(fraction = 1) {
-    this.dx = fraction * this.speed * Math.cos(this.angle);
-    this.dy = fraction * -this.speed * Math.sin(this.angle);
+    // Swap the axis ratios to compensate for the aspect ratio. Without this, the ball would move faster on the Y axis when the game is wider than it is tall.
+    this.dx = this.fy * fraction * this.speed * Math.cos(this.angle);
+    this.dy = this.fx * fraction * -this.speed * Math.sin(this.angle);
     this.element.style.setProperty('--dx', this.dx + 'px');
     this.element.style.setProperty('--dy', this.dy + 'px');
   }
@@ -133,10 +149,10 @@ export class Ball extends GameObject {
     if (this.x - this.radius <= 0 || this.x + this.radius >= 100) {
       this.angle = Math.PI - this.angle;
       // Adjust angle if it's too flat
-      if (Math.abs(this.angle) < Math.PI / 8) {
+      if (Math.abs(this.angle) < Math.PI / 6) {
         this.angle *= 2.5;
         if (this.angle === 0) {
-          this.angle = Math.PI / 8;
+          this.angle = Math.PI / 6;
         }
       }
       // Correct positions
