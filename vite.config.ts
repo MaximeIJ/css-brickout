@@ -1,3 +1,5 @@
+/// <reference types="vitest" />
+
 import {resolve} from 'path';
 
 import {defineConfig} from 'vite';
@@ -26,4 +28,7 @@ export default defineConfig({
     }),
     removeConsole({includes: ['log', 'warn', 'error', 'info', 'debug']}),
   ],
+  test: {
+    environment: 'jsdom',
+  },
 });

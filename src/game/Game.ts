@@ -155,6 +155,7 @@ export class Game {
           }
           ball.update(msSinceLastFrame / this.fpsInterval);
           ball.handleLevelCollision(this.level, this.paddle);
+          ball.updateElementPosition();
           // autoplay lol
           if (this.debug && ball.y > this.paddle.y - this.paddle.height && ball.y < this.paddle.y) {
             const semiR = Math.round(ball.x - this.paddle.width / 2 + (Math.random() * this.paddle.width) / 2);

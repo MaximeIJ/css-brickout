@@ -1,6 +1,6 @@
 {
   "name": "@maximeij/css-brickout",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "type": "module",
   "description": "Classic Brickout Game Engine implemented in Typescript and rendered with CSS. No dependencies.",
   "author": "Maxime IJ",
@@ -47,25 +47,29 @@
     "eslint-import-resolver-typescript": "^3.5.1",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "jsdom": "^22.1.0",
     "prettier": "^2.8.7",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.0.4",
     "vite": "^4.2.1",
-    "vite-plugin-dts": "^2.3.0",
-    "vite-plugin-remove-console": "^2.1.1"
+    "vite-plugin-dts": "^3.3.0",
+    "vite-plugin-remove-console": "^2.1.1",
+    "vitest": "^0.33.0"
   },
   "scripts": {
     "build": "vite build",
     "build:demo": "vite build -c vite.config.demo.ts",
+    "custom:publish": "npm publish && npx clean-package restore && git restore . && git push",
     "dev": "vite -c vite.config.demo.ts",
     "lint": "eslint . --fix && prettier -w .",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "custom:publish": "npm publish && npx clean-package restore && git restore . && git push",
     "prepublishOnly": "npm run build && npm run lint && clean-package",
+    "preversion": "auto-changelog -p && git add CHANGELOG.md",
     "publish:major": "npm version major && npm run custom:publish",
     "publish:minor": "npm version minor && npm run custom:publish",
     "publish:patch": "npm version patch && npm run custom:publish",
-    "preversion": "auto-changelog -p && git add CHANGELOG.md"
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
   },
   "repository": {
     "type": "git",
