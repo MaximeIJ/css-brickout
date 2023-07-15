@@ -141,6 +141,11 @@ export class Ball extends GameObject {
   }
 
   handleBrickCollision(brick: Brick) {
+    if (brick.breakthrough) {
+      brick.takeHit(this);
+      this.dispatchCollisionEvent(brick);
+      return;
+    }
     // determine delta with each side of the brick
     const {top, left, right, bottom} = brick.boundingBox;
 

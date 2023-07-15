@@ -9,6 +9,24 @@ const makeBall = (angle: number, x: number, y: number) => {
   return b;
 };
 
+describe.concurrent('breakthrough brick', () => {
+  let bb: Brick;
+
+  beforeAll(async () => {
+    bb = new Brick({x: 50, y: 50, width: 20, height: 20, parent, elementId: `bb`, hp: 1, breakthrough: true});
+    bb.updatePosition();
+  });
+
+  it('from top - deep collision', async ({expect}) => {
+    const ball = makeBall(-Math.PI / 2, 50, 40);
+    expect(ball.isColliding(bb)).toBeTruthy();
+    ball.handleBrickCollision(bb);
+    expect(ball.angle).toBeCloseTo(-Math.PI / 2);
+    expect(ball.x).toBeCloseTo(50);
+    expect(ball.y).toBeCloseTo(40);
+  });
+});
+
 describe.concurrent('ball brick collision', () => {
   let square: Brick;
   let tall: Brick;
