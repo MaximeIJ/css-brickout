@@ -4,8 +4,8 @@
   width: 100%;
   position: relative;
   overflow: hidden;
-  font-size: 1.75rem;
-  font-family: system-ui;
+  font-size: min(1.75rem, 5vmin);
+  font-family: monospace;
   font-weight: bold;
   color: var(--text, hsl(0, 0%, 90%));
 }

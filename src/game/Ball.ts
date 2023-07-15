@@ -86,7 +86,7 @@ export class Ball extends GameObject {
     let i = 0;
     const nearby = level.getNearbyBricks(this);
 
-    while (i < nearby.length) {
+    while (i < nearby.length && !hitBrick) {
       const brick = nearby[i];
       i++;
       if (brick.destroyed) continue;

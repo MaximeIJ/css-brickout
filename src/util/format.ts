@@ -8,14 +8,9 @@ ${object.bonuses?.map(bonus => `.${bonus.cssClass}`).join('\n')}`;
 
 export function msToString(ms: number): string {
   const seconds = Math.floor(ms / 1000);
-  let timeStr;
-  if (seconds < 60) {
-    timeStr = `${padZero(seconds)}`;
-  } else {
-    const minutes = Math.floor(seconds / 60);
-    const secondsLeft = seconds % 60;
-    timeStr = `${minutes}:${padZero(secondsLeft)}`;
-  }
+  const minutes = Math.floor(seconds / 60);
+  const secondsLeft = seconds % 60;
+  const timeStr = `${padZero(minutes)}:${padZero(secondsLeft)}`;
   return timeStr;
 }
 
