@@ -48,12 +48,12 @@ export class Ball extends GameObject {
   updateSpeedRatios() {
     this.updateHypothenuse();
     // Account for aspect ratio
-    this.fx = this.parent.offsetWidth / this.hypothenuse;
-    this.fy = this.parent.offsetHeight / this.hypothenuse;
+    this.fx = (this.parent.offsetWidth || 100) / this.hypothenuse;
+    this.fy = (this.parent.offsetHeight || 100) / this.hypothenuse;
   }
 
   updateHypothenuse() {
-    this.hypothenuse = pythagoras(this.parent.offsetWidth, this.parent.offsetHeight);
+    this.hypothenuse = pythagoras(this.parent.offsetWidth || 100, this.parent.offsetHeight || 100);
   }
 
   updateElementSize(): void {
@@ -162,7 +162,7 @@ export class Ball extends GameObject {
         }
         return {delta, type};
       })
-      .filter(({delta}) => a(delta) < d);
+      .filter(({delta}) => a(delta) <= d);
 
     if (sidesHit.length === 1) {
       // side hit
@@ -178,13 +178,29 @@ export class Ball extends GameObject {
       }
     } else if (sidesHit.length === 2) {
       // corner hit (todo: fix, the logic is right but deltas must be adjusted. Smallest one should be primary though)
-      const [secondary, primary] = sidesHit.sort((a, b) => a.delta - b.delta);
+      // const [primary, secondary] = sidesHit.sort((A, B) => B.delta - A.delta);
       // console.log('corner hit', primary, secondary);
-      if (primary.type === 'horizontal') {
+      // if (primary.type === 'horizontal' || primary.delta === secondary.delta) {
+      //   this.angle = Math.atan2(this.speed * Math.sin(this.angle), -this.speed * Math.cos(this.angle));
+      //   this.x += primary.delta;
+      //   this.y += secondary.delta;
+      // } else {
+      //   this.angle = Math.atan2(-this.speed * Math.sin(this.angle), this.speed * Math.cos(this.angle));
+      //   this.y += primary.delta;
+      //   this.x += secondary.delta;
+      // }
+      const hz = sidesHit.filter(({type}) => type === 'horizontal')[0];
+      const hzBouncePossible = (this.dx > 0 && hz.delta === deltaLeft) || (this.dx < 0 && hz.delta === deltaRight);
+      const vt = sidesHit.filter(({type}) => type === 'vertical')[0];
+      const vtBouncePossible = (this.dy > 0 && vt.delta === deltaTop) || (this.dy < 0 && vt.delta === deltaBottom);
+      if (hzBouncePossible && (!vtBouncePossible || Math.abs(hz.delta) < Math.abs(vt.delta))) {
         this.angle = Math.atan2(this.speed * Math.sin(this.angle), -this.speed * Math.cos(this.angle));
       } else {
+        // Default in case of tie to vertical
         this.angle = Math.atan2(-this.speed * Math.sin(this.angle), this.speed * Math.cos(this.angle));
       }
+      this.x += hz.delta;
+      this.y += vt.delta;
     } else {
       // no hit
       console.warn('no hit', sidesHit);
@@ -230,9 +246,6 @@ export class Ball extends GameObject {
   }
 
   update(frameFraction = 1) {
-    if (frameFraction > 2 || frameFraction < 0.1) {
-      console.warn('frameFraction', frameFraction);
-    }
     this.setD(frameFraction);
     this.updatePosition();
   }

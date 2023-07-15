@@ -62,7 +62,7 @@
     "custom:publish": "npm publish && npx clean-package restore && git restore . && git push",
     "dev": "vite -c vite.config.demo.ts",
     "lint": "eslint . --fix && prettier -w .",
-    "prepublishOnly": "npm run build && npm run lint && clean-package",
+    "prepublishOnly": "npm run build && npm run test:run && npm run lint && clean-package",
     "preversion": "auto-changelog -p && git add CHANGELOG.md",
     "publish:major": "npm version major && npm run custom:publish",
     "publish:minor": "npm version minor && npm run custom:publish",

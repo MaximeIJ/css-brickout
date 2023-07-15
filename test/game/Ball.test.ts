@@ -5,7 +5,9 @@ import {Ball, Brick} from '../../src/game';
 const parent = document.createElement('div');
 const makeBall = (angle: number, x: number, y: number) => {
   const b = new Ball({x, y, radius: 2, parent, idx: 0, angle, speed: 1});
-  b.updatePosition();
+  b.update(-1);
+  b.update(1);
+  // console.log(b);
   return b;
 };
 
@@ -48,7 +50,8 @@ describe.concurrent('ball brick collision', () => {
     expect(ball.isColliding(tall)).toBeFalsy();
 
     ball.y = 45;
-    ball.updatePosition();
+    ball.update(-1);
+    ball.update(1);
     expect(ball.isColliding(wide)).toBeFalsy();
   });
   it('from top - minimal collision', async ({expect}) => {
@@ -103,7 +106,8 @@ describe.concurrent('ball brick collision', () => {
     expect(ball.isColliding(tall)).toBeFalsy();
 
     ball.y = 55;
-    ball.updatePosition();
+    ball.update(-1);
+    ball.update(1);
     expect(ball.isColliding(wide)).toBeFalsy();
   });
   it('from bottom - minimal collision', async ({expect}) => {
@@ -283,19 +287,88 @@ describe.concurrent('ball brick collision', () => {
     expect(b1.x).toBeCloseTo(38);
     expect(b1.y).toBeCloseTo(38);
 
-    const b2 = makeBall(-Math.PI / 4, 46, 38);
+    const b2 = makeBall(-Math.PI / 4, 45.5, 38);
     expect(b2.isColliding(tall)).toBeTruthy();
     b2.handleBrickCollision(tall);
     expect(b2.angle).toBeCloseTo(Math.PI / 4);
-    expect(b2.x).toBeCloseTo(46);
+    expect(b2.x).toBeCloseTo(45.5);
     expect(b2.y).toBeCloseTo(38);
 
-    // deeper on x
-    const b3 = makeBall(-Math.PI / 4, 38, 47);
+    const b3 = makeBall(-Math.PI / 4, 38, 45.5);
+    expect(b3.isColliding(wide)).toBeTruthy();
+    b3.handleBrickCollision(wide);
+    expect(b3.angle).toBeCloseTo(Math.PI / 4);
+    expect(b3.x).toBeCloseTo(38);
+    expect(b3.y).toBeCloseTo(45.5);
+  });
+  it('from top left - deep collision', async ({expect}) => {
+    const b1 = makeBall(-Math.PI / 4, 40, 40);
+    expect(b1.isColliding(square)).toBeTruthy();
+    b1.handleBrickCollision(square);
+    expect(b1.angle).toBeCloseTo(Math.PI / 4);
+    expect(b1.x).toBeCloseTo(38);
+    expect(b1.y).toBeCloseTo(38);
+
+    const b2 = makeBall(-Math.PI / 4, 47.5, 40);
+    expect(b2.isColliding(tall)).toBeTruthy();
+    b2.handleBrickCollision(tall);
+    expect(b2.angle).toBeCloseTo(Math.PI / 4);
+    expect(b2.x).toBeCloseTo(45.5);
+    expect(b2.y).toBeCloseTo(38);
+
+    const b3 = makeBall(-Math.PI / 4, 40, 47.5);
+    expect(b3.isColliding(wide)).toBeTruthy();
+    b3.handleBrickCollision(wide);
+    expect(b3.angle).toBeCloseTo(Math.PI / 4);
+    expect(b3.x).toBeCloseTo(38);
+    expect(b3.y).toBeCloseTo(45.5);
+  });
+
+  // Favoring top
+  it('from top top left - deep collision', async ({expect}) => {
+    const b1 = makeBall(-Math.PI / 4, 39, 40);
+    expect(b1.isColliding(square)).toBeTruthy();
+    b1.handleBrickCollision(square);
+    expect(b1.angle).toBeCloseTo((-3 * Math.PI) / 4);
+    expect(b1.x).toBeCloseTo(38);
+    expect(b1.y).toBeCloseTo(38);
+
+    const b2 = makeBall(-Math.PI / 4, 46.5, 40);
+    expect(b2.isColliding(tall)).toBeTruthy();
+    b2.handleBrickCollision(tall);
+    expect(b2.angle).toBeCloseTo((-3 * Math.PI) / 4);
+    expect(b2.x).toBeCloseTo(45.5);
+    expect(b2.y).toBeCloseTo(38);
+
+    const b3 = makeBall(-Math.PI / 4, 39, 47.5);
     expect(b3.isColliding(wide)).toBeTruthy();
     b3.handleBrickCollision(wide);
     expect(b3.angle).toBeCloseTo((-3 * Math.PI) / 4);
     expect(b3.x).toBeCloseTo(38);
-    expect(b3.y).toBeCloseTo(47);
+    expect(b3.y).toBeCloseTo(45.5);
+  });
+
+  // Favoring left
+  it('from top left left - deep collision', async ({expect}) => {
+    const b1 = makeBall(-Math.PI / 4, 40, 39);
+    expect(b1.isColliding(square)).toBeTruthy();
+    b1.handleBrickCollision(square);
+    expect(b1.angle).toBeCloseTo(Math.PI / 4);
+    expect(b1.x).toBeCloseTo(38);
+    expect(b1.y).toBeCloseTo(38);
+
+    const b2 = makeBall(-Math.PI / 4, 47.5, 39);
+    expect(b2.isColliding(tall)).toBeTruthy();
+    b2.handleBrickCollision(tall);
+    expect(b2.angle).toBeCloseTo(Math.PI / 4);
+    expect(b2.x).toBeCloseTo(45.5);
+    expect(b2.y).toBeCloseTo(38);
+
+    const b3 = makeBall(-Math.PI / 4, 40, 46.5);
+    expect(b3.isColliding(wide)).toBeTruthy();
+    b3.handleBrickCollision(wide);
+    expect(b3.angle).toBeCloseTo(Math.PI / 4);
+    expect(b3.x).toBeCloseTo(38);
+    expect(b3.y).toBeCloseTo(45.5);
   });
 });
