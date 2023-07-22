@@ -100,22 +100,7 @@ const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
 let gameLoop = new Game(inputMap.hello);
 gameLoop.start();
 
-let lastDisplay = 'windowed';
 let lastTheme = 'classic';
-
-function onDisplayChange({target}: Event) {
-  const className = (target as HTMLSelectElement)?.value;
-  gameLoop.pause();
-  const gameScreenElement = document.getElementById('demo-screen');
-  if (gameScreenElement) {
-    gameScreenElement.classList.remove(lastDisplay);
-    gameScreenElement.classList.add(className);
-    lastDisplay = className;
-  }
-  gameLoop.start();
-}
-
-document.getElementById('display')?.addEventListener('change', onDisplayChange);
 
 function onLayoutChange({target}: Event) {
   const layout = (target as HTMLSelectElement)?.value;

@@ -53,21 +53,10 @@
       label {
         margin: 0.5rem 0;
       }
-      #demo-screen.windowed {
+      #demo-screen {
         width: min(960px, 90vw);
         height: min(650px, 65vh);
         margin: 0 auto;
-      }
-      #demo-screen.fullscreen {
-        position: absolute;
-        top: 0;
-        height: 100vh;
-        left: 0;
-        right: 0;
-        /* Subtract 16px for scrollbar */
-        width: calc(100vw - 16px);
-        /* To still see controls */
-        margin-top: 10rem;
       }
     </style>
   </head>
@@ -92,14 +81,6 @@
                 <option value="even">Even</option>
                 <option value="random">Custom</option>
                 <option value="mixed">Mixed</option>
-              </select>
-            </label>
-
-            <label for="display"
-              >Display
-              <select id="display">
-                <option value="windowed">Windowed</option>
-                <option value="fullscreen">Full Screen</option>
               </select>
             </label>
 
