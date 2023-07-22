@@ -88,5 +88,4 @@ The movement of the ball is not very smooth and the game does consume more power
 ## Coming soon
 
 - Bonus Drops + Effect Duration
-- Built-in fullscreen
 - Object properties as CSS variables
