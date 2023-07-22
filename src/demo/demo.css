@@ -51,6 +51,7 @@
   --ball-border: hsl(0, 0%, 14%) solid 2px;
   --brick-border: hsl(20, 49%, 18%, 77%) solid 3px;
   --text: hsl(212, 64%, 85%);
+  --hud-bg: hsl(0, 100%, 100%, 5%);
   --hud-text: hsl(212, 64%, 85%, 90%);
 }
 

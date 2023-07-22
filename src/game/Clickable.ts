@@ -1,9 +1,8 @@
-import {GameObject, GameObjectConfig} from './GameObject';
+import {GameObject, PartialGameObjectConfig} from './GameObject';
 
-type Config = Required<Pick<GameObjectConfig, 'parent'>> &
-  Partial<GameObjectConfig> & {
-    onClick: () => void;
-  };
+type Config = PartialGameObjectConfig & {
+  onClick: () => void;
+};
 
 export class Clickable extends GameObject {
   onClick: () => void;
@@ -13,7 +12,7 @@ export class Clickable extends GameObject {
       ...rest,
       x,
       y,
-      className: [...[rest.className ?? ''], 'clickable'].join(' '),
+      className: [rest.className ?? '', 'clickable'].filter(Boolean).join(' '),
     });
     this.onClick = onClick;
     this.element.addEventListener('click', this.onClick);

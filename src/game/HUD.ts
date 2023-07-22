@@ -1,20 +1,13 @@
 import {msToString} from '../util';
 
-import {GameObject, GameObjectConfig} from './GameObject';
+import {GameObject, PartialGameObjectConfig} from './GameObject';
 
 export class HUD extends GameObject {
   lives: GameObject;
   time: GameObject;
   score: GameObject;
 
-  constructor({
-    elementId = 'hud',
-    x = 50,
-    y = 96,
-    width = 100,
-    height = 9,
-    ...rest
-  }: Required<Pick<GameObjectConfig, 'parent'>> & Partial<GameObjectConfig>) {
+  constructor({elementId = 'hud', x = 50, y = 96, width = 100, height = 9, ...rest}: PartialGameObjectConfig) {
     super({
       elementId,
       x,
@@ -44,7 +37,7 @@ export class HUD extends GameObject {
   }
 
   updateLives(lives: number) {
-    this.lives.element.textContent = `🤍 ${lives}`;
+    this.lives.element.textContent = `🤍${lives}`;
   }
   updateScore(score: number) {
     this.score.element.textContent = '💎' + score.toString();
@@ -57,5 +50,12 @@ export class HUD extends GameObject {
     super.updateElementPosition();
     this.lives.updateElementPosition();
     this.score.updateElementPosition();
+  }
+
+  destroy(): void {
+    this.lives.destroy();
+    this.time.destroy();
+    this.score.destroy();
+    super.destroy();
   }
 }

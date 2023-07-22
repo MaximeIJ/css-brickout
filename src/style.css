@@ -94,23 +94,47 @@
   z-index: 2;
 }
 
-/* HUD */
+/* Controls and HUD */
 
-#hud {
+.game #controls * {
+  pointer-events: all;
+}
+
+#hud, #controls {
   position: absolute;
   box-sizing: border-box;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   letter-spacing: 0.5vmin;
   -webkit-text-stroke: 0;
-  z-index: 1;
   opacity: 0.95;
   padding: 0 3%;
-  color: var(--hud-text, hsl(0, 0%, 90%));
 }
 
-#hud > * {
+#controls {
+  justify-content: flex-end;
+  opacity: 0.15;
+}
+
+#controls:hover  {
+  justify-content: flex-end;
+  opacity: 0.95;
+}
+
+@media(any-hover: none) {
+  #controls {
+    opacity: 0.95;
+  }
+}
+
+#hud {
+  justify-content: space-between;
+  background: var(--hud-bg, transparent);
+  color: var(--hud-text, hsl(0, 0%, 90%));
+  z-index: 1;
+}
+
+#hud > *, #controls > * {
   transform: none !important;
 }
 

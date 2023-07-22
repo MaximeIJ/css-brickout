@@ -12,6 +12,8 @@ export type GameObjectConfig = {
   showTitle?: boolean;
 };
 
+export type PartialGameObjectConfig = Required<Pick<GameObjectConfig, 'parent'>> & Partial<GameObjectConfig>;
+
 export type BonusConfig = {
   cssClass: string;
   duration: number;

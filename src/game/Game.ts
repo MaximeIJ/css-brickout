@@ -8,6 +8,7 @@ import {
   Brick,
   BrickDestroyedEvent,
   Clickable,
+  Controls,
   Debug,
   GameObjectConfig,
   HUD,
@@ -56,6 +57,7 @@ export class Game {
   level: Level;
   paddle: Paddle;
   hud: HUD | null;
+  controls: Controls | null;
   lives = 0;
   score = 0;
   // Pause
@@ -82,8 +84,6 @@ export class Game {
       parent: this.element,
     });
 
-    this.setBalls();
-
     // Set up player
     if (params.playerConfig) {
       this.lives = params.playerConfig.lives;
@@ -92,6 +92,16 @@ export class Game {
     this.updateHUDLives();
     this.updateHUDScore();
     this.updateHUDTime();
+
+    this.controls = new Controls({
+      parent: this.element,
+      handleFullscreen: () => this.toggleFullscreen(),
+      handlePause: () => this.togglePause(),
+      handleDebug: params.allowDebug ? () => this.toggleDebug() : undefined,
+    });
+    this.controls.updateElementPosition();
+    // touchOnly
+    this.setBalls();
 
     // Event listeners
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
@@ -221,6 +231,44 @@ export class Game {
     this.hud?.updateTime(this.msSinceStart);
   };
 
+  toggleDebug = () => {
+    if (!this.allowDebug) {
+      return;
+    }
+    if (this.debug) {
+      this.debug.destroy();
+      this.debug = null;
+      if (this.state === 'debug') {
+        this.state = 'playing';
+      }
+    } else {
+      this.debug = new Debug({
+        parent: this.element,
+      });
+      if (this.state === 'playing') {
+        this.state = 'debug';
+      }
+      this.debug.setContent(this.state);
+      this.debug.updateElement();
+    }
+  };
+
+  toggleFullscreen = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else if (this.element.requestFullscreen) {
+      this.element.requestFullscreen();
+    }
+  };
+
+  togglePause = () => {
+    if (this.paused) {
+      this.resume();
+    } else {
+      this.pause();
+    }
+  };
+
   handleResize = () => {
     this.paddle.updateElement();
     this.balls.forEach(ball => ball.updateElement());
@@ -228,6 +276,7 @@ export class Game {
     this.paused?.updateElement();
     this.resumeLink?.updateElement();
     this.debug?.updateElement();
+    this.controls?.updateElement();
     this.hud?.updateElement();
   };
 
@@ -247,30 +296,17 @@ export class Game {
       case 'Space':
         if (this.state === 'starting') {
           this.resume('starting');
-        } else if (this.paused) {
-          this.resume();
         } else {
-          this.pause();
+          this.togglePause();
         }
         e.preventDefault();
         e.stopPropagation();
         break;
       case 'KeyD':
-        if (!this.allowDebug) {
-          break;
-        }
-        if (this.debug) {
-          this.debug.destroy();
-          this.debug = null;
-          if (this.state === 'debug') {
-            this.state = 'playing';
-          }
-        } else if (this.state === 'playing') {
-          this.debug = new Debug({
-            parent: this.element,
-          });
-          this.state = 'debug';
-        }
+        this.toggleDebug();
+        break;
+      case 'KeyF':
+        this.toggleFullscreen();
         break;
       default:
         break;
@@ -342,6 +378,7 @@ export class Game {
     this.paddle.destroy();
     this.level.destroy();
     this.hud?.destroy();
+    this.controls?.destroy();
     this.state = 'lost';
     this.lives = 0;
     this.balls.forEach(ball => ball.destroy());
