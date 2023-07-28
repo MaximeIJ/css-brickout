@@ -39,16 +39,6 @@
   transition: all 17ms;
 }
 
-.ball--destroyed {
-  background: transparent;
-  border-width: 0;
-  height: 23%;
-  width: 23%;
-  opacity: 0;
-  transition: border-width 50ms ease-out, height 310ms ease-out, width 350ms ease-in, opacity 150ms ease-in-out 200ms,
-    background 220ms ease-in 100ms;
-}
-
 /* Paddle */
 
 .paddle {
@@ -177,4 +167,10 @@
   100% {
     opacity: 1;
   }
+}
+
+/* Particles */
+
+.particle {
+  position: absolute;
 }

@@ -8,7 +8,7 @@
 
 [Demo](https://maximeij.dev/css-brickout/)
 
-CSS Brickout (sometimes typo'd as _CSS Breakout_) exposes a responsive, customizable, themable, extensible implementation of the beloved classic to the web. This 0 dependency library can be used in any ecosystem and framework.
+CSS Brickout (aka _CSS Breakout_) exposes a responsive, customizable, themable, extensible implementation of the beloved classic to the web. This 0 dependency library can be used in any ecosystem and framework.
 
 ### Quick start
 
@@ -68,7 +68,32 @@ These events are currently available and include the GameObject emitting it unle
 Example use:
 
 ```typescript
+// Basic
 element.addEventListener('ballcollision', ({detail}) => console.log(detail.ball, 'bonk', detail.object));
+
+/**
+ * Advanced (as seen on demo.ts)
+ * Basic particle effect for ball destruction using moving particles
+ */
+element.addEventListener('balldestroyed', ({detail: ball}) =>
+  ball.emitParticles(10, ['ball--destroyed-particle'], 300, true).forEach(particle => {
+    particle.style.left = `${50 - Math.round(100 * Math.random())}px`;
+    particle.style.top = `${0 - Math.round(50 * Math.random())}px`;
+    particle.style.opacity = '0';
+  }),
+);
+```
+
+```css
+/** Previous example class */
+.particle.ball--destroyed-particle {
+  border-radius: 50%;
+  background: var(--ball-bg);
+  transition: all 300ms ease-out;
+  top: 0px;
+  left: 0px;
+  opacity: 1;
+}
 ```
 
 ### Still though... CSS for 60 FPS?

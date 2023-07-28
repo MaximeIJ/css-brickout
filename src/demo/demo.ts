@@ -1,3 +1,4 @@
+import {Ball, BallDestroyedEvent} from '../game/Ball';
 import {Game, GameParams} from '../game/Game';
 
 import '../style.css';
@@ -132,3 +133,12 @@ function onThemeChange({target}: Event) {
 }
 
 document.getElementById('theme')?.addEventListener('change', onThemeChange);
+document.getElementById('game')?.addEventListener('balldestroyed', e => {
+  const ball: Ball = (e as BallDestroyedEvent).detail;
+  const particles = ball.emitParticles(10, ['ball--destroyed-particle'], 300, true);
+  particles.forEach(particle => {
+    particle.style.left = `${50 - Math.round(100 * Math.random())}px`;
+    particle.style.top = `${0 - Math.round(50 * Math.random())}px`;
+    particle.style.opacity = '0';
+  });
+});

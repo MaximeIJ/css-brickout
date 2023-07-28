@@ -38,6 +38,21 @@
     var(--ball-bg);
 }
 
+.ball--destroyed {
+  border-width: 0;
+  opacity: 0;
+  transition: border-width 50ms ease-out, opacity 150ms ease-in-out;
+}
+
+.particle.ball--destroyed-particle {
+  border-radius: 50%;
+  background: var(--ball-bg);
+  transition: top 300ms ease-out, left 250ms ease-out, opacity 100ms linear 200ms;
+  top: 0px;
+  left: 0px;
+  opacity: 1;
+}
+
 /* Themes */
 /* Classic */
 

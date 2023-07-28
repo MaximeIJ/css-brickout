@@ -136,6 +136,28 @@ export class GameObject {
     this.element.innerHTML = content;
   }
 
+  emitParticles(count: number, classNames?: Array<string>, durationMs = 500, inheriteSize = false): Array<HTMLElement> {
+    const particles: Array<HTMLElement> = [];
+    for (let i = 0; i < count; i++) {
+      const particle = document.createElement('particle');
+      particle.classList.add('particle');
+      if (classNames?.length) {
+        particle.classList.add(...classNames);
+      }
+      if (inheriteSize) {
+        particle.style.setProperty('width', this.element.clientWidth + 'px');
+        particle.style.setProperty('height', this.element.clientHeight + 'px');
+      }
+      particle.style.setProperty('transform', this.element.style.transform);
+      this.parent.appendChild(particle);
+      particles.push(particle);
+      setTimeout(() => {
+        particle.remove();
+      }, durationMs);
+    }
+    return particles;
+  }
+
   destroy() {
     this.element.remove();
   }

@@ -100,7 +100,6 @@ export class Ball extends GameObject {
 
     const anyCollision = hitBrick || hitBoundary || this.handlePaddleCollision(paddle) || false;
     if (anyCollision) {
-      // console.count('collision on ball ' + this.idx);
       // Bounce hard!
       // this.updatePosition();
     }
@@ -177,18 +176,6 @@ export class Ball extends GameObject {
         // console.log('vertical', this.angle, delta, this.y);
       }
     } else if (sidesHit.length === 2) {
-      // corner hit (todo: fix, the logic is right but deltas must be adjusted. Smallest one should be primary though)
-      // const [primary, secondary] = sidesHit.sort((A, B) => B.delta - A.delta);
-      // console.log('corner hit', primary, secondary);
-      // if (primary.type === 'horizontal' || primary.delta === secondary.delta) {
-      //   this.angle = Math.atan2(this.speed * Math.sin(this.angle), -this.speed * Math.cos(this.angle));
-      //   this.x += primary.delta;
-      //   this.y += secondary.delta;
-      // } else {
-      //   this.angle = Math.atan2(-this.speed * Math.sin(this.angle), this.speed * Math.cos(this.angle));
-      //   this.y += primary.delta;
-      //   this.x += secondary.delta;
-      // }
       const hz = sidesHit.filter(({type}) => type === 'horizontal')[0];
       const hzBouncePossible = (this.dx > 0 && hz.delta === deltaLeft) || (this.dx < 0 && hz.delta === deltaRight);
       const vt = sidesHit.filter(({type}) => type === 'vertical')[0];
@@ -199,8 +186,9 @@ export class Ball extends GameObject {
         // Default in case of tie to vertical
         this.angle = Math.atan2(-this.speed * Math.sin(this.angle), this.speed * Math.cos(this.angle));
       }
-      this.x += hz.delta;
-      this.y += vt.delta;
+      // todo: fix this
+      // this.x += hz.delta;
+      // this.y += vt.delta;
     } else {
       // no hit
       console.warn('no hit', sidesHit);

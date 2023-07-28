@@ -38,7 +38,7 @@ export class Controls extends GameObject {
       y: 0,
       onClick: handleFullscreen,
     });
-    this.fullscreen.element.title = 'Toggle fullscreen';
+    this.fullscreen.element.title = 'Toggle fullscreen [F]';
     this.fullscreen.setContent('🖥️');
     this.pause = new Clickable({
       parent: this.element,
@@ -47,7 +47,7 @@ export class Controls extends GameObject {
       y: 0,
       onClick: handlePause,
     });
-    this.pause.element.title = 'Pause';
+    this.pause.element.title = 'Pause [SPACE] [P]';
     this.pause.setContent('⏸️');
     if (handleDebug) {
       this.debug = new Clickable({
@@ -57,7 +57,7 @@ export class Controls extends GameObject {
         y: 0,
         onClick: handleDebug,
       });
-      this.debug.element.title = 'Toggle debug mode';
+      this.debug.element.title = 'Toggle debug mode [D]';
       this.debug.setContent('🐞');
     }
   }
