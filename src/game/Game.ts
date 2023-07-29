@@ -27,6 +27,7 @@ export type GameParams = {
   fps?: number;
   capFps?: boolean;
   allowDebug?: boolean;
+  nextLifeDelayMs?: number;
 };
 
 type PlayerParams = {
@@ -60,6 +61,7 @@ export class Game {
   controls: Controls | null;
   lives = 0;
   score = 0;
+  nextLifeDelayMs = 500;
   // Pause
   paused: Pause | null;
   resumeLink: Clickable | null;
@@ -100,7 +102,6 @@ export class Game {
       handleDebug: params.allowDebug ? () => this.toggleDebug() : undefined,
     });
     this.controls.updateElementPosition();
-    // touchOnly
     this.setBalls();
 
     // Event listeners
@@ -116,6 +117,7 @@ export class Game {
     this.fpsInterval = Math.floor(1000.0 / (params.fps || 60)) || 1;
     this.fpsCap = params.capFps ? this.fpsInterval : 1;
     this.allowDebug = params.allowDebug ?? false;
+    this.nextLifeDelayMs = params.nextLifeDelayMs ?? 500;
   }
 
   // Create Ball objects based on ballConfig
@@ -184,15 +186,17 @@ export class Game {
     console.debug('BallLost', (event as BallDestroyedEvent).detail);
     this.balls = this.balls.filter(ball => !ball.destroyed);
     if (this.balls.length === 0) {
-      this.lives--;
-      if (this.lives >= 0) {
-        this.updateHUDLives();
-        this.setBalls();
-      } else {
-        this.state = 'lost';
-        this.createdPausedElement('Game Over', 'final');
-        this.dispatchGameEvent('gamelost');
-      }
+      setTimeout(() => {
+        this.lives--;
+        if (this.lives >= 0) {
+          this.updateHUDLives();
+          this.setBalls();
+        } else {
+          this.state = 'lost';
+          this.createdPausedElement('Game Over', 'final');
+          this.dispatchGameEvent('gamelost');
+        }
+      }, this.nextLifeDelayMs || 20);
     }
   };
 
