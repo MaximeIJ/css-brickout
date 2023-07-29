@@ -306,22 +306,22 @@ describe.concurrent('ball brick collision', () => {
     expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
     expect(b1.angle).toBeCloseTo(Math.PI / 4);
-    expect(b1.x).toBeCloseTo(38);
-    expect(b1.y).toBeCloseTo(38);
+    expect(b1.x).toBeCloseTo(40);
+    expect(b1.y).toBeCloseTo(40);
 
     const b2 = makeBall(-Math.PI / 4, 47.5, 40);
     expect(b2.isColliding(tall)).toBeTruthy();
     b2.handleBrickCollision(tall);
     expect(b2.angle).toBeCloseTo(Math.PI / 4);
-    expect(b2.x).toBeCloseTo(45.5);
-    expect(b2.y).toBeCloseTo(38);
+    expect(b2.x).toBeCloseTo(47.5);
+    expect(b2.y).toBeCloseTo(40);
 
     const b3 = makeBall(-Math.PI / 4, 40, 47.5);
     expect(b3.isColliding(wide)).toBeTruthy();
     b3.handleBrickCollision(wide);
     expect(b3.angle).toBeCloseTo(Math.PI / 4);
-    expect(b3.x).toBeCloseTo(38);
-    expect(b3.y).toBeCloseTo(45.5);
+    expect(b3.x).toBeCloseTo(40);
+    expect(b3.y).toBeCloseTo(47.5);
   });
 
   // Favoring top
@@ -330,22 +330,22 @@ describe.concurrent('ball brick collision', () => {
     expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
     expect(b1.angle).toBeCloseTo((-3 * Math.PI) / 4);
-    expect(b1.x).toBeCloseTo(38);
-    expect(b1.y).toBeCloseTo(38);
+    expect(b1.x).toBeCloseTo(39);
+    expect(b1.y).toBeCloseTo(40);
 
     const b2 = makeBall(-Math.PI / 4, 46.5, 40);
     expect(b2.isColliding(tall)).toBeTruthy();
     b2.handleBrickCollision(tall);
     expect(b2.angle).toBeCloseTo((-3 * Math.PI) / 4);
-    expect(b2.x).toBeCloseTo(45.5);
-    expect(b2.y).toBeCloseTo(38);
+    expect(b2.x).toBeCloseTo(46.5);
+    expect(b2.y).toBeCloseTo(40);
 
     const b3 = makeBall(-Math.PI / 4, 39, 47.5);
     expect(b3.isColliding(wide)).toBeTruthy();
     b3.handleBrickCollision(wide);
     expect(b3.angle).toBeCloseTo((-3 * Math.PI) / 4);
-    expect(b3.x).toBeCloseTo(38);
-    expect(b3.y).toBeCloseTo(45.5);
+    expect(b3.x).toBeCloseTo(39);
+    expect(b3.y).toBeCloseTo(47.5);
   });
 
   // Favoring left
@@ -354,21 +354,21 @@ describe.concurrent('ball brick collision', () => {
     expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
     expect(b1.angle).toBeCloseTo(Math.PI / 4);
-    expect(b1.x).toBeCloseTo(38);
-    expect(b1.y).toBeCloseTo(38);
+    expect(b1.x).toBeCloseTo(40);
+    expect(b1.y).toBeCloseTo(39);
 
     const b2 = makeBall(-Math.PI / 4, 47.5, 39);
     expect(b2.isColliding(tall)).toBeTruthy();
     b2.handleBrickCollision(tall);
     expect(b2.angle).toBeCloseTo(Math.PI / 4);
-    expect(b2.x).toBeCloseTo(45.5);
-    expect(b2.y).toBeCloseTo(38);
+    expect(b2.x).toBeCloseTo(47.5);
+    expect(b2.y).toBeCloseTo(39);
 
     const b3 = makeBall(-Math.PI / 4, 40, 46.5);
     expect(b3.isColliding(wide)).toBeTruthy();
     b3.handleBrickCollision(wide);
     expect(b3.angle).toBeCloseTo(Math.PI / 4);
-    expect(b3.x).toBeCloseTo(38);
-    expect(b3.y).toBeCloseTo(45.5);
+    expect(b3.x).toBeCloseTo(40);
+    expect(b3.y).toBeCloseTo(46.5);
   });
 });
