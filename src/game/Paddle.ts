@@ -1,12 +1,20 @@
 import {GameObject, GameObjectConfig} from './GameObject';
 
+export type PaddleConfig = GameObjectConfig & {
+  gripFactor?: number;
+};
+
 export class Paddle extends GameObject {
   // How much ball angle is modified when it hits the paddle further from the center
   gripFactor = 0.05;
 
-  constructor(config: GameObjectConfig) {
+  constructor(config: PaddleConfig) {
     super({...config, className: [...(config.className?.split(' ') ?? []), 'paddle'].join(' '), showTitle: true});
+    if (config.gripFactor !== undefined) {
+      this.gripFactor = config.gripFactor;
+    }
     this.applyBonuses();
+    this.updateTitle();
     this.parent.addEventListener('mousemove', this.handleMouseMove);
     this.parent.addEventListener('touchmove', this.handleTouchMove, {passive: true});
   }

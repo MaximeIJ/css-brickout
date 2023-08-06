@@ -126,13 +126,13 @@ export class Level {
       }
     } else if (layout.type === 'custom') {
       layout.bricks.forEach((brick, idx) => {
-        this.bricks.push(new Brick({...brick, parent, elementId: `brick-${this.left + idx}`}));
+        this.bricks.push(new Brick({...brick, parent, elementId: brick.elementId ?? `brick-${this.left + idx}`}));
       });
     }
   }
 
   isDone() {
-    return this.left === 0;
+    return !this.bricks.some(b => !b.permanent && !b.destroyed);
   }
 
   destroy() {

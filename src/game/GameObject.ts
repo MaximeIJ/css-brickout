@@ -10,6 +10,7 @@ export type GameObjectConfig = {
   height?: number;
   startingBonuses?: Array<BonusConfig>;
   showTitle?: boolean;
+  permanent?: boolean;
 };
 
 export type PartialGameObjectConfig = Required<Pick<GameObjectConfig, 'parent'>> & Partial<GameObjectConfig>;
@@ -36,6 +37,7 @@ export class GameObject {
     bottom: 0,
     left: 0,
   };
+  permanent = false;
 
   constructor({
     parent,
@@ -47,12 +49,14 @@ export class GameObject {
     height = 0,
     startingBonuses = [],
     showTitle = false,
+    permanent = false,
   }: GameObjectConfig) {
     this.width = width;
     this.height = height;
     this.parent = parent;
     this.bonuses = startingBonuses;
     this.element = document.createElement('div');
+    this.permanent = permanent;
     if (showTitle) {
       this.element.title = formatObjectTitle(this);
     }
@@ -125,7 +129,6 @@ export class GameObject {
     this.element.style.transform = `translateX(calc(${absX}px - 50%)) translateY(calc(${absY}px - 50%))`;
     this.element.style.setProperty('--xp', this.x.toFixed(2));
     this.element.style.setProperty('--yp', this.y.toFixed(2));
-    this.updateTitle(); // todo move to onPause
   }
 
   setStyle(style: StyleKey, value: string) {
@@ -159,6 +162,8 @@ export class GameObject {
   }
 
   destroy() {
-    this.element.remove();
+    if (!this.permanent) {
+      this.element.remove();
+    }
   }
 }

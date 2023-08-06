@@ -1,6 +1,9 @@
-import {a, createEvent, pythagoras} from '../util';
+import {a, clamp, createEvent, pythagoras} from '../util';
 
 import {Brick, GameObject, GameObjectConfig, Level, Paddle} from './';
+
+const MAX_ANGLE = 0.9 * Math.PI;
+const MIN_ANGLE = 0.1 * Math.PI;
 
 export type BallConfig = Omit<GameObjectConfig, 'elementId'> & {
   idx: number;
@@ -43,6 +46,7 @@ export class Ball extends GameObject {
     this.applyBonuses();
     this.updateSpeedRatios();
     this.updateElementSize();
+    this.updateTitle();
   }
 
   updateSpeedRatios() {
@@ -86,7 +90,7 @@ export class Ball extends GameObject {
     let i = 0;
     const nearby = level.getNearbyBricks(this);
 
-    while (i < nearby.length && !hitBrick) {
+    while (i < nearby.length) {
       const brick = nearby[i];
       i++;
       if (brick.destroyed) continue;
@@ -108,13 +112,6 @@ export class Ball extends GameObject {
   handleBoundaryCollision() {
     if (this.x - this.radius <= 0 || this.x + this.radius >= 100) {
       this.angle = Math.PI - this.angle;
-      // Adjust angle if it's too flat
-      if (Math.abs(this.angle) < Math.PI / 6) {
-        this.angle *= 2.5;
-        if (this.angle === 0) {
-          this.angle = Math.PI / 6;
-        }
-      }
       // Correct positions
       if (this.x - this.radius <= 0) {
         this.x = this.radius;
@@ -207,15 +204,17 @@ export class Ball extends GameObject {
       const hitPositionNormalized = hitPosition / (paddle.width / 2);
 
       // Calculate the incoming angle of the ball
-      const incomingAngle = this.angle;
+      const incomingAngle =
+        (this.angle > Math.PI ? (this.angle % (2 * Math.PI)) - 2 * Math.PI : this.angle) % (2 * Math.PI);
 
       // Calculate the new angle with skewness towards more vertical angles
       const angleMultiplier = paddle.gripFactor; // Adjust this value to control the skewness
       const hitPositionSkewness = hitPositionNormalized * angleMultiplier;
-      const angle = -(incomingAngle + hitPositionSkewness);
+      const angle = -(incomingAngle + hitPositionSkewness) % (2 * Math.PI);
 
       this.y = paddleTop - this.radius;
-      this.angle = angle;
+      const nextAngle = angle < -Math.PI / 2 ? Math.PI : angle;
+      this.angle = clamp(nextAngle, MAX_ANGLE, MIN_ANGLE);
       this.dispatchCollisionEvent(paddle);
       return true;
     }
@@ -224,13 +223,11 @@ export class Ball extends GameObject {
   isColliding(object: GameObject) {
     const {top, left, right, bottom} = object.boundingBox;
 
-    // Check for collision
-    return (
-      this.boundingBox.right >= left &&
-      this.boundingBox.left <= right &&
-      this.boundingBox.bottom >= top &&
-      this.boundingBox.top <= bottom
-    );
+    // Check for collision between a circle and a rectangle
+    // https://yal.cc/rectangle-circle-intersection-test/
+    const deltaX = this.x - Math.max(left, Math.min(this.x, right));
+    const deltaY = this.y - Math.max(top, Math.min(this.y, bottom));
+    return deltaX * deltaX + deltaY * deltaY <= this.radius * this.radius;
   }
 
   update(frameFraction = 1) {

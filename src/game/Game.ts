@@ -349,6 +349,9 @@ export class Game {
       this.state = to ?? 'paused';
       this.debug?.setContent(this.state);
       this.element.classList.add('paused');
+      this.balls.forEach(ball => ball.updateTitle());
+      this.paddle.updateTitle();
+      this.level.bricks.forEach(brick => brick.updateTitle());
       this.dispatchGameEvent('gamepaused');
     }
   };
