@@ -28,6 +28,7 @@ export class Ball extends GameObject {
   hypothenuse = 1;
   fx = 0;
   fy = 0;
+  antiTunneling = false;
 
   constructor({idx, radius, angle, speed, damage = 1, ...objConfig}: BallConfig) {
     super({
@@ -40,6 +41,7 @@ export class Ball extends GameObject {
     this.angle = angle;
     this.speed = speed;
     this.damage = damage;
+    this.antiTunneling = this.speed > this.radius;
     // unused
     this.width = radius * 2;
     this.height = radius * 2;
@@ -82,31 +84,41 @@ export class Ball extends GameObject {
    * Detects collisions between this ball and the boundaries, level bricks, and paddle (in that order)
    * @param level The level with the bricks and strips
    * @param paddle The player's paddle
+   * @returns true if the position has been updated already
    */
-  handleLevelCollision(level: Level, paddle: Paddle) {
+  handleLevelCollision(level: Level, paddle: Paddle, frameFraction = 1) {
     const hitBoundary = this.handleBoundaryCollision();
+    if (hitBoundary) {
+      return false;
+    } else if (this.handlePaddleCollision(paddle, frameFraction)) {
+      return true;
+    }
 
     let hitBrick = false;
     let i = 0;
     const nearby = level.getNearbyBricks(this);
 
-    while (i < nearby.length) {
+    while (i < nearby.length && !hitBrick) {
       const brick = nearby[i];
       i++;
       if (brick.destroyed) continue;
 
       // Check for collision
-      if (this.isColliding(brick)) {
-        hitBrick = true;
-        this.handleBrickCollision(brick);
+      if (this.antiTunneling) {
+        // swept shape collision
+        if (this.sweptShapeCollision(brick, frameFraction)) {
+          hitBrick = true;
+          this.handleBrickCollision(brick);
+        }
+      } else {
+        if (this.isColliding(brick)) {
+          hitBrick = true;
+          this.handleBrickCollision(brick);
+        }
       }
     }
 
-    const anyCollision = hitBrick || hitBoundary || this.handlePaddleCollision(paddle) || false;
-    if (anyCollision) {
-      // Bounce hard!
-      // this.updatePosition();
-    }
+    return hitBrick;
   }
 
   handleBoundaryCollision() {
@@ -145,7 +157,7 @@ export class Ball extends GameObject {
     // determine delta with each side of the brick
     const {top, left, right, bottom} = brick.boundingBox;
 
-    const d = this.radius * 2;
+    const d = this.width;
     const deltaLeft = left - this.boundingBox.right;
     const deltaRight = right - this.boundingBox.left;
     const deltaTop = top - this.boundingBox.bottom;
@@ -179,13 +191,12 @@ export class Ball extends GameObject {
       const vtBouncePossible = (this.dy > 0 && vt.delta === deltaTop) || (this.dy < 0 && vt.delta === deltaBottom);
       if (hzBouncePossible && (!vtBouncePossible || Math.abs(hz.delta) < Math.abs(vt.delta))) {
         this.angle = Math.atan2(this.speed * Math.sin(this.angle), -this.speed * Math.cos(this.angle));
+        this.x += hz.delta;
       } else {
         // Default in case of tie to vertical
         this.angle = Math.atan2(-this.speed * Math.sin(this.angle), this.speed * Math.cos(this.angle));
+        this.y += vt.delta;
       }
-      // todo: fix this
-      // this.x += hz.delta;
-      // this.y += vt.delta;
     } else {
       // no hit
       console.warn('no hit', sidesHit);
@@ -195,10 +206,11 @@ export class Ball extends GameObject {
     brick.takeHit(this);
   }
 
-  handlePaddleCollision(paddle: Paddle) {
+  handlePaddleCollision(paddle: Paddle, frameFraction = 1) {
     const paddleTop = paddle.boundingBox.top;
+    const isColliding = this.antiTunneling ? this.sweptShapeCollision(paddle, frameFraction) : this.isColliding(paddle);
 
-    if (this.isColliding(paddle)) {
+    if (isColliding) {
       // Calculate the hit position on the paddle
       const hitPosition = this.x - paddle.x;
       const hitPositionNormalized = hitPosition / (paddle.width / 2);
@@ -230,9 +242,54 @@ export class Ball extends GameObject {
     return deltaX * deltaX + deltaY * deltaY <= this.radius * this.radius;
   }
 
-  update(frameFraction = 1) {
-    this.setD(frameFraction);
-    this.updatePosition();
+  sweptShapeCollision(object: GameObject, frameFraction = 1) {
+    const sweptVolumeX = this.x + Math.min(0, this.dx);
+    const sweptVolumeY = this.y + Math.min(0, this.dy);
+
+    // Check if swept volume intersects with the rectangle
+    if (
+      sweptVolumeX - this.radius < object.x + object.width / 2 &&
+      sweptVolumeX + this.radius > object.x - object.width / 2 &&
+      sweptVolumeY - this.radius < object.y + object.height / 2 &&
+      sweptVolumeY + this.radius > object.y - object.height / 2
+    ) {
+      // Collision detected, resolve it
+      const collisionX =
+        this.dx > 0 ? object.x - object.width / 2 - this.radius : object.x + object.width / 2 + this.radius;
+      const collisionY =
+        this.dy > 0 ? object.y - object.height / 2 - this.radius : object.y + object.height / 2 + this.radius;
+
+      const timeOfCollisionX = (collisionX - this.x) / this.dx;
+      const timeOfCollisionY = (collisionY - this.y) / this.dy;
+
+      const actualTime = Math.min(Math.abs(timeOfCollisionX), Math.abs(timeOfCollisionY), frameFraction);
+
+      if (actualTime !== frameFraction) {
+        console.log('swept shape collision', actualTime, timeOfCollisionX, timeOfCollisionY, frameFraction);
+        console.log(this.x, this.y, this.dx, this.dy, this.radius, object.x, object.y, object.width, object.height);
+      }
+
+      this.x += this.dx * actualTime;
+      this.y += this.dy * actualTime;
+      return true;
+    }
+    return false;
+  }
+
+  processFrame(frameFraction = 1, level?: Level, paddle?: Paddle) {
+    let shouldUpdateLast = this.antiTunneling;
+    if (!shouldUpdateLast) {
+      this.setD(frameFraction);
+      this.updatePosition();
+    }
+    if (level && paddle) {
+      shouldUpdateLast = !this.handleLevelCollision(level, paddle);
+    }
+    if (shouldUpdateLast) {
+      this.setD(frameFraction);
+      this.updatePosition();
+    }
+    this.updateElementPosition();
   }
 
   dispatchCollisionEvent(object: GameObject) {
