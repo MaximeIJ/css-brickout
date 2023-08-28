@@ -10,18 +10,18 @@ import {
   Clickable,
   Controls,
   Debug,
-  GameObjectConfig,
   HUD,
   Level,
   LevelConfig,
   Paddle,
+  PaddleConfig,
   Pause,
 } from './';
 
 export type GameParams = {
   ballConfigs: Array<Omit<BallConfig, 'idx' | 'parent'>>;
   levelConfig: Omit<LevelConfig, 'parent'>;
-  paddleConfig: Partial<GameObjectConfig>;
+  paddleConfig: Partial<PaddleConfig>;
   playerConfig?: PlayerParams;
   parentId?: string;
   fps?: number;
@@ -170,9 +170,9 @@ export class Game {
           ball.processFrame(frameFraction, this.level, this.paddle);
 
           // autoplay lol
-          if (this.debug && ball.y > this.paddle.y - this.paddle.height && ball.y < this.paddle.y) {
+          if (this.debug && ball.y > this.paddle.maxY - this.paddle.height && ball.y < this.paddle.maxY) {
             const semiR = Math.round(ball.x - this.paddle.width / 2 + (Math.random() * this.paddle.width) / 2);
-            this.paddle.updatePosition(semiR);
+            this.paddle.updatePosition(semiR, this.paddle.maxY);
           }
         }
       } else {

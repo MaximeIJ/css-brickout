@@ -92,7 +92,7 @@ const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
         LAYOUTS.hello,
       ],
     },
-    paddleConfig,
+    paddleConfig: {...paddleConfig, minY: 75, maxY: 97},
     playerConfig,
   },
 };

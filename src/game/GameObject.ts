@@ -176,6 +176,7 @@ export type MovementProps = {
 
 export type TurnStep = {
   movement: MovementProps;
+  // Checked after each frame, if true, move to next step
   condition?: (mgo: MovingGameObject) => boolean;
 };
 
