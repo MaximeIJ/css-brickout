@@ -7,7 +7,7 @@ import {BONUSES, LAYOUTS} from './presets';
 
 // Start the game loop
 const ng = -Math.PI / 2;
-const ballBase = {x: 50, y: 20, radius: 0.75, speed: 0.75, startingBonuses: [BONUSES.speedup1]};
+const ballBase = {x: 50, y: 20, radius: 1, movement: {speed: 0.4}, startingBonuses: [BONUSES.speedup1]};
 const paddleConfig = {
   width: 8.9,
   height: 1.8,
@@ -22,7 +22,7 @@ const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
     ballConfigs: [
       {
         ...ballBase,
-        angle: ng,
+        movement: {...ballBase.movement, angle: ng},
       },
     ],
     levelConfig: {layout: LAYOUTS.hello},
@@ -34,7 +34,7 @@ const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
     ballConfigs: [
       {
         ...ballBase,
-        angle: ng,
+        movement: {...ballBase.movement, angle: ng},
       },
     ],
     levelConfig: {layout: LAYOUTS.evenHighSmall},
@@ -48,7 +48,7 @@ const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
         ...ballBase,
         x: 15,
         y: 50,
-        angle: ng / 2,
+        movement: {...ballBase.movement, angle: ng / 2},
       },
     ],
     levelConfig: {layout: LAYOUTS.random},
@@ -62,25 +62,25 @@ const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
         ...ballBase,
         x: 50,
         y: 45,
-        angle: (3 * ng) / 4,
+        movement: {...ballBase.movement, angle: (3 * ng) / 4},
       },
       {
         ...ballBase,
         x: 50,
         y: 45,
-        angle: (3.05 * ng) / 4,
+        movement: {...ballBase.movement, angle: (3.02 * ng) / 4},
       },
       {
         ...ballBase,
         x: 50,
         y: 45,
-        angle: (3.1 * ng) / 4,
+        movement: {...ballBase.movement, angle: (3.05 * ng) / 4},
       },
       {
         ...ballBase,
         x: 50,
         y: 45,
-        angle: (3.15 * ng) / 4,
+        movement: {...ballBase.movement, angle: (3.08 * ng) / 4},
       },
     ],
     levelConfig: {

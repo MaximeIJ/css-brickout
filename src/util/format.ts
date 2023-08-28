@@ -1,7 +1,9 @@
 import {GameObject} from '../game';
 
 export function formatObjectTitle(object: GameObject): string {
-  return `${object.constructor.name}: ${object.element.id} (${object.x}, ${object.y})
+  return `${object.constructor.name}: ${object.element.id} (${object.x?.toFixed(2) ?? '?'}, ${
+    object.y?.toFixed(2) ?? '?'
+  })
 
 ${object.bonuses?.map(bonus => `.${bonus.cssClass}`).join('\n')}`;
 }

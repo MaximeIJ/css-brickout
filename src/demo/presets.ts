@@ -170,8 +170,28 @@ export const LAYOUTS: Record<string, LayoutDefinitionConfig> = {
       {x: 65, y: 32.5, width: 4, height: 2.5, className: 'hello-o'},
       {x: 68, y: 28, width: 2, height: 12, className: 'hello-o'},
       // !
-      {x: 77, y: 25, width: 2.5, height: 12, className: 'hello-bang'},
-      {x: 77, y: 34, width: 3, height: 3, className: 'hello-bang'},
+      {
+        x: 77,
+        y: 25,
+        width: 2.5,
+        height: 12,
+        className: 'hello-bang',
+        movement: [
+          {movement: {speed: 0.15, angle: -Math.PI / 2}, condition: mgo => mgo.y > 35},
+          {movement: {speed: 0.25, angle: Math.PI / 2}, condition: mgo => mgo.y < 15},
+        ],
+      },
+      {
+        x: 77,
+        y: 34,
+        width: 3,
+        height: 3,
+        className: 'hello-bang',
+        movement: [
+          {movement: {speed: 0.2, angle: -Math.PI / 2}, condition: mgo => mgo.y > 45},
+          {movement: {speed: 0.1, angle: Math.PI / 2}, condition: mgo => mgo.y < 27},
+        ],
+      },
     ],
   },
 };

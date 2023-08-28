@@ -41,12 +41,15 @@ export type LevelConfig = {
 
 export class Level {
   bricks: Array<Brick>;
+  mobileBricks: Array<Brick>;
   left = 0;
   _strips: Array<Array<Brick>>;
   _stripW: number;
+  // todo: add elements that can be collided with and run custom functions in response (or just emit event really)
 
   constructor({layout, parent}: LevelConfig) {
     this.bricks = [];
+    this.mobileBricks = [];
     this._strips = [];
 
     if (layout instanceof Array) {
@@ -62,6 +65,9 @@ export class Level {
       if (brick.width > maxBrickWidth) {
         maxBrickWidth = brick.width;
       }
+      if (brick.speed) {
+        this.mobileBricks.push(brick);
+      }
     });
     // We want a round number of strips across the screen of width 100. What's the closest we can get?
     const stripCount = Math.floor(100 / (maxBrickWidth + 1)); // +1 buffer to be sure
@@ -72,11 +78,16 @@ export class Level {
     }
     // Assign bricks to strips
     this.bricks.forEach(brick => {
-      const leftStrip = Math.floor((brick.x - brick.width / 2) / this._stripW);
-      const rightStrip = Math.floor((brick.x + brick.width / 2) / this._stripW);
-      this._strips[leftStrip]?.push(brick);
-      if (rightStrip !== leftStrip && rightStrip < stripCount) {
-        this._strips[rightStrip]?.push(brick);
+      // If it's mobile, add it to all strips
+      if (brick.speed) {
+        this._strips.forEach(strip => strip.push(brick));
+      } else {
+        const leftStrip = Math.floor((brick.x - brick.width / 2) / this._stripW);
+        const rightStrip = Math.floor((brick.x + brick.width / 2) / this._stripW);
+        this._strips[leftStrip]?.push(brick);
+        if (rightStrip !== leftStrip && rightStrip < stripCount) {
+          this._strips[rightStrip]?.push(brick);
+        }
       }
     });
 
@@ -92,7 +103,7 @@ export class Level {
     const left = Math.floor((ball.x - ball.radius) / this._stripW);
     const right = Math.floor((ball.x + ball.radius) / this._stripW);
     for (let i = left; i <= right && i < this._strips.length; i++) {
-      res.push(...this._strips[i]);
+      res.push(...(this._strips[i] ?? []));
     }
     return res;
   }

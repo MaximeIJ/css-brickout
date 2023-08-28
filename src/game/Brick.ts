@@ -1,13 +1,13 @@
 import {createEvent} from '../util';
 
-import {Ball, GameObject, GameObjectConfig} from './';
+import {Ball, MovingGameObjectConfig, MovingGameObject} from './';
 
-export type BrickConfig = GameObjectConfig & {
+export type BrickConfig = MovingGameObjectConfig & {
   hp?: number;
   breakthrough?: boolean;
 };
 
-export class Brick extends GameObject {
+export class Brick extends MovingGameObject {
   breakthrough;
   destroyed = false;
   hp: number;

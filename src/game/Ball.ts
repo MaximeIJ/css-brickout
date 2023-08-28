@@ -1,81 +1,54 @@
-import {a, clamp, createEvent, pythagoras} from '../util';
+import {a, clamp, createEvent} from '../util';
 
-import {Brick, GameObject, GameObjectConfig, Level, Paddle} from './';
+import {Brick, GameObject, Level, MovingGameObject, MovingGameObjectConfig, Paddle} from './';
 
 const MAX_ANGLE = 0.9 * Math.PI;
 const MIN_ANGLE = 0.1 * Math.PI;
 
-export type BallConfig = Omit<GameObjectConfig, 'elementId'> & {
+export type BallConfig = Omit<MovingGameObjectConfig, 'elementId'> & {
   idx: number;
   // % of the game's height (see updateElementSize)
   radius: number;
-  // Angle in radians
-  angle: number;
-  // % of the game's height per frame (see GameConfig.fps)
-  speed: number;
   // damage inflicted on bricks
   damage?: number;
 };
 
-export class Ball extends GameObject {
+export class Ball extends MovingGameObject {
   destroyed = false;
   radius = 0;
-  speed = 0;
-  angle = 0;
   damage = 1;
-  dx = 0;
-  dy = 0;
-  hypothenuse = 1;
-  fx = 0;
-  fy = 0;
+  rx = 0;
   antiTunneling = false;
 
-  constructor({idx, radius, angle, speed, damage = 1, ...objConfig}: BallConfig) {
+  constructor({idx, radius, movement, damage = 1, ...objConfig}: BallConfig) {
     super({
       ...objConfig,
       className: [...(objConfig.className?.split(' ') ?? []), 'ball'].join(' '),
       elementId: `ball-${idx}`,
+      movement,
       showTitle: true,
     });
     this.radius = radius;
-    this.angle = angle;
-    this.speed = speed;
     this.damage = damage;
-    this.antiTunneling = this.speed > this.radius;
-    // unused
-    this.width = radius * 2;
-    this.height = radius * 2;
+    this.antiTunneling = this.speed > this.radius * 2;
     this.applyBonuses();
-    this.updateSpeedRatios();
     this.updateElementSize();
     this.updateTitle();
   }
 
-  updateSpeedRatios() {
-    this.updateHypothenuse();
-    // Account for aspect ratio
-    this.fx = (this.parent.offsetWidth || 100) / this.hypothenuse;
-    this.fy = (this.parent.offsetHeight || 100) / this.hypothenuse;
-  }
-
-  updateHypothenuse() {
-    this.hypothenuse = pythagoras(this.parent.offsetWidth || 100, this.parent.offsetHeight || 100);
-  }
-
   updateElementSize(): void {
-    this.updateSpeedRatios();
-    const pxRadius = Math.round((this.radius / 100.0) * this.hypothenuse);
+    super.updateElementSize();
+    // calc size based on height, adjust rx with aspect ratio
+    const pxRadius = Math.round((this.radius / 100.0) * this.pHeight);
+
+    this.rx = (this.radius * this.pHeight) / this.pWidth;
+    this.width = this.rx * 2;
+    this.height = this.radius * 2;
     this.element.style.setProperty('--diameter', pxRadius * 2 + 'px');
   }
 
-  updatePosition(x?: number, y?: number) {
-    super.updatePosition((x ?? this.x ?? 0) + (this.dx ?? 0), (y ?? this.y ?? 0) + (this.dy ?? 0));
-  }
-
-  setD(fraction = 1) {
-    // Swap the axis ratios to compensate for the aspect ratio. Without this, the ball would move faster on the Y axis when the game is wider than it is tall.
-    this.dx = this.fy * fraction * this.speed * Math.cos(this.angle);
-    this.dy = this.fx * fraction * -this.speed * Math.sin(this.angle);
+  setD() {
+    super.setD();
     this.element.style.setProperty('--dx', this.dx + 'px');
     this.element.style.setProperty('--dy', this.dy + 'px');
   }
@@ -122,18 +95,23 @@ export class Ball extends GameObject {
   }
 
   handleBoundaryCollision() {
-    if (this.x - this.radius <= 0 || this.x + this.radius >= 100) {
-      this.angle = Math.PI - this.angle;
-      // Correct positions
-      if (this.x - this.radius <= 0) {
-        this.x = this.radius;
+    const hitTop = this.y - this.radius <= 0;
+    if (this.x - this.rx <= 0 || this.x + this.rx >= 100) {
+      if (hitTop) {
+        // Corner collision
+        this.angle = this.angle - Math.PI;
+        this.y = this.radius;
       } else {
-        this.x = 100 - this.radius;
+        this.angle = Math.PI - this.angle;
+      }
+      // Correct positions
+      if (this.x - this.rx <= 0) {
+        this.x = this.rx;
+      } else {
+        this.x = 100 - this.rx;
       }
       return true;
-    }
-
-    if (this.y - this.radius <= 0) {
+    } else if (hitTop) {
       this.angle = -this.angle;
       if (this.y - this.radius < 0) {
         this.y = this.radius;
@@ -178,24 +156,22 @@ export class Ball extends GameObject {
       if (type === 'horizontal') {
         this.angle = Math.atan2(this.speed * Math.sin(this.angle), -this.speed * Math.cos(this.angle));
         this.x += delta;
-        // console.log('horizontal', this.angle, delta, this.x);
       } else {
         this.angle = Math.atan2(-this.speed * Math.sin(this.angle), this.speed * Math.cos(this.angle));
         this.y += delta;
-        // console.log('vertical', this.angle, delta, this.y);
       }
     } else if (sidesHit.length === 2) {
       const hz = sidesHit.filter(({type}) => type === 'horizontal')[0];
-      const hzBouncePossible = (this.dx > 0 && hz.delta === deltaLeft) || (this.dx < 0 && hz.delta === deltaRight);
+      const hzBouncePossible = (this.dx > 0 && hz?.delta === deltaLeft) || (this.dx < 0 && hz?.delta === deltaRight);
       const vt = sidesHit.filter(({type}) => type === 'vertical')[0];
-      const vtBouncePossible = (this.dy > 0 && vt.delta === deltaTop) || (this.dy < 0 && vt.delta === deltaBottom);
-      if (hzBouncePossible && (!vtBouncePossible || Math.abs(hz.delta) < Math.abs(vt.delta))) {
+      const vtBouncePossible = (this.dy > 0 && vt?.delta === deltaTop) || (this.dy < 0 && vt?.delta === deltaBottom);
+      if (hzBouncePossible && (!vtBouncePossible || a(hz?.delta) < a(vt?.delta))) {
         this.angle = Math.atan2(this.speed * Math.sin(this.angle), -this.speed * Math.cos(this.angle));
-        this.x += hz.delta;
+        this.x += hz?.delta;
       } else {
         // Default in case of tie to vertical
         this.angle = Math.atan2(-this.speed * Math.sin(this.angle), this.speed * Math.cos(this.angle));
-        this.y += vt.delta;
+        this.y += vt?.delta;
       }
     } else {
       // no hit
@@ -211,22 +187,27 @@ export class Ball extends GameObject {
     const isColliding = this.antiTunneling ? this.sweptShapeCollision(paddle, frameFraction) : this.isColliding(paddle);
 
     if (isColliding) {
-      // Calculate the hit position on the paddle
-      const hitPosition = this.x - paddle.x;
-      const hitPositionNormalized = hitPosition / (paddle.width / 2);
+      if (this.y < paddleTop) {
+        // Ball is coming from above the paddle, bounce it up
+        // Calculate the hit position on the paddle
+        const hitPosition = this.x - paddle.x;
+        const hitPositionNormalized = hitPosition / (paddle.width / 2);
 
-      // Calculate the incoming angle of the ball
-      const incomingAngle =
-        (this.angle > Math.PI ? (this.angle % (2 * Math.PI)) - 2 * Math.PI : this.angle) % (2 * Math.PI);
+        // Calculate the incoming angle of the ball
+        const incomingAngle =
+          (this.angle > Math.PI ? (this.angle % (2 * Math.PI)) - 2 * Math.PI : this.angle) % (2 * Math.PI);
 
-      // Calculate the new angle with skewness towards more vertical angles
-      const angleMultiplier = paddle.gripFactor; // Adjust this value to control the skewness
-      const hitPositionSkewness = hitPositionNormalized * angleMultiplier;
-      const angle = -(incomingAngle + hitPositionSkewness) % (2 * Math.PI);
+        // Calculate the new angle with skewness towards more vertical angles
+        const angleMultiplier = paddle.gripFactor; // Adjust this value to control the skewness
+        const hitPositionSkewness = hitPositionNormalized * angleMultiplier;
+        const angle = -(incomingAngle + hitPositionSkewness) % (2 * Math.PI);
 
-      this.y = paddleTop - this.radius;
-      const nextAngle = angle < -Math.PI / 2 ? Math.PI : angle;
-      this.angle = clamp(nextAngle, MAX_ANGLE, MIN_ANGLE);
+        const nextAngle = angle < -Math.PI / 2 ? Math.PI : angle;
+        this.angle = clamp(nextAngle, MAX_ANGLE, MIN_ANGLE);
+      }
+
+      // Set ball right above the paddle
+      this.y = paddleTop - this.radius * 1;
       this.dispatchCollisionEvent(paddle);
       return true;
     }
@@ -239,7 +220,7 @@ export class Ball extends GameObject {
     // https://yal.cc/rectangle-circle-intersection-test/
     const deltaX = this.x - Math.max(left, Math.min(this.x, right));
     const deltaY = this.y - Math.max(top, Math.min(this.y, bottom));
-    return deltaX * deltaX + deltaY * deltaY <= this.radius * this.radius;
+    return deltaX * deltaX + deltaY * deltaY <= this.radius * this.rx;
   }
 
   sweptShapeCollision(object: GameObject, frameFraction = 1) {
@@ -248,26 +229,20 @@ export class Ball extends GameObject {
 
     // Check if swept volume intersects with the rectangle
     if (
-      sweptVolumeX - this.radius < object.x + object.width / 2 &&
-      sweptVolumeX + this.radius > object.x - object.width / 2 &&
+      sweptVolumeX - this.rx < object.x + object.width / 2 &&
+      sweptVolumeX + this.rx > object.x - object.width / 2 &&
       sweptVolumeY - this.radius < object.y + object.height / 2 &&
       sweptVolumeY + this.radius > object.y - object.height / 2
     ) {
       // Collision detected, resolve it
-      const collisionX =
-        this.dx > 0 ? object.x - object.width / 2 - this.radius : object.x + object.width / 2 + this.radius;
+      const collisionX = this.dx > 0 ? object.x - object.width / 2 - this.rx : object.x + object.width / 2 + this.rx;
       const collisionY =
         this.dy > 0 ? object.y - object.height / 2 - this.radius : object.y + object.height / 2 + this.radius;
 
       const timeOfCollisionX = (collisionX - this.x) / this.dx;
       const timeOfCollisionY = (collisionY - this.y) / this.dy;
 
-      const actualTime = Math.min(Math.abs(timeOfCollisionX), Math.abs(timeOfCollisionY), frameFraction);
-
-      if (actualTime !== frameFraction) {
-        console.log('swept shape collision', actualTime, timeOfCollisionX, timeOfCollisionY, frameFraction);
-        console.log(this.x, this.y, this.dx, this.dy, this.radius, object.x, object.y, object.width, object.height);
-      }
+      const actualTime = Math.min(a(timeOfCollisionX), a(timeOfCollisionY), frameFraction);
 
       this.x += this.dx * actualTime;
       this.y += this.dy * actualTime;
@@ -279,15 +254,13 @@ export class Ball extends GameObject {
   processFrame(frameFraction = 1, level?: Level, paddle?: Paddle) {
     let shouldUpdateLast = this.antiTunneling;
     if (!shouldUpdateLast) {
-      this.setD(frameFraction);
-      this.updatePosition();
+      this.updatePosition(undefined, undefined, frameFraction);
     }
     if (level && paddle) {
       shouldUpdateLast = !this.handleLevelCollision(level, paddle);
     }
     if (shouldUpdateLast) {
-      this.setD(frameFraction);
-      this.updatePosition();
+      this.updatePosition(undefined, undefined, frameFraction);
     }
     this.updateElementPosition();
   }
