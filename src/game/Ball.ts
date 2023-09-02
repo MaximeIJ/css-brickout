@@ -91,7 +91,7 @@ export class Ball extends MovingGameObject {
       }
     }
 
-    return hitBrick;
+    return true;
   }
 
   handleBoundaryCollision() {

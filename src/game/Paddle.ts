@@ -65,7 +65,7 @@ export class Paddle extends GameObject {
   };
 
   destroy(): void {
-    this.parent.removeEventListener('mouseover', this.handleMouseMove);
+    this.parent.removeEventListener('mousemove', this.handleMouseMove);
     this.parent.removeEventListener('touchmove', this.handleTouchMove);
     super.destroy();
   }

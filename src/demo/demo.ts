@@ -7,10 +7,10 @@ import {BONUSES, LAYOUTS} from './presets';
 
 // Start the game loop
 const ng = -Math.PI / 2;
-const ballBase = {x: 50, y: 20, radius: 1, movement: {speed: 0.4}, startingBonuses: [BONUSES.speedup1]};
+const ballBase = {x: 50, y: 20, radius: 1, movement: {speed: 0.8}, startingBonuses: [BONUSES.speedup1]};
 const paddleConfig = {
   width: 8.9,
-  height: 1.8,
+  height: 2.3,
   startingBonuses: [BONUSES.grip1],
 };
 const playerConfig = {
