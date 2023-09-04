@@ -233,10 +233,18 @@ export class MovingGameObject extends GameObject {
   }
 
   constructor({movement = {speed: 0, angle: 0}, ...rest}: MovingGameObjectConfig) {
-    super(rest);
-    // Reupdate element to calculate necessary ratios for movement props
-    this.updateElement();
-    this.movement = movement;
+    if (Array.isArray(movement) || (movement as unknown as MovementProps)?.speed > 0) {
+      super({...rest, className: `moving-object ${rest.className ?? ''}`});
+      // Reupdate element to calculate necessary ratios for movement props
+      this.updateElement();
+      if (Array.isArray(movement)) {
+        this.movement = [...movement];
+      } else {
+        this.movement = {...movement};
+      }
+    } else {
+      super(rest);
+    }
   }
 
   updateSpeedRatios() {

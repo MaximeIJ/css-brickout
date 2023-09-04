@@ -24,6 +24,11 @@
     var(--game-bg, hsl(0, 0%, 45%));
 }
 
+.moving-object {
+  will-change: transform;
+  transition: all 17ms;
+}
+
 /* Ball */
 
 .ball {
@@ -35,8 +40,6 @@
   position: absolute;
   top: 0;
   left: 0;
-  will-change: transform;
-  transition: all 17ms;
 }
 
 /* Paddle */
@@ -49,8 +52,6 @@
   left: 0;
   --border-radius: var(--paddle-radius, 0);
   border-radius: var(--border-radius);
-  will-change: transform;
-  transition: transfrom 17ms, background 100ms;
 }
 
 /* Bricks */
