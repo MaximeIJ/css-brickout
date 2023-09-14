@@ -2,7 +2,7 @@
 
 
 <p align="center">
-  <img src="https://github.com/MaximeIJ/css-brickout/assets/5600516/8ca67c1b-a7f6-4975-ae83-6992f616ad4b" height=250 align="center" />
+  <img alt="gameplay screenshot" src="https://github.com/MaximeIJ/css-brickout/assets/5600516/8ca67c1b-a7f6-4975-ae83-6992f616ad4b" height=250 align="center" />
 </p>
 
 ## A timeless favorite...
