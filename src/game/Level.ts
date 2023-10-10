@@ -47,7 +47,6 @@ export class Level {
   left = 0;
   _strips: Array<Array<Brick>>;
   _stripW: number;
-  // todo: add elements that can be collided with and run custom functions in response (or just emit event really)
 
   constructor({layout, parent}: LevelConfig) {
     this.bricks = [];

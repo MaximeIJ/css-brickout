@@ -18,7 +18,6 @@ import {
   Pause,
 } from './';
 
-// todo implement
 type GameOptions = {
   fps: number;
   capFps: boolean;
@@ -71,16 +70,12 @@ export class Game {
   debounceTimer: NodeJS.Timeout | undefined = undefined;
   ogParams: GameParams;
   // Debug
-  /** @deprecated use options instead */
-  allowDebug = false;
   debug: Debug | null;
   lastFrameTime: number = Date.now();
   lastFpsUpdate: number = Date.now();
   // Gameplay
   options: GameOptions;
-  /** @deprecated use options instead */
   fpsInterval: number;
-  /** @deprecated use options instead */
   fpsCap: number;
   msSinceStart = 0;
   balls: Ball[] = [];
@@ -90,8 +85,6 @@ export class Game {
   controls: Controls | null;
   lives = 0;
   score = 0;
-  /** @deprecated use options instead */
-  nextLifeDelayMs = 500;
   // Pause
   paused: Pause | null;
   resumeLink: Clickable | null;
@@ -127,7 +120,7 @@ export class Game {
       parent: this.element,
       handleFullscreen: () => this.toggleFullscreen(),
       handlePause: () => this.togglePause(),
-      handleDebug: params.allowDebug ? () => this.toggleDebug() : undefined,
+      handleDebug: this.options.allowDebug ? () => this.toggleDebug() : undefined,
     });
     this.controls.updateElementPosition();
     this.hud = new HUD({parent: this.element});
@@ -148,11 +141,8 @@ export class Game {
     this.element.addEventListener('mouseleave', this.handleMouseLeave);
     new ResizeObserver(this.handleResize).observe(this.element);
 
-    // TODO
-    this.fpsInterval = Math.floor(1000.0 / (params.fps || 60)) || 1;
-    this.fpsCap = params.capFps ? this.fpsInterval : 1;
-    this.allowDebug = params.allowDebug ?? false;
-    this.nextLifeDelayMs = params.nextLifeDelayMs ?? 500;
+    this.fpsInterval = Math.floor(1000.0 / (this.options.fps || 60)) || 1;
+    this.fpsCap = this.options.capFps ? this.fpsInterval : 1;
   }
 
   // Create Ball objects based on ballConfig
@@ -232,7 +222,7 @@ export class Game {
           this.createdPausedElement('Game Over', 'final');
           this.dispatchGameEvent('gamelost');
         }
-      }, this.nextLifeDelayMs || 20);
+      }, this.options.nextLifeDelayMs || 20);
     }
   };
 
@@ -276,7 +266,7 @@ export class Game {
   };
 
   toggleDebug = () => {
-    if (!this.allowDebug) {
+    if (!this.options.allowDebug) {
       return;
     }
     if (this.debug) {
@@ -372,13 +362,13 @@ export class Game {
   };
 
   handleMouseEnter = () => {
-    this.debounce(() => this.resume('away'), 1000)();
+    this.debounce(() => this.resume('away'), this.options.mouseoverResumeDelayMs)();
   };
 
   handleMouseLeave = () => {
-    this.debounce(() => {
-      this.pause('away');
-    })();
+    if (this.options.mouseoutPauseDelayMs) {
+      this.debounce(() => this.pause('away'), this.options.mouseoutPauseDelayMs)();
+    }
   };
 
   createdPausedElement = (content: string, classes = '') => {
