@@ -1,6 +1,5 @@
 # css-brickout [![npm (scoped)](https://img.shields.io/npm/v/@maximeij/css-brickout?color=green&label=npm%20package&logo=logo)](https://www.npmjs.com/package/@maximeij/css-brickout) [![image](https://github.com/MaximeIJ/css-brickout/assets/5600516/27a4f945-e91c-4f75-bdf3-80c689d8f453)](http://vanilla-js.com/)
 
-
 <p align="center">
   <img alt="gameplay screenshot" src="https://github.com/MaximeIJ/css-brickout/assets/5600516/8ca67c1b-a7f6-4975-ae83-6992f616ad4b" height=250 align="center" />
 </p>

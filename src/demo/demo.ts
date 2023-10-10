@@ -142,3 +142,7 @@ document.getElementById('game')?.addEventListener('balldestroyed', e => {
     particle.style.opacity = '0';
   });
 });
+document.getElementById('game')?.addEventListener('brickdestroyed', () => {
+  gameLoop.score += 1;
+  gameLoop.updateHUDScore();
+});

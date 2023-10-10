@@ -231,9 +231,6 @@ export class Game {
     let type = 'BallCollision';
     if (object instanceof Brick) {
       type = 'BallBrickCollision';
-      // todo: add score from brick params if they exist. Make this a separate function that can be added as a handler
-      this.score += 1;
-      this.updateHUDScore();
     } else if (object instanceof Paddle) {
       type = 'BallPaddleCollision';
     }
@@ -425,7 +422,6 @@ export class Game {
     this.element.removeEventListener('brickdestroyed', this.handleBrickDestroyed);
     this.element.removeEventListener('mouseenter', this.handleMouseEnter);
     this.element.removeEventListener('mouseleave', this.handleMouseLeave);
-    // this.element.innerHTML = '';
     this.paddle.destroy();
     this.level.destroy();
     this.hud?.destroy();
