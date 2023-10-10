@@ -4,29 +4,55 @@
   width: 100%;
   position: relative;
   overflow: hidden;
-  font-size: min(1.75rem, 5vmin);
+  font-size: max(1.5rem, 3vmin);
   font-family: monospace;
   font-weight: bold;
   color: var(--text, hsl(0, 0%, 90%));
+
+  display: grid;
+  grid-template-columns: 1fr max(5rem, 20%);
+  grid-template-rows: 50% 50%;
 }
 
-.game:not(.paused) {
+.game.column {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: max(3rem, 8%) 1fr max(3rem, 10%);
+}
+
+.game:not(.paused) .level {
   cursor: none;
 }
 
-.game:not(.paused) * {
+.game:not(.paused) .level * {
   pointer-events: none;
 }
 
-.game.paused {
+.game.paused .level {
   cursor: crosshair;
   background: radial-gradient(hsl(0, 0%, 5%, 30%) 10%, hsl(0, 0%, 5%, 60%) 65%, hsl(0, 0%, 5%, 90%)),
-    var(--game-bg, hsl(0, 0%, 45%));
+    var(--level-bg, transparent);
 }
 
 .moving-object {
   will-change: transform;
   transition: all 17ms;
+}
+
+/* Level */
+
+.level {
+  background: var(--level-bg, transparent);
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+
+  grid-column: 1 / 2; 
+  grid-row: 1 / 3; 
+}
+.column .level {
+  grid-row: 2;
 }
 
 /* Ball */
@@ -87,45 +113,46 @@
 
 /* Controls and HUD */
 
+#controls {
+  background: var(--controls-bg, transparent);
+}
+
 .game #controls * {
   pointer-events: all;
 }
 
 #hud, #controls {
-  position: absolute;
   box-sizing: border-box;
   display: flex;
-  align-items: center;
+
+  flex-direction: column;
+  align-items: end;
+  gap: 1vmin;
+
   letter-spacing: 0.5vmin;
   -webkit-text-stroke: 0;
-  opacity: 0.95;
-  padding: 0 3%;
+  padding: 5%;
 }
 
-#controls {
+.column #hud, .column #controls {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2%;
+}
+
+.column #controls {
   justify-content: flex-end;
-  opacity: 0.15;
-}
-
-#controls:hover  {
-  justify-content: flex-end;
-  opacity: 0.95;
-}
-
-@media(any-hover: none) {
-  #controls {
-    opacity: 0.95;
-  }
 }
 
 #hud {
-  justify-content: space-between;
+  justify-content: flex-end;
   background: var(--hud-bg, transparent);
   color: var(--hud-text, hsl(0, 0%, 90%));
   z-index: 1;
 }
 
-#hud > *, #controls > * {
+#hud, #hud > *, #controls, #controls > * {
   transform: none !important;
 }
 

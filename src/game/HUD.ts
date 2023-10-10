@@ -7,13 +7,11 @@ export class HUD extends GameObject {
   time: GameObject;
   score: GameObject;
 
-  constructor({elementId = 'hud', x = 50, y = 96, width = 100, height = 9, ...rest}: PartialGameObjectConfig) {
+  constructor({elementId = 'hud', x = 0, y = 0, ...rest}: PartialGameObjectConfig) {
     super({
       elementId,
       x,
       y,
-      width,
-      height,
       ...rest,
     });
     this.lives = new GameObject({

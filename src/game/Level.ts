@@ -40,6 +40,8 @@ export type LevelConfig = {
 };
 
 export class Level {
+  element: HTMLDivElement;
+  parent: HTMLDivElement;
   bricks: Array<Brick>;
   mobileBricks: Array<Brick>;
   left = 0;
@@ -51,11 +53,19 @@ export class Level {
     this.bricks = [];
     this.mobileBricks = [];
     this._strips = [];
+    this.parent = parent;
+    if (document.getElementById('level')) {
+      this.element = document.getElementById('level') as HTMLDivElement;
+    } else {
+      this.element = document.createElement('div');
+      parent.appendChild(this.element);
+    }
+    this.element.classList.add('level');
 
     if (layout instanceof Array) {
-      layout.forEach(l => this.layBricks(l, parent));
+      layout.forEach(l => this.layBricks(l, this.element));
     } else {
-      this.layBricks(layout, parent);
+      this.layBricks(layout, this.element);
     }
     this.left = this.bricks.length;
 
@@ -147,7 +157,7 @@ export class Level {
   }
 
   destroy() {
-    parent.removeEventListener('brickdestroyed', this.handleBrickDestroyed);
+    this.parent.removeEventListener('brickdestroyed', this.handleBrickDestroyed);
     this.bricks.forEach(brick => brick.destroy());
   }
 }

@@ -12,23 +12,11 @@ export class Controls extends GameObject {
   pause: Clickable;
   debug?: Clickable;
 
-  constructor({
-    elementId = 'controls',
-    x = 50,
-    y = 4,
-    width = 100,
-    height = 9,
-    handleFullscreen,
-    handlePause,
-    handleDebug,
-    ...rest
-  }: Config) {
+  constructor({elementId = 'controls', x = 0, y = 0, handleFullscreen, handlePause, handleDebug, ...rest}: Config) {
     super({
       elementId,
       x,
       y,
-      width,
-      height,
       ...rest,
     });
     this.fullscreen = new Clickable({

@@ -18,15 +18,40 @@ import {
   Pause,
 } from './';
 
+// todo implement
+type GameOptions = {
+  fps: number;
+  capFps: boolean;
+  allowDebug: boolean;
+  nextLifeDelayMs: number;
+  // disabled if 0
+  mouseoutPauseDelayMs: number;
+  mouseoverResumeDelayMs: number;
+};
+
+const DEFAULT_OPTIONS: GameOptions = {
+  fps: 60,
+  capFps: false,
+  allowDebug: false,
+  nextLifeDelayMs: 500,
+  mouseoutPauseDelayMs: 1000,
+  mouseoverResumeDelayMs: 1000,
+};
+
 export type GameParams = {
   ballConfigs: Array<Omit<BallConfig, 'idx' | 'parent'>>;
   levelConfig: Omit<LevelConfig, 'parent'>;
   paddleConfig: Partial<PaddleConfig>;
   playerConfig?: PlayerParams;
   parentId?: string;
+  options?: Partial<GameOptions>;
+  /** @deprecated use options instead */
   fps?: number;
+  /** @deprecated use options instead */
   capFps?: boolean;
+  /** @deprecated use options instead */
   allowDebug?: boolean;
+  /** @deprecated use options instead */
   nextLifeDelayMs?: number;
 };
 
@@ -46,12 +71,16 @@ export class Game {
   debounceTimer: NodeJS.Timeout | undefined = undefined;
   ogParams: GameParams;
   // Debug
+  /** @deprecated use options instead */
   allowDebug = false;
   debug: Debug | null;
   lastFrameTime: number = Date.now();
   lastFpsUpdate: number = Date.now();
   // Gameplay
+  options: GameOptions;
+  /** @deprecated use options instead */
   fpsInterval: number;
+  /** @deprecated use options instead */
   fpsCap: number;
   msSinceStart = 0;
   balls: Ball[] = [];
@@ -61,6 +90,7 @@ export class Game {
   controls: Controls | null;
   lives = 0;
   score = 0;
+  /** @deprecated use options instead */
   nextLifeDelayMs = 500;
   // Pause
   paused: Pause | null;
@@ -71,9 +101,14 @@ export class Game {
     this.element = document.getElementById(params.parentId ?? 'game') as HTMLDivElement;
     this.element.classList.add('game');
 
+    this.level = new Level({
+      ...params.levelConfig,
+      parent: this.element,
+    });
+
     this.paddle = new Paddle({
       ...params.paddleConfig,
-      parent: this.element,
+      parent: this.level.element,
       elementId: 'paddle',
       x: params.paddleConfig?.x ?? 50,
       y: params.paddleConfig?.y ?? 83,
@@ -81,20 +116,13 @@ export class Game {
     this.debug = null;
     this.paused = null;
     this.resumeLink = null;
-    this.level = new Level({
-      ...params.levelConfig,
-      parent: this.element,
-    });
+
+    this.options = {...DEFAULT_OPTIONS, ...params.options};
 
     // Set up player
     if (params.playerConfig) {
       this.lives = params.playerConfig.lives;
     }
-    this.hud = new HUD({parent: this.element});
-    this.updateHUDLives();
-    this.updateHUDScore();
-    this.updateHUDTime();
-
     this.controls = new Controls({
       parent: this.element,
       handleFullscreen: () => this.toggleFullscreen(),
@@ -102,7 +130,13 @@ export class Game {
       handleDebug: params.allowDebug ? () => this.toggleDebug() : undefined,
     });
     this.controls.updateElementPosition();
+    this.hud = new HUD({parent: this.element});
+    this.updateHUDLives();
+    this.updateHUDScore();
+    this.updateHUDTime();
+
     this.setBalls();
+    this.responsive(true);
 
     // Event listeners
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
@@ -114,6 +148,7 @@ export class Game {
     this.element.addEventListener('mouseleave', this.handleMouseLeave);
     new ResizeObserver(this.handleResize).observe(this.element);
 
+    // TODO
     this.fpsInterval = Math.floor(1000.0 / (params.fps || 60)) || 1;
     this.fpsCap = params.capFps ? this.fpsInterval : 1;
     this.allowDebug = params.allowDebug ?? false;
@@ -125,7 +160,7 @@ export class Game {
     this.balls.forEach(ball => ball.destroy());
     this.balls = [];
     this.ogParams.ballConfigs.forEach((ballConfig, idx) => {
-      const ball = new Ball({...ballConfig, idx, parent: this.element});
+      const ball = new Ball({...ballConfig, idx, parent: this.level.element});
       this.balls.push(ball);
     });
   };
@@ -186,7 +221,7 @@ export class Game {
   handleBallLost = (event: Event) => {
     console.debug('BallLost', (event as BallDestroyedEvent).detail);
     this.balls = this.balls.filter(ball => !ball.destroyed);
-    if (this.balls.length === 0) {
+    if (this.balls.filter(b => b.active).length === 0) {
       setTimeout(() => {
         this.lives--;
         if (this.lives >= 0) {
@@ -218,10 +253,14 @@ export class Game {
   handleBrickDestroyed = (event: Event) => {
     console.debug('BrickDestroyed', (event as BrickDestroyedEvent).detail);
     if (this.level.isDone()) {
-      this.state = 'won';
-      this.createdPausedElement('Victory!', 'final');
-      this.dispatchGameEvent('gamewon');
+      this.win();
     }
+  };
+
+  win = () => {
+    this.state = 'won';
+    this.createdPausedElement('Victory!', 'final');
+    this.dispatchGameEvent('gamewon');
   };
 
   updateHUDLives = () => {
@@ -274,7 +313,21 @@ export class Game {
     }
   };
 
+  responsive = (callResize = false) => {
+    // if ratio is more vertical, apply the column class to this.element, otherwise remove it
+    const {width, height} = this.element.getBoundingClientRect();
+    if (width / height < 1) {
+      this.element.classList.add('column');
+    } else {
+      this.element.classList.remove('column');
+    }
+    if (callResize) {
+      this.handleResize();
+    }
+  };
+
   handleResize = () => {
+    this.responsive();
     this.paddle.updateElement();
     this.balls.forEach(ball => ball.updateElement());
     this.level.updateElements();
@@ -332,7 +385,7 @@ export class Game {
     this.resumeLink?.destroy();
     this.paused?.destroy();
     this.paused = new Pause({
-      parent: this.element,
+      parent: this.level.element,
       className: classes,
     });
     this.resumeLink = new Clickable({
@@ -382,7 +435,7 @@ export class Game {
     this.element.removeEventListener('brickdestroyed', this.handleBrickDestroyed);
     this.element.removeEventListener('mouseenter', this.handleMouseEnter);
     this.element.removeEventListener('mouseleave', this.handleMouseLeave);
-    this.element.innerHTML = '';
+    // this.element.innerHTML = '';
     this.paddle.destroy();
     this.level.destroy();
     this.hud?.destroy();
