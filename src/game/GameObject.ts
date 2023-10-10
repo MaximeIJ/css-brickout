@@ -195,6 +195,7 @@ export class MovingGameObject extends GameObject {
   protected fy = 0;
   protected pHeight = 100;
   protected pWidth = 100;
+  active = true;
 
   get speed(): number {
     return this._speed;
@@ -289,7 +290,9 @@ export class MovingGameObject extends GameObject {
   }
 
   processFrame(frameFraction = 1) {
-    this.updatePosition(undefined, undefined, frameFraction);
-    this.updateElementPosition();
+    if (this.active) {
+      this.updatePosition(undefined, undefined, frameFraction);
+      this.updateElementPosition();
+    }
   }
 }

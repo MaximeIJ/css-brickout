@@ -252,6 +252,7 @@ export class Ball extends MovingGameObject {
   }
 
   processFrame(frameFraction = 1, level?: Level, paddle?: Paddle) {
+    if (!this.active) return;
     let shouldUpdateLast = this.antiTunneling;
     if (!shouldUpdateLast) {
       this.updatePosition(undefined, undefined, frameFraction);
