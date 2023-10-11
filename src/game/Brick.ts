@@ -15,10 +15,10 @@ export class Brick extends MovingGameObject {
 
   constructor({hp = 1, breakthrough = false, ...config}: BrickConfig) {
     super({...config, className: [config.className ?? '', 'brick'].filter(Boolean).join(' '), showTitle: true});
-    this.applyBonuses();
     this.hp = hp;
     this.maxHp = hp;
     this.breakthrough = breakthrough;
+    this.applyBonuses();
     this.updateTitle();
   }
 
