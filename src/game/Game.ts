@@ -147,8 +147,8 @@ export class Game {
 
   // Create Ball objects based on ballConfig
   setBalls = () => {
-    this.balls.forEach(ball => ball.destroy());
-    this.balls = [];
+    this.balls.filter(b => b.active).forEach(ball => ball.destroy());
+    this.balls = this.balls.filter(b => !b.active);
     this.ogParams.ballConfigs.forEach((ballConfig, idx) => {
       const ball = new Ball({...ballConfig, idx, parent: this.level.element});
       this.balls.push(ball);
