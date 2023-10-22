@@ -382,6 +382,7 @@ export class Game {
     });
     this.resumeLink.setContent(content);
     this.resumeLink.updateElementPosition();
+    this.element.classList.add('paused');
   };
 
   pause = (to?: State) => {
@@ -389,7 +390,6 @@ export class Game {
       this.createdPausedElement(to === 'away' ? 'Away' : `Resume`);
       this.state = to ?? 'paused';
       this.debug?.setContent(this.state);
-      this.element.classList.add('paused');
       this.balls.forEach(ball => ball.updateTitle());
       this.paddle.updateTitle();
       this.level.bricks.forEach(brick => brick.updateTitle());
