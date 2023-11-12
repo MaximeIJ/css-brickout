@@ -121,7 +121,7 @@ export class Ball extends MovingGameObject {
 
     if (this.y + this.radius >= 100) {
       this.speed = 0;
-      this.destroy();
+      this.destroy(false);
       return true;
     }
   }
@@ -274,14 +274,14 @@ export class Ball extends MovingGameObject {
     this.parent.dispatchEvent(event);
   }
 
-  destroy() {
-    setTimeout(() => {
-      super.destroy();
-    }, 350);
+  destroy(forReal = true) {
     this.element.classList.add('ball--destroyed');
     this.destroyed = true;
     const event: BallDestroyedEvent = createEvent<Ball>('balldestroyed', this);
     this.parent.dispatchEvent(event);
+    if (forReal) {
+      super.destroy();
+    }
   }
 }
 

@@ -162,9 +162,7 @@ export class GameObject {
   }
 
   destroy() {
-    if (!this.permanent) {
-      this.element.remove();
-    }
+    this.element.remove();
   }
 }
 export type MovementProps = {
