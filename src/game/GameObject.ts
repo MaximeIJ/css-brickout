@@ -38,6 +38,8 @@ export class GameObject {
     left: 0,
   };
   permanent = false;
+  particles: Array<HTMLElement> = [];
+  totalParticles = 0;
 
   constructor({
     parent,
@@ -139,7 +141,61 @@ export class GameObject {
     this.element.innerHTML = content;
   }
 
-  emitParticles(count: number, classNames?: Array<string>, durationMs = 500, inheriteSize = false): Array<HTMLElement> {
+  // pops a particle from the particle pool, creates one if none exist
+  getParticleElement(recycleCondition: 'animationend' | 'transitionend' | number = 'animationend'): HTMLElement {
+    const nextParticle = this.particles.pop();
+    if (nextParticle) {
+      nextParticle.style.setProperty('transform', this.element.style.transform);
+      return nextParticle;
+    } else {
+      const particle = document.createElement('particle');
+      particle.classList.add('particle');
+      this.parent.appendChild(particle);
+      if (typeof recycleCondition === 'number') {
+        setTimeout(() => {
+          particle.className = 'particle';
+          this.particles.push(particle);
+        }, recycleCondition);
+      } else {
+        particle.addEventListener(recycleCondition, () => {
+          particle.className = 'particle';
+          this.particles.push(particle);
+        });
+      }
+      this.totalParticles++;
+      particle.id = `${this.element.id}-particle-${this.totalParticles}`;
+      return particle;
+    }
+  }
+
+  emitParticles(
+    count: number,
+    classNames?: Array<string>,
+    recycleCondition: 'animationend' | 'transitionend' | number = 'animationend',
+    inheriteSize = false,
+  ): Array<HTMLElement> {
+    const particles: Array<HTMLElement> = [];
+    for (let i = 0; i < count; i++) {
+      const particle = this.getParticleElement(recycleCondition);
+      if (classNames?.length) {
+        particle.classList.add(...classNames);
+      }
+      if (inheriteSize) {
+        particle.style.setProperty('width', this.element.clientWidth + 'px');
+        particle.style.setProperty('height', this.element.clientHeight + 'px');
+      }
+      particle.style.setProperty('transform', this.element.style.transform);
+      particles.push(particle);
+    }
+    return particles;
+  }
+
+  _emitParticles(
+    count: number,
+    classNames?: Array<string>,
+    durationMs = 500,
+    inheriteSize = false,
+  ): Array<HTMLElement> {
     const particles: Array<HTMLElement> = [];
     for (let i = 0; i < count; i++) {
       const particle = document.createElement('particle');
@@ -163,6 +219,7 @@ export class GameObject {
 
   destroy() {
     this.element.remove();
+    this.particles.forEach(particle => particle.remove());
   }
 }
 export type MovementProps = {
