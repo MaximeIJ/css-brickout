@@ -92,9 +92,9 @@ export class Paddle extends GameObject {
         const ratio = dAngle / (Math.PI / 2);
 
         // Project the angle proportionally within the specified limit
-        const angle = -1 * ratio * this.angleLimit;
+        const angle = 1 * ratio * this.angleLimit;
 
-        this.angle += angle / 10;
+        this.angle = clamp(this.angle - angle / 10, this.angleLimit, -this.angleLimit);
 
         this.cursorX = normX;
         this.cursorY = normY;
