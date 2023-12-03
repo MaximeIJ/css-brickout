@@ -285,12 +285,13 @@ export class Game {
     }
   };
 
-  toggleFullscreen = () => {
+  toggleFullscreen = async () => {
     if (document.fullscreenElement) {
-      document.exitFullscreen();
+      await document.exitFullscreen();
     } else if (this.element.requestFullscreen) {
-      this.element.requestFullscreen();
+      await this.element.requestFullscreen();
     }
+    this.handleResize();
   };
 
   togglePause = () => {
@@ -316,9 +317,9 @@ export class Game {
 
   handleResize = () => {
     this.responsive();
+    this.level.updateElements();
     this.paddle.updateElement();
     this.balls.forEach(ball => ball.updateElement());
-    this.level.updateElements();
     this.paused?.updateElement();
     this.resumeLink?.updateElement();
     this.debug?.updateElement();
