@@ -20,8 +20,8 @@
   grid-template-rows: max(3rem, 8%) 1fr max(3rem, 10%);
 }
 
-.game:not(.paused) .level {
-  cursor: none;
+.game > .level {
+  cursor: crosshair;
 }
 
 .game:not(.paused) .level * {
@@ -29,9 +29,12 @@
 }
 
 .game.paused .level {
-  cursor: crosshair;
   background: radial-gradient(hsl(0, 0%, 5%, 30%) 10%, hsl(0, 0%, 5%, 60%) 65%, hsl(0, 0%, 5%, 90%)),
     var(--level-bg, transparent);
+}
+
+.hide-cursor:not(.paused) .level {
+  cursor: none;
 }
 
 .moving-object {

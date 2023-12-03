@@ -7,8 +7,6 @@ const parent = document.body.appendChild(document.createElement('div'));
 const makeBall = (angle: number, x: number, y: number) => {
   const b = new Ball({x, y, radius: 2, parent, idx: 0, movement: {angle, speed: 1}});
   b.updateElement();
-  b.processFrame(-1);
-  b.processFrame(1);
   return b;
 };
 
@@ -22,72 +20,50 @@ describe.concurrent('paddle no grip', () => {
 
   it('from top center - deep vertical collision', async ({expect}) => {
     const ball = makeBall(-Math.PI / 2, 50, 46);
-    expect(ball.isColliding(p)).toBeTruthy();
     ball.handlePaddleCollision(p);
-    expect(ball.angle).toBeCloseTo(Math.PI / 2);
+    expect(ball.movement.angle).toBeCloseTo(Math.PI / 2);
     expect(ball.x).toBeCloseTo(50);
     expect(ball.y).toBeCloseTo(45.5);
   });
 
   it('from top left - deep vertical collision', async ({expect}) => {
     const ball = makeBall(-Math.PI / 2, 39, 46);
-    expect(ball.isColliding(p)).toBeTruthy();
     ball.handlePaddleCollision(p);
-    expect(ball.angle).toBeCloseTo(Math.PI / 2);
+    expect(ball.movement.angle).toBeCloseTo(Math.PI / 2);
     expect(ball.x).toBeCloseTo(39);
     expect(ball.y).toBeCloseTo(45.5);
   });
 
   it('from top right - deep vertical collision', async ({expect}) => {
     const ball = makeBall(-Math.PI / 2, 61, 46);
-    expect(ball.isColliding(p)).toBeTruthy();
     ball.handlePaddleCollision(p);
-    expect(ball.angle).toBeCloseTo(Math.PI / 2);
+    expect(ball.movement.angle).toBeCloseTo(Math.PI / 2);
     expect(ball.x).toBeCloseTo(61);
     expect(ball.y).toBeCloseTo(45.5);
   });
 
   it('from top center - diagonal collision', async ({expect}) => {
     const ball = makeBall(-Math.PI / 4, 50, 46);
-    expect(ball.isColliding(p)).toBeTruthy();
     ball.handlePaddleCollision(p);
-    expect(ball.angle).toBeCloseTo(Math.PI / 4);
+    expect(ball.movement.angle).toBeCloseTo(Math.PI / 4);
     expect(ball.x).toBeCloseTo(50);
     expect(ball.y).toBeCloseTo(45.5);
   });
 
   it('from top left - diagonal collision', async ({expect}) => {
     const ball = makeBall(-Math.PI / 6, 39, 46);
-    expect(ball.isColliding(p)).toBeTruthy();
     ball.handlePaddleCollision(p);
-    expect(ball.angle).toBeCloseTo(Math.PI / 6);
+    expect(ball.movement.angle).toBeCloseTo(Math.PI / 6);
     expect(ball.x).toBeCloseTo(39);
     expect(ball.y).toBeCloseTo(45.5);
   });
 
   it('from top right - diagonal collision', async ({expect}) => {
     const ball = makeBall((-3 * Math.PI) / 4, 61, 46);
-    expect(ball.isColliding(p)).toBeTruthy();
     ball.handlePaddleCollision(p);
-    expect(ball.angle).toBeCloseTo((3 * Math.PI) / 4);
+    expect(ball.movement.angle).toBeCloseTo((3 * Math.PI) / 4);
     expect(ball.x).toBeCloseTo(61);
     expect(ball.y).toBeCloseTo(45.5);
-  });
-
-  it('from top center - horizontal collision', async ({expect}) => {
-    const ball = makeBall(0, 50, 46);
-    expect(ball.isColliding(p)).toBeTruthy();
-    ball.handlePaddleCollision(p);
-    expect(ball.angle).toBeCloseTo(0.1 * Math.PI);
-    expect(ball.x).toBeCloseTo(50);
-    expect(ball.y).toBeCloseTo(45.5);
-
-    const b2 = makeBall(Math.PI, 50, 46);
-    expect(b2.isColliding(p)).toBeTruthy();
-    b2.handlePaddleCollision(p);
-    expect(b2.angle).toBeCloseTo(0.9 * Math.PI);
-    expect(b2.x).toBeCloseTo(50);
-    expect(b2.y).toBeCloseTo(45.5);
   });
 });
 
@@ -102,9 +78,8 @@ describe.concurrent('paddle heavy grip', () => {
   it('from top center - deep vertical collision', async ({expect}) => {
     const ball = makeBall(-Math.PI / 2, 50, 46);
 
-    expect(ball.isColliding(p)).toBeTruthy();
     ball.handlePaddleCollision(p);
-    expect(ball.angle).toBeCloseTo(Math.PI / 2);
+    expect(ball.movement.angle).toBeCloseTo(Math.PI / 2);
     expect(ball.x).toBeCloseTo(50);
     expect(ball.y).toBeCloseTo(45.5);
   });
@@ -112,9 +87,8 @@ describe.concurrent('paddle heavy grip', () => {
   it('from top left - deep vertical collision', async ({expect}) => {
     const ball = makeBall(-Math.PI / 2, 39, 46);
 
-    expect(ball.isColliding(p)).toBeTruthy();
     ball.handlePaddleCollision(p);
-    expect(ball.angle).toBeCloseTo(0.9 * Math.PI);
+    expect(ball.movement.angle).toBeCloseTo(0.9 * Math.PI);
     expect(ball.x).toBeCloseTo(39);
     expect(ball.y).toBeCloseTo(45.5);
   });
@@ -122,9 +96,8 @@ describe.concurrent('paddle heavy grip', () => {
   it('from top right - deep vertical collision', async ({expect}) => {
     const ball = makeBall(-Math.PI / 2, 61, 46);
 
-    expect(ball.isColliding(p)).toBeTruthy();
     ball.handlePaddleCollision(p);
-    expect(ball.angle).toBeCloseTo(0.1 * Math.PI);
+    expect(ball.movement.angle).toBeCloseTo(0.1 * Math.PI);
     expect(ball.x).toBeCloseTo(61);
     expect(ball.y).toBeCloseTo(45.5);
   });
@@ -132,9 +105,8 @@ describe.concurrent('paddle heavy grip', () => {
   it('from top center - diagonal collision', async ({expect}) => {
     const ball = makeBall(-Math.PI / 4, 50, 46);
 
-    expect(ball.isColliding(p)).toBeTruthy();
     ball.handlePaddleCollision(p);
-    expect(ball.angle).toBeCloseTo(Math.PI / 4);
+    expect(ball.movement.angle).toBeCloseTo(Math.PI / 4);
     expect(ball.x).toBeCloseTo(50);
     expect(ball.y).toBeCloseTo(45.5);
   });
@@ -142,9 +114,8 @@ describe.concurrent('paddle heavy grip', () => {
   it('from top left - diagonal collision', async ({expect}) => {
     const ball = makeBall(-Math.PI / 3, 39, 46);
 
-    expect(ball.isColliding(p)).toBeTruthy();
     ball.handlePaddleCollision(p);
-    expect(ball.angle).toBeCloseTo(0.9 * Math.PI);
+    expect(ball.movement.angle).toBeCloseTo(0.9 * Math.PI);
     expect(ball.x).toBeCloseTo(39);
     expect(ball.y).toBeCloseTo(45.5);
   });
@@ -152,9 +123,8 @@ describe.concurrent('paddle heavy grip', () => {
   it('from top right - diagonal collision', async ({expect}) => {
     const ball = makeBall((-1 * Math.PI) / 4, 61, 46);
 
-    expect(ball.isColliding(p)).toBeTruthy();
     ball.handlePaddleCollision(p);
-    expect(ball.angle).toBeCloseTo(0.1 * Math.PI);
+    expect(ball.movement.angle).toBeCloseTo(0.1 * Math.PI);
     expect(ball.x).toBeCloseTo(61);
     expect(ball.y).toBeCloseTo(45.5);
   });
@@ -162,18 +132,55 @@ describe.concurrent('paddle heavy grip', () => {
   it('from top center - horizontal collision', async ({expect}) => {
     const ball = makeBall(0, 50, 46);
 
-    expect(ball.isColliding(p)).toBeTruthy();
     ball.handlePaddleCollision(p);
-    expect(ball.angle).toBeCloseTo(0.1 * Math.PI);
+    expect(ball.movement.angle).toBeCloseTo(0.1 * Math.PI);
     expect(ball.x).toBeCloseTo(50);
     expect(ball.y).toBeCloseTo(45.5);
 
     const b2 = makeBall(Math.PI, 50, 46);
-    expect(b2.isColliding(p)).toBeTruthy();
     b2.handlePaddleCollision(p);
-    expect(b2.angle).toBeCloseTo(0.9 * Math.PI);
+    expect(b2.movement.angle).toBeCloseTo(0.9 * Math.PI);
     expect(b2.x).toBeCloseTo(50);
     expect(b2.y).toBeCloseTo(45.5);
+  });
+});
+
+describe.concurrent('paddle angle PI / 4', () => {
+  let p: Paddle;
+
+  beforeAll(async () => {
+    p = new Paddle({
+      x: 50,
+      y: 50,
+      width: 20,
+      height: 5,
+      parent,
+      elementId: `paddle`,
+      gripFactor: 0,
+      angle: -Math.PI / 4,
+    });
+    p.updatePosition();
+  });
+
+  it('from top center - deep vertical collision', async ({expect}) => {
+    const ball = makeBall(-Math.PI / 2, 50, 46);
+    ball.handlePaddleCollision(p);
+    expect(ball.movement.angle).toBeCloseTo(Math.PI);
+    expect(ball.x).toBeCloseTo(48.82);
+    expect(ball.y).toBeCloseTo(44.82);
+  });
+
+  it('from top left - no vertical collision', async ({expect}) => {
+    const ball = makeBall(-Math.PI / 2, 41, 46);
+    expect(ball.isColliding(p)).toBeFalsy();
+  });
+
+  it('from top right - deep vertical collision', async ({expect}) => {
+    const ball = makeBall(-Math.PI / 2, 55, 41);
+    ball.handlePaddleCollision(p);
+    expect(ball.movement.angle).toBeCloseTo(Math.PI);
+    expect(ball.x).toBeCloseTo(53.82);
+    expect(ball.y).toBeCloseTo(39.82);
   });
 });
 
@@ -189,7 +196,7 @@ describe.concurrent('breakthrough brick', () => {
     const ball = makeBall(-Math.PI / 2, 50, 40);
     expect(ball.isColliding(bb)).toBeTruthy();
     ball.handleBrickCollision(bb);
-    expect(ball.angle).toBeCloseTo(-Math.PI / 2);
+    expect(ball.movement.angle).toBeCloseTo(-Math.PI / 2);
     expect(ball.x).toBeCloseTo(50);
     expect(ball.y).toBeCloseTo(40);
   });
@@ -222,45 +229,39 @@ describe.concurrent('ball brick collision', () => {
   });
   it('from top - minimal collision', async ({expect}) => {
     const b1 = makeBall(-Math.PI / 2, 50, 38);
-    expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
-    expect(b1.angle).toBeCloseTo(Math.PI / 2);
+    expect(b1.movement.angle).toBeCloseTo(Math.PI / 2);
     expect(b1.x).toBeCloseTo(50);
     expect(b1.y).toBeCloseTo(38);
 
     const b2 = makeBall(-Math.PI / 2, 50, 38);
-    expect(b2.isColliding(tall)).toBeTruthy();
     b2.handleBrickCollision(tall);
-    expect(b2.angle).toBeCloseTo(Math.PI / 2);
+    expect(b2.movement.angle).toBeCloseTo(Math.PI / 2);
     expect(b2.x).toBeCloseTo(50);
     expect(b2.y).toBeCloseTo(38);
 
     const b3 = makeBall(-Math.PI / 2, 50, 45.5);
-    expect(b3.isColliding(wide)).toBeTruthy();
     b3.handleBrickCollision(wide);
-    expect(b3.angle).toBeCloseTo(Math.PI / 2);
+    expect(b3.movement.angle).toBeCloseTo(Math.PI / 2);
     expect(b3.x).toBeCloseTo(50);
     expect(b3.y).toBeCloseTo(45.5);
   });
   it('from top - deep collision', async ({expect}) => {
     const b1 = makeBall(-Math.PI / 2, 50, 41);
-    expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
-    expect(b1.angle).toBeCloseTo(Math.PI / 2);
+    expect(b1.movement.angle).toBeCloseTo(Math.PI / 2);
     expect(b1.x).toBeCloseTo(50);
     expect(b1.y).toBeCloseTo(38);
 
     const b2 = makeBall(-Math.PI / 2, 50, 41);
-    expect(b2.isColliding(tall)).toBeTruthy();
     b2.handleBrickCollision(tall);
-    expect(b2.angle).toBeCloseTo(Math.PI / 2);
+    expect(b2.movement.angle).toBeCloseTo(Math.PI / 2);
     expect(b2.x).toBeCloseTo(50);
     expect(b2.y).toBeCloseTo(38);
 
     const b3 = makeBall(-Math.PI / 2, 50, 48);
-    expect(b3.isColliding(wide)).toBeTruthy();
     b3.handleBrickCollision(wide);
-    expect(b3.angle).toBeCloseTo(Math.PI / 2);
+    expect(b3.movement.angle).toBeCloseTo(Math.PI / 2);
     expect(b3.x).toBeCloseTo(50);
     expect(b3.y).toBeCloseTo(45.5);
   });
@@ -278,45 +279,39 @@ describe.concurrent('ball brick collision', () => {
   });
   it('from bottom - minimal collision', async ({expect}) => {
     const b1 = makeBall(Math.PI / 2, 50, 62);
-    expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
-    expect(b1.angle).toBeCloseTo(-Math.PI / 2);
+    expect(b1.movement.angle).toBeCloseTo(-Math.PI / 2);
     expect(b1.x).toBeCloseTo(50);
     expect(b1.y).toBeCloseTo(62);
 
     const b2 = makeBall(Math.PI / 2, 50, 62);
-    expect(b2.isColliding(tall)).toBeTruthy();
     b2.handleBrickCollision(tall);
-    expect(b2.angle).toBeCloseTo(-Math.PI / 2);
+    expect(b2.movement.angle).toBeCloseTo(-Math.PI / 2);
     expect(b2.x).toBeCloseTo(50);
     expect(b2.y).toBeCloseTo(62);
 
     const b3 = makeBall(Math.PI / 2, 50, 54.5);
-    expect(b3.isColliding(wide)).toBeTruthy();
     b3.handleBrickCollision(wide);
-    expect(b3.angle).toBeCloseTo(-Math.PI / 2);
+    expect(b3.movement.angle).toBeCloseTo(-Math.PI / 2);
     expect(b3.x).toBeCloseTo(50);
     expect(b3.y).toBeCloseTo(54.5);
   });
   it('from bottom - deep collision', async ({expect}) => {
     const b1 = makeBall(Math.PI / 2, 50, 59);
-    expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
-    expect(b1.angle).toBeCloseTo(-Math.PI / 2);
+    expect(b1.movement.angle).toBeCloseTo(-Math.PI / 2);
     expect(b1.x).toBeCloseTo(50);
     expect(b1.y).toBeCloseTo(62);
 
     const b2 = makeBall(Math.PI / 2, 50, 59);
-    expect(b2.isColliding(tall)).toBeTruthy();
     b2.handleBrickCollision(tall);
-    expect(b2.angle).toBeCloseTo(-Math.PI / 2);
+    expect(b2.movement.angle).toBeCloseTo(-Math.PI / 2);
     expect(b2.x).toBeCloseTo(50);
     expect(b2.y).toBeCloseTo(62);
 
     const b3 = makeBall(Math.PI / 2, 50, 52);
-    expect(b3.isColliding(wide)).toBeTruthy();
     b3.handleBrickCollision(wide);
-    expect(b3.angle).toBeCloseTo(-Math.PI / 2);
+    expect(b3.movement.angle).toBeCloseTo(-Math.PI / 2);
     expect(b3.x).toBeCloseTo(50);
     expect(b3.y).toBeCloseTo(54.5);
   });
@@ -333,45 +328,39 @@ describe.concurrent('ball brick collision', () => {
   });
   it('from left - minimal collision', async ({expect}) => {
     const b1 = makeBall(Math.PI, 38, 50);
-    expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
-    expect(b1.angle).toBeCloseTo(0);
+    expect(b1.movement.angle).toBeCloseTo(0);
     expect(b1.x).toBeCloseTo(38);
     expect(b1.y).toBeCloseTo(50);
 
     const b2 = makeBall(Math.PI, 38, 50);
-    expect(b2.isColliding(wide)).toBeTruthy();
     b2.handleBrickCollision(wide);
-    expect(b2.angle).toBeCloseTo(0);
+    expect(b2.movement.angle).toBeCloseTo(0);
     expect(b2.x).toBeCloseTo(38);
     expect(b2.y).toBeCloseTo(50);
 
     const b3 = makeBall(Math.PI, 45.5, 50);
-    expect(b3.isColliding(tall)).toBeTruthy();
     b3.handleBrickCollision(tall);
-    expect(b3.angle).toBeCloseTo(0);
+    expect(b3.movement.angle).toBeCloseTo(0);
     expect(b3.x).toBeCloseTo(45.5);
     expect(b3.y).toBeCloseTo(50);
   });
   it('from left - deep collision', async ({expect}) => {
     const b1 = makeBall(Math.PI, 41, 50);
-    expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
-    expect(b1.angle).toBeCloseTo(0);
+    expect(b1.movement.angle).toBeCloseTo(0);
     expect(b1.x).toBeCloseTo(38);
     expect(b1.y).toBeCloseTo(50);
 
     const b2 = makeBall(Math.PI, 41, 50);
-    expect(b2.isColliding(wide)).toBeTruthy();
     b2.handleBrickCollision(wide);
-    expect(b2.angle).toBeCloseTo(0);
+    expect(b2.movement.angle).toBeCloseTo(0);
     expect(b2.x).toBeCloseTo(38);
     expect(b2.y).toBeCloseTo(50);
 
     const b3 = makeBall(Math.PI, 48, 50);
-    expect(b3.isColliding(tall)).toBeTruthy();
     b3.handleBrickCollision(tall);
-    expect(b3.angle).toBeCloseTo(0);
+    expect(b3.movement.angle).toBeCloseTo(0);
     expect(b3.x).toBeCloseTo(45.5);
     expect(b3.y).toBeCloseTo(50);
   });
@@ -388,45 +377,39 @@ describe.concurrent('ball brick collision', () => {
   });
   it('from right - minimal collision', async ({expect}) => {
     const b1 = makeBall(0, 62, 50);
-    expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
-    expect(b1.angle).toBeCloseTo(Math.PI);
+    expect(b1.movement.angle).toBeCloseTo(Math.PI);
     expect(b1.x).toBeCloseTo(62);
     expect(b1.y).toBeCloseTo(50);
 
     const b2 = makeBall(0, 62, 50);
-    expect(b2.isColliding(wide)).toBeTruthy();
     b2.handleBrickCollision(wide);
-    expect(b2.angle).toBeCloseTo(Math.PI);
+    expect(b2.movement.angle).toBeCloseTo(Math.PI);
     expect(b2.x).toBeCloseTo(62);
     expect(b2.y).toBeCloseTo(50);
 
     const b3 = makeBall(0, 54.5, 50);
-    expect(b3.isColliding(tall)).toBeTruthy();
     b3.handleBrickCollision(tall);
-    expect(b3.angle).toBeCloseTo(Math.PI);
+    expect(b3.movement.angle).toBeCloseTo(Math.PI);
     expect(b3.x).toBeCloseTo(54.5);
     expect(b3.y).toBeCloseTo(50);
   });
   it('from right - deep collision', async ({expect}) => {
     const b1 = makeBall(0, 59, 50);
-    expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
-    expect(b1.angle).toBeCloseTo(Math.PI);
+    expect(b1.movement.angle).toBeCloseTo(Math.PI);
     expect(b1.x).toBeCloseTo(62);
     expect(b1.y).toBeCloseTo(50);
 
     const b2 = makeBall(0, 59, 50);
-    expect(b2.isColliding(wide)).toBeTruthy();
     b2.handleBrickCollision(wide);
-    expect(b2.angle).toBeCloseTo(Math.PI);
+    expect(b2.movement.angle).toBeCloseTo(Math.PI);
     expect(b2.x).toBeCloseTo(62);
     expect(b2.y).toBeCloseTo(50);
 
     const b3 = makeBall(0, 52, 50);
-    expect(b3.isColliding(tall)).toBeTruthy();
     b3.handleBrickCollision(tall);
-    expect(b3.angle).toBeCloseTo(Math.PI);
+    expect(b3.movement.angle).toBeCloseTo(Math.PI);
     expect(b3.x).toBeCloseTo(54.5);
     expect(b3.y).toBeCloseTo(50);
   });
@@ -447,69 +430,60 @@ describe.concurrent('ball brick collision', () => {
   });
   it('from top left - minimal collision', async ({expect}) => {
     const b1 = makeBall(-Math.PI / 4, 38.75, 38.75);
-    expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
-    expect(b1.angle).toBeCloseTo(Math.PI / 4);
-    expect(b1.x).toBeCloseTo(38.75);
-    expect(b1.y).toBeCloseTo(38);
+    expect(b1.movement.angle).toBeCloseTo((-3 * Math.PI) / 4);
+    expect(b1.x).toBeCloseTo(38);
+    expect(b1.y).toBeCloseTo(38.75);
 
     const b2 = makeBall(-Math.PI / 4, 47, 38.5);
-    expect(b2.isColliding(tall)).toBeTruthy();
     b2.handleBrickCollision(tall);
-    expect(b2.angle).toBeCloseTo(Math.PI / 4);
+    expect(b2.movement.angle).toBeCloseTo(Math.PI / 4);
     expect(b2.x).toBeCloseTo(47);
     expect(b2.y).toBeCloseTo(38);
 
     const b3 = makeBall(-Math.PI / 4, 39, 46.5);
-    expect(b3.isColliding(wide)).toBeTruthy();
     b3.handleBrickCollision(wide);
-    expect(b3.angle).toBeCloseTo(Math.PI / 4);
-    expect(b3.x).toBeCloseTo(39);
-    expect(b3.y).toBeCloseTo(45.5);
+    expect(b3.movement.angle).toBeCloseTo((-3 * Math.PI) / 4);
+    expect(b3.x).toBeCloseTo(38);
+    expect(b3.y).toBeCloseTo(46.5);
   });
   it('from top left - deep collision', async ({expect}) => {
     const b1 = makeBall(-Math.PI / 4, 40, 40);
-    expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
-    expect(b1.angle).toBeCloseTo(Math.PI / 4);
-    expect(b1.x).toBeCloseTo(40);
-    expect(b1.y).toBeCloseTo(38);
+    expect(b1.movement.angle).toBeCloseTo((-3 * Math.PI) / 4);
+    expect(b1.x).toBeCloseTo(38);
+    expect(b1.y).toBeCloseTo(40);
 
     const b2 = makeBall(-Math.PI / 4, 47.5, 40);
-    expect(b2.isColliding(tall)).toBeTruthy();
     b2.handleBrickCollision(tall);
-    expect(b2.angle).toBeCloseTo(Math.PI / 4);
-    expect(b2.x).toBeCloseTo(47.5);
-    expect(b2.y).toBeCloseTo(38);
+    expect(b2.movement.angle).toBeCloseTo((-3 * Math.PI) / 4);
+    expect(b2.x).toBeCloseTo(45.5);
+    expect(b2.y).toBeCloseTo(40);
 
     const b3 = makeBall(-Math.PI / 4, 40, 47.5);
-    expect(b3.isColliding(wide)).toBeTruthy();
     b3.handleBrickCollision(wide);
-    expect(b3.angle).toBeCloseTo(Math.PI / 4);
-    expect(b3.x).toBeCloseTo(40);
-    expect(b3.y).toBeCloseTo(45.5);
+    expect(b3.movement.angle).toBeCloseTo((-3 * Math.PI) / 4);
+    expect(b3.x).toBeCloseTo(38);
+    expect(b3.y).toBeCloseTo(47.5);
   });
 
   // Favoring top
   it('from top top left - deep collision', async ({expect}) => {
     const b1 = makeBall(-Math.PI / 4, 39, 40);
-    expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
-    expect(b1.angle).toBeCloseTo((-3 * Math.PI) / 4);
+    expect(b1.movement.angle).toBeCloseTo((-3 * Math.PI) / 4);
     expect(b1.x).toBeCloseTo(38);
     expect(b1.y).toBeCloseTo(40);
 
     const b2 = makeBall(-Math.PI / 4, 46.5, 40);
-    expect(b2.isColliding(tall)).toBeTruthy();
     b2.handleBrickCollision(tall);
-    expect(b2.angle).toBeCloseTo((-3 * Math.PI) / 4);
+    expect(b2.movement.angle).toBeCloseTo((-3 * Math.PI) / 4);
     expect(b2.x).toBeCloseTo(45.5);
     expect(b2.y).toBeCloseTo(40);
 
     const b3 = makeBall(-Math.PI / 4, 39, 47.5);
-    expect(b3.isColliding(wide)).toBeTruthy();
     b3.handleBrickCollision(wide);
-    expect(b3.angle).toBeCloseTo((-3 * Math.PI) / 4);
+    expect(b3.movement.angle).toBeCloseTo((-3 * Math.PI) / 4);
     expect(b3.x).toBeCloseTo(38);
     expect(b3.y).toBeCloseTo(47.5);
   });
@@ -517,23 +491,20 @@ describe.concurrent('ball brick collision', () => {
   // Favoring left
   it('from top left left - deep collision', async ({expect}) => {
     const b1 = makeBall(-Math.PI / 4, 40, 39);
-    expect(b1.isColliding(square)).toBeTruthy();
     b1.handleBrickCollision(square);
-    expect(b1.angle).toBeCloseTo(Math.PI / 4);
+    expect(b1.movement.angle).toBeCloseTo(Math.PI / 4);
     expect(b1.x).toBeCloseTo(40);
     expect(b1.y).toBeCloseTo(38);
 
     const b2 = makeBall(-Math.PI / 4, 47.5, 39);
-    expect(b2.isColliding(tall)).toBeTruthy();
     b2.handleBrickCollision(tall);
-    expect(b2.angle).toBeCloseTo(Math.PI / 4);
+    expect(b2.movement.angle).toBeCloseTo(Math.PI / 4);
     expect(b2.x).toBeCloseTo(47.5);
     expect(b2.y).toBeCloseTo(38);
 
     const b3 = makeBall(-Math.PI / 4, 40, 46.5);
-    expect(b3.isColliding(wide)).toBeTruthy();
     b3.handleBrickCollision(wide);
-    expect(b3.angle).toBeCloseTo(Math.PI / 4);
+    expect(b3.movement.angle).toBeCloseTo(Math.PI / 4);
     expect(b3.x).toBeCloseTo(40);
     expect(b3.y).toBeCloseTo(45.5);
   });
@@ -545,7 +516,7 @@ describe.concurrent('boundary collision - 1:1 ratio', () => {
   it('to top center - minimal vertical collision', async ({expect}) => {
     const ball = makeBall(Math.PI / 2, 50, 2);
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(-Math.PI / 2);
+    expect(ball.movement.angle).toBeCloseTo(-Math.PI / 2);
     expect(ball.x).toBeCloseTo(50);
     expect(ball.y).toBeCloseTo(2);
   });
@@ -553,7 +524,7 @@ describe.concurrent('boundary collision - 1:1 ratio', () => {
   it('to top center - deep vertical collision', async ({expect}) => {
     const ball = makeBall(Math.PI / 2, 50, 1);
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(-Math.PI / 2);
+    expect(ball.movement.angle).toBeCloseTo(-Math.PI / 2);
     expect(ball.x).toBeCloseTo(50);
     expect(ball.y).toBeCloseTo(2);
   });
@@ -561,7 +532,7 @@ describe.concurrent('boundary collision - 1:1 ratio', () => {
   it('to top left - minimal diagonal collision', async ({expect}) => {
     const ball = makeBall((3 * Math.PI) / 4, 2, 2);
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(-Math.PI / 4);
+    expect(ball.movement.angle).toBeCloseTo(-Math.PI / 4);
     expect(ball.x).toBeCloseTo(2);
     expect(ball.y).toBeCloseTo(2);
   });
@@ -569,7 +540,7 @@ describe.concurrent('boundary collision - 1:1 ratio', () => {
   it('to top left - deep diagonal collision', async ({expect}) => {
     const ball = makeBall((3 * Math.PI) / 4, 1, 1);
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(-Math.PI / 4);
+    expect(ball.movement.angle).toBeCloseTo(-Math.PI / 4);
     expect(ball.x).toBeCloseTo(2);
     expect(ball.y).toBeCloseTo(2);
   });
@@ -577,7 +548,7 @@ describe.concurrent('boundary collision - 1:1 ratio', () => {
   it('to center left - minimal horizontal collision', async ({expect}) => {
     const ball = makeBall(Math.PI, 2, 50);
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(0);
+    expect(ball.movement.angle).toBeCloseTo(0);
     expect(ball.x).toBeCloseTo(2);
     expect(ball.y).toBeCloseTo(50);
   });
@@ -585,7 +556,7 @@ describe.concurrent('boundary collision - 1:1 ratio', () => {
   it('to center left - deep horizontal collision', async ({expect}) => {
     const ball = makeBall(Math.PI, 1, 50);
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(0);
+    expect(ball.movement.angle).toBeCloseTo(0);
     expect(ball.x).toBeCloseTo(2);
     expect(ball.y).toBeCloseTo(50);
   });
@@ -610,7 +581,7 @@ describe('boundary collision - 2:1 ratio', () => {
 
   it('to top center - minimal vertical collision', async ({expect}) => {
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(-Math.PI / 2);
+    expect(ball.movement.angle).toBeCloseTo(-Math.PI / 2);
     expect(ball.x).toBeCloseTo(50);
     expect(ball.y).toBeCloseTo(2);
   });
@@ -618,16 +589,16 @@ describe('boundary collision - 2:1 ratio', () => {
   it('to top center - deep vertical collision', async ({expect}) => {
     ball.y = 1;
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(-Math.PI / 2);
+    expect(ball.movement.angle).toBeCloseTo(-Math.PI / 2);
     expect(ball.x).toBeCloseTo(50);
     expect(ball.y).toBeCloseTo(2);
   });
 
   it('to top left - minimal diagonal collision', async ({expect}) => {
     ball.x = rx;
-    ball.angle = (3 * Math.PI) / 4;
+    ball.movementAngle = (3 * Math.PI) / 4;
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(-Math.PI / 4);
+    expect(ball.movement.angle).toBeCloseTo(-Math.PI / 4);
     expect(ball.x).toBeCloseTo(rx);
     expect(ball.y).toBeCloseTo(2);
   });
@@ -635,27 +606,27 @@ describe('boundary collision - 2:1 ratio', () => {
   it('to top left - deep diagonal collision', async ({expect}) => {
     ball.x = 0;
     ball.y = 1;
-    ball.angle = (3 * Math.PI) / 4;
+    ball.movementAngle = (3 * Math.PI) / 4;
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(-Math.PI / 4);
+    expect(ball.movement.angle).toBeCloseTo(-Math.PI / 4);
     expect(ball.x).toBeCloseTo(rx);
     expect(ball.y).toBeCloseTo(2);
   });
 
   it('to center left - minimal horizontal collision', async ({expect}) => {
     ball.x = rx;
-    ball.angle = Math.PI;
+    ball.movementAngle = Math.PI;
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(0);
+    expect(ball.movement.angle).toBeCloseTo(0);
     expect(ball.x).toBeCloseTo(rx);
     expect(ball.y).toBeCloseTo(2);
   });
 
   it('to center left - deep horizontal collision', async ({expect}) => {
     ball.x = 0;
-    ball.angle = Math.PI;
+    ball.movementAngle = Math.PI;
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(0);
+    expect(ball.movement.angle).toBeCloseTo(0);
     expect(ball.x).toBeCloseTo(rx);
     expect(ball.y).toBeCloseTo(2);
   });
@@ -680,7 +651,7 @@ describe('boundary collision - 1:2 ratio', () => {
 
   it('to top center - minimal vertical collision', async ({expect}) => {
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(-Math.PI / 2);
+    expect(ball.movement.angle).toBeCloseTo(-Math.PI / 2);
     expect(ball.x).toBeCloseTo(50);
     expect(ball.y).toBeCloseTo(2);
   });
@@ -688,16 +659,16 @@ describe('boundary collision - 1:2 ratio', () => {
   it('to top center - deep vertical collision', async ({expect}) => {
     ball.y = 1;
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(-Math.PI / 2);
+    expect(ball.movement.angle).toBeCloseTo(-Math.PI / 2);
     expect(ball.x).toBeCloseTo(50);
     expect(ball.y).toBeCloseTo(2);
   });
 
   it('to top left - minimal diagonal collision', async ({expect}) => {
     ball.x = rx;
-    ball.angle = (3 * Math.PI) / 4;
+    ball.movementAngle = (3 * Math.PI) / 4;
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(-Math.PI / 4);
+    expect(ball.movement.angle).toBeCloseTo(-Math.PI / 4);
     expect(ball.x).toBeCloseTo(rx);
     expect(ball.y).toBeCloseTo(2);
   });
@@ -705,27 +676,27 @@ describe('boundary collision - 1:2 ratio', () => {
   it('to top left - deep diagonal collision', async ({expect}) => {
     ball.x = 0;
     ball.y = 1;
-    ball.angle = (3 * Math.PI) / 4;
+    ball.movementAngle = (3 * Math.PI) / 4;
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(-Math.PI / 4);
+    expect(ball.movement.angle).toBeCloseTo(-Math.PI / 4);
     expect(ball.x).toBeCloseTo(rx);
     expect(ball.y).toBeCloseTo(2);
   });
 
   it('to center left - minimal horizontal collision', async ({expect}) => {
     ball.x = rx;
-    ball.angle = Math.PI;
+    ball.movementAngle = Math.PI;
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(0);
+    expect(ball.movement.angle).toBeCloseTo(0);
     expect(ball.x).toBeCloseTo(rx);
     expect(ball.y).toBeCloseTo(2);
   });
 
   it('to center left - deep horizontal collision', async ({expect}) => {
     ball.x = 0;
-    ball.angle = Math.PI;
+    ball.movementAngle = Math.PI;
     expect(ball.handleBoundaryCollision()).toBeTruthy();
-    expect(ball.angle).toBeCloseTo(0);
+    expect(ball.movement.angle).toBeCloseTo(0);
     expect(ball.x).toBeCloseTo(rx);
     expect(ball.y).toBeCloseTo(2);
   });

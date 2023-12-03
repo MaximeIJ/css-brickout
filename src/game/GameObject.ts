@@ -1,13 +1,12 @@
-import {formatObjectTitle, pythagoras} from '../util';
+import {BoundingBox, Vector, formatObjectTitle, pythagoras, rotatePoint} from '../util';
 
-export type GameObjectConfig = {
+export type GameObjectConfig = Vector & {
   parent: HTMLDivElement;
   elementId?: string;
   className?: string;
-  x: number;
-  y: number;
   width?: number;
   height?: number;
+  angle?: number;
   startingBonuses?: Array<BonusConfig>;
   showTitle?: boolean;
   permanent?: boolean;
@@ -28,14 +27,15 @@ export class GameObject {
   y = 0;
   width: number;
   height: number;
+  private _angle: number;
   bonuses: Array<BonusConfig>;
   element: HTMLDivElement;
   parent: HTMLDivElement;
-  boundingBox: {top: number; right: number; bottom: number; left: number} = {
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
+  boundingBox: BoundingBox = {
+    topL: {x: 0, y: 0},
+    topR: {x: 0, y: 0},
+    bottomL: {x: 0, y: 0},
+    bottomR: {x: 0, y: 0},
   };
   permanent = false;
   particles: Array<HTMLElement> = [];
@@ -49,12 +49,14 @@ export class GameObject {
     y,
     width = 0,
     height = 0,
+    angle = 0,
     startingBonuses = [],
     showTitle = false,
     permanent = false,
   }: GameObjectConfig) {
     this.width = width;
     this.height = height;
+    this._angle = angle;
     this.parent = parent;
     this.bonuses = startingBonuses;
     this.element = document.createElement('div');
@@ -71,7 +73,18 @@ export class GameObject {
     }
     parent.appendChild(this.element);
     this.updatePosition(x, y);
+    this.angle = angle;
     this.updateElement();
+  }
+
+  get angle(): number {
+    return this._angle;
+  }
+
+  set angle(angle: number) {
+    this._angle = angle;
+    this.updateBoundingBox();
+    this.element.style.setProperty('--angle', `${angle}rad`);
   }
 
   updateElementSize(): void {
@@ -115,20 +128,32 @@ export class GameObject {
     this.x = x ?? this.x;
     this.y = y ?? this.y;
     if (this.width && this.height) {
-      this.boundingBox = {
-        top: this.y - this.height / 2,
-        right: this.x + this.width / 2,
-        bottom: this.y + this.height / 2,
-        left: this.x - this.width / 2,
-      };
+      this.updateBoundingBox();
     }
+  }
+
+  updateBoundingBox() {
+    const halfWidth = this.width / 2;
+    const halfHeight = this.height / 2;
+
+    const args: [number, number, number] = [this.x, this.y, this.angle];
+
+    this.boundingBox = {
+      bottomR: rotatePoint(this.x + halfWidth, this.y + halfHeight, ...args),
+      bottomL: rotatePoint(this.x - halfWidth, this.y + halfHeight, ...args),
+      topL: rotatePoint(this.x - halfWidth, this.y - halfHeight, ...args),
+      topR: rotatePoint(this.x + halfWidth, this.y - halfHeight, ...args),
+    };
   }
 
   updateElementPosition() {
     const {offsetWidth, offsetHeight} = this.parent;
     const absX = (this.x / 100.0) * offsetWidth;
     const absY = (this.y / 100.0) * offsetHeight;
-    this.setStyle('transform', `translateX(calc(${absX}px - 50%)) translateY(calc(${absY}px - 50%))`);
+    this.setStyle(
+      'transform',
+      `translateX(calc(${absX}px - 50%)) translateY(calc(${absY}px - 50%)) rotate(var(--angle, 0rad))`,
+    );
     this.element.style.setProperty('--xp', this.x.toFixed(2));
     this.element.style.setProperty('--yp', this.y.toFixed(2));
   }
@@ -242,7 +267,7 @@ export type MovingGameObjectConfig = GameObjectConfig & {
 
 export class MovingGameObject extends GameObject {
   private _speed = 0;
-  private _angle = 0;
+  private _movementAngle = 0;
   protected turnSteps: Array<TurnStep> = [];
   protected dx = 0;
   protected dy = 0;
@@ -261,17 +286,17 @@ export class MovingGameObject extends GameObject {
     this.setD();
   }
 
-  get angle(): number {
-    return this._angle;
+  get movementAngle(): number {
+    return this._movementAngle;
   }
 
-  set angle(angle: number) {
-    this._angle = angle;
+  set movementAngle(angle: number) {
+    this._movementAngle = angle;
     this.setD();
   }
 
   get movement(): MovementProps {
-    return {angle: this.angle, speed: this.speed};
+    return {angle: this.movementAngle, speed: this.speed};
   }
 
   set movement(movementConfig: MovingGameObjectConfig['movement']) {
@@ -282,7 +307,7 @@ export class MovingGameObject extends GameObject {
         this.movement = firstStep.movement;
       }
     } else {
-      this._angle = movementConfig?.angle ?? 0;
+      this._movementAngle = movementConfig?.angle ?? 0;
       this._speed = movementConfig?.speed ?? 0;
       this.setD();
     }
@@ -340,8 +365,8 @@ export class MovingGameObject extends GameObject {
 
   setD() {
     // Swap the axis ratios to compensate for the aspect ratio. Without this, the ball would move faster on the Y axis when the game is wider than it is tall.
-    this.dx = this.fy * this.speed * Math.cos(this.angle);
-    this.dy = this.fx * -this.speed * Math.sin(this.angle);
+    this.dx = this.fy * this.speed * Math.cos(this.movementAngle);
+    this.dy = this.fx * -this.speed * Math.sin(this.movementAngle);
   }
 
   processFrame(frameFraction = 1) {

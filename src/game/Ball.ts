@@ -1,9 +1,6 @@
-import {a, clamp, createEvent} from '../util';
+import {AxisOverlap, Vector, a, clamp, createEvent, getOverlapsAndAxes, normalizeAngle, overlapOnAxis} from '../util';
 
 import {Brick, GameObject, Level, MovingGameObject, MovingGameObjectConfig, Paddle} from './';
-
-const MAX_ANGLE = 0.9 * Math.PI;
-const MIN_ANGLE = 0.1 * Math.PI;
 
 export type BallConfig = Omit<MovingGameObjectConfig, 'elementId'> & {
   idx: number;
@@ -11,7 +8,12 @@ export type BallConfig = Omit<MovingGameObjectConfig, 'elementId'> & {
   radius: number;
   // damage inflicted on bricks
   damage?: number;
+  // whether the ball should be able to tunnel through bricks
+  antiTunneling?: boolean;
 };
+
+const MAX_ANGLE = 0.9 * Math.PI;
+const MIN_ANGLE = 0.1 * Math.PI;
 
 export class Ball extends MovingGameObject {
   destroyed = false;
@@ -19,8 +21,10 @@ export class Ball extends MovingGameObject {
   damage = 1;
   rx = 0;
   antiTunneling = false;
+  // Prevents the ball from hitting the same object twice in a row
+  antiJuggling: string | false = false;
 
-  constructor({idx, radius, movement, damage = 1, ...objConfig}: BallConfig) {
+  constructor({idx, radius, movement, damage = 1, antiTunneling = false, ...objConfig}: BallConfig) {
     super({
       ...objConfig,
       className: [...(objConfig.className?.split(' ') ?? []), 'ball'].join(' '),
@@ -30,7 +34,7 @@ export class Ball extends MovingGameObject {
     });
     this.radius = radius;
     this.damage = damage;
-    this.antiTunneling = this.speed > this.radius * 2;
+    this.antiTunneling = antiTunneling;
     this.applyBonuses();
     this.updateElementSize();
     this.updateTitle();
@@ -99,10 +103,10 @@ export class Ball extends MovingGameObject {
     if (this.x - this.rx <= 0 || this.x + this.rx >= 100) {
       if (hitTop) {
         // Corner collision
-        this.angle = this.angle - Math.PI;
+        this.movementAngle = this.movementAngle - Math.PI;
         this.y = this.radius;
       } else {
-        this.angle = Math.PI - this.angle;
+        this.movementAngle = Math.PI - this.movementAngle;
       }
       // Correct positions
       if (this.x - this.rx <= 0) {
@@ -110,12 +114,14 @@ export class Ball extends MovingGameObject {
       } else {
         this.x = 100 - this.rx;
       }
+      this.antiJuggling = false;
       return true;
     } else if (hitTop) {
-      this.angle = -this.angle;
+      this.movementAngle = -this.movementAngle;
       if (this.y - this.radius < 0) {
         this.y = this.radius;
       }
+      this.antiJuggling = false;
       return true;
     }
 
@@ -132,98 +138,94 @@ export class Ball extends MovingGameObject {
       this.dispatchCollisionEvent(brick);
       return;
     }
-    // determine delta with each side of the brick
-    const {top, left, right, bottom} = brick.boundingBox;
 
-    const d = this.width;
-    const deltaLeft = left - this.boundingBox.right;
-    const deltaRight = right - this.boundingBox.left;
-    const deltaTop = top - this.boundingBox.bottom;
-    const deltaBottom = bottom - this.boundingBox.top;
-    const sidesHit = [deltaLeft, deltaRight, deltaTop, deltaBottom]
-      .map((delta, idx) => {
-        let type = 'vertical';
-        if (idx < 2) {
-          type = 'horizontal';
-        }
-        return {delta, type};
-      })
-      .filter(({delta}) => a(delta) <= d);
+    const overlapsAndAxes = getOverlapsAndAxes(brick, this);
+    const {axis: maxOverlapAxis} = overlapsAndAxes[1];
+    const collisionAngle = -Math.atan2(maxOverlapAxis.y, maxOverlapAxis.x);
 
-    if (sidesHit.length === 1) {
-      // side hit
-      const {delta, type} = sidesHit[0];
-      if (type === 'horizontal') {
-        this.angle = Math.atan2(this.speed * Math.sin(this.angle), -this.speed * Math.cos(this.angle));
-        this.x += delta;
-      } else {
-        this.angle = Math.atan2(-this.speed * Math.sin(this.angle), this.speed * Math.cos(this.angle));
-        this.y += delta;
-      }
-    } else if (sidesHit.length === 2) {
-      const hz = sidesHit.filter(({type}) => type === 'horizontal')[0];
-      const hzBouncePossible = (this.dx > 0 && hz?.delta === deltaLeft) || (this.dx < 0 && hz?.delta === deltaRight);
-      const vt = sidesHit.filter(({type}) => type === 'vertical')[0];
-      const vtBouncePossible = (this.dy > 0 && vt?.delta === deltaTop) || (this.dy < 0 && vt?.delta === deltaBottom);
-      if (hzBouncePossible && (!vtBouncePossible || a(hz?.delta) < a(vt?.delta))) {
-        this.angle = Math.atan2(this.speed * Math.sin(this.angle), -this.speed * Math.cos(this.angle));
-        this.x += hz?.delta;
-      } else {
-        // Default in case of tie to vertical
-        this.angle = Math.atan2(-this.speed * Math.sin(this.angle), this.speed * Math.cos(this.angle));
-        this.y += vt?.delta;
-      }
-    } else {
-      // no hit
-      console.warn('no hit', sidesHit);
-    }
+    // Calculate the new angle after reflection
+    const reflectedAngle = normalizeAngle(2 * collisionAngle - this.movementAngle);
+
+    this.movementAngle = reflectedAngle;
+    // todo: correct position with min overlap
+    this.correctPostion(overlapsAndAxes[0], brick);
 
     this.dispatchCollisionEvent(brick);
     brick.takeHit(this);
   }
 
   handlePaddleCollision(paddle: Paddle, frameFraction = 1) {
-    const paddleTop = paddle.boundingBox.top;
     const isColliding = this.antiTunneling ? this.sweptShapeCollision(paddle, frameFraction) : this.isColliding(paddle);
 
     if (isColliding) {
-      if (this.y < paddleTop) {
-        // Ball is coming from above the paddle, bounce it up
-        // Calculate the hit position on the paddle
-        const hitPosition = this.x - paddle.x;
-        const hitPositionNormalized = hitPosition / (paddle.width / 2);
+      // Ball is coming from above the paddle, bounce it up
+      // Calculate the hit position on the paddle
+      const hitPosition = this.x - paddle.x;
+      const hitPositionNormalized = hitPosition / (paddle.width / 2);
 
-        // Calculate the incoming angle of the ball
-        const incomingAngle =
-          (this.angle > Math.PI ? (this.angle % (2 * Math.PI)) - 2 * Math.PI : this.angle) % (2 * Math.PI);
+      // Calculate the incoming angle of the ball
+      const incomingAngle =
+        (this.movementAngle > Math.PI ? (this.movementAngle % (2 * Math.PI)) - 2 * Math.PI : this.movementAngle) %
+        (2 * Math.PI);
 
-        // Calculate the new angle with skewness towards more vertical angles
-        const angleMultiplier = paddle.gripFactor; // Adjust this value to control the skewness
-        const hitPositionSkewness = hitPositionNormalized * angleMultiplier;
-        const angle = -(incomingAngle + hitPositionSkewness) % (2 * Math.PI);
+      // Calculate the new angle with skewness towards more vertical angles
+      const angleMultiplier = paddle.gripFactor; // Adjust this value to control the skewness
+      const hitPositionSkewness = hitPositionNormalized * angleMultiplier;
 
-        const nextAngle = angle < -Math.PI / 2 ? Math.PI : angle;
-        this.angle = clamp(nextAngle, MAX_ANGLE, MIN_ANGLE);
-      }
+      const nextAngle = normalizeAngle(-paddle.angle * 2 - incomingAngle) - hitPositionSkewness;
+      this.movementAngle = clamp(nextAngle, MAX_ANGLE - paddle.angle, MIN_ANGLE - paddle.angle);
+      this.correctPostion(getOverlapsAndAxes(paddle, this)[0], paddle);
 
-      // Set ball right above the paddle
-      this.y = paddleTop - this.radius * 1;
       this.dispatchCollisionEvent(paddle);
       return true;
     }
   }
 
   isColliding(object: GameObject) {
-    const {top, left, right, bottom} = object.boundingBox;
+    if (this.antiJuggling === object.element.id) {
+      return false;
+    }
+    const cos = Math.cos(object.angle);
+    const sin = Math.sin(object.angle);
 
-    // Check for collision between a circle and a rectangle
-    // https://yal.cc/rectangle-circle-intersection-test/
-    const deltaX = this.x - Math.max(left, Math.min(this.x, right));
-    const deltaY = this.y - Math.max(top, Math.min(this.y, bottom));
-    return deltaX * deltaX + deltaY * deltaY <= this.radius * this.rx;
+    const axes: Vector[] = [
+      {x: cos, y: sin},
+      {x: -sin, y: cos},
+    ];
+
+    // Check for overlap on all axes
+    for (const axis of axes) {
+      if (!overlapOnAxis(this, axis, object.boundingBox)) {
+        return false; // No overlap on this axis, no collision
+      }
+    }
+
+    this.antiJuggling = object.element.id;
+    return true; // Overlapping on all axes, collision detected
   }
 
-  sweptShapeCollision(object: GameObject, frameFraction = 1) {
+  correctPostion(axisOverlaps: AxisOverlap, object: GameObject): void {
+    const {overlap, axis} = axisOverlaps;
+    if (overlap !== 0) {
+      if (object.x > this.x) {
+        axis.x *= -1;
+      }
+      if (object.y < this.y) {
+        axis.y *= -1;
+      }
+      this.x += axis.x * overlap;
+      this.y += axis.y * overlap;
+    }
+  }
+
+  /**
+   * Uses swept collision to detect collision with a rectangle with anti tunneling
+   * Does NOT work with angled objects
+   * @param object GameObject to check collision with
+   * @param frameFraction duration of the interval (in frames)
+   * @returns whether objects are colliding
+   */
+  sweptShapeCollision(object: GameObject, frameFraction = 1): boolean {
     const sweptVolumeX = this.x + Math.min(0, this.dx);
     const sweptVolumeY = this.y + Math.min(0, this.dy);
 

@@ -9,6 +9,8 @@ export type PaddleConfig = GameObjectConfig & {
   minY?: number;
   // Default to y
   maxY?: number;
+  // Defaults to pi / 4
+  angleLimit?: number;
 };
 
 export class Paddle extends GameObject {
@@ -16,6 +18,9 @@ export class Paddle extends GameObject {
   gripFactor = 0.05;
   minY: number;
   maxY: number;
+  cursorX: number;
+  cursorY: number;
+  angleLimit = 0.5;
   vtBound = true;
 
   constructor({gripFactor, minY, maxY, ...config}: PaddleConfig) {
@@ -25,6 +30,8 @@ export class Paddle extends GameObject {
     }
     this.minY = minY ?? this.y;
     this.maxY = maxY ?? this.y;
+    this.cursorX = this.x;
+    this.cursorY = this.y;
     if (this.maxY !== this.minY) {
       this.vtBound = false;
     }
@@ -53,15 +60,46 @@ export class Paddle extends GameObject {
 
   handleMove = (x: number, y: number) => {
     // Calculate the touch position relative to the window width
-    const paddleX = (x / this.parent.offsetWidth) * 100;
+    const normX = (x / this.parent.offsetWidth) * 100;
+    const normY = (y / this.parent.offsetHeight) * 100;
 
+    const paddleX = normX;
     let paddleY;
     if (!this.vtBound) {
-      paddleY = clamp((y / this.parent.offsetHeight) * 100, this.maxY, this.minY);
+      paddleY = clamp(normY, this.maxY, this.minY);
     }
-
-    // Update the paddle position
     this.updatePosition(paddleX, paddleY);
+
+    if (this.angleLimit !== 0) {
+      const dx = normX - this.cursorX;
+      const dy = normY - this.cursorY;
+      const setAngle = () => {
+        let dAngle = Math.atan2(dy, dx);
+        if (dx < 0) {
+          if (dAngle > 0) {
+            dAngle -= Math.PI;
+          } else {
+            dAngle += Math.PI;
+          }
+        }
+        dAngle *= -1;
+        // Ensure angle is within the range [-PI/2, PI/2)
+        dAngle = ((dAngle + Math.PI / 2) % Math.PI) - Math.PI / 2;
+        // Calculate the ratio of the current angle to the maximum allowable angle
+        const ratio = dAngle / (Math.PI / 2);
+
+        // Project the angle proportionally within the specified limit
+        const angle = -1 * ratio * this.angleLimit;
+
+        this.angle = angle;
+
+        this.cursorX = normX;
+        this.cursorY = normY;
+      };
+      if (Math.abs(dx) > 2 && Math.abs(dy) > 0) {
+        setAngle();
+      }
+    }
   };
 
   destroy(): void {
