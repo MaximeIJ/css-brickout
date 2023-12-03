@@ -26,6 +26,7 @@ type GameOptions = {
   // disabled if 0
   mouseoutPauseDelayMs: number;
   mouseoverResumeDelayMs: number;
+  showCursorInPlay: boolean;
 };
 
 const DEFAULT_OPTIONS: GameOptions = {
@@ -35,6 +36,7 @@ const DEFAULT_OPTIONS: GameOptions = {
   nextLifeDelayMs: 500,
   mouseoutPauseDelayMs: 1000,
   mouseoverResumeDelayMs: 1000,
+  showCursorInPlay: false,
 };
 
 export type GameParams = {
@@ -44,14 +46,6 @@ export type GameParams = {
   playerConfig?: PlayerParams;
   parentId?: string;
   options?: Partial<GameOptions>;
-  /** @deprecated use options instead */
-  fps?: number;
-  /** @deprecated use options instead */
-  capFps?: boolean;
-  /** @deprecated use options instead */
-  allowDebug?: boolean;
-  /** @deprecated use options instead */
-  nextLifeDelayMs?: number;
 };
 
 type PlayerParams = {
@@ -93,7 +87,11 @@ export class Game {
     this.ogParams = {...params};
     this.element = document.getElementById(params.parentId ?? 'game') as HTMLDivElement;
     this.element.classList.add('game');
+    if (!params.options?.showCursorInPlay) {
+      this.element.classList.add('hide-cursor');
+    }
 
+    // Set up level
     this.level = new Level({
       ...params.levelConfig,
       parent: this.element,
@@ -197,7 +195,10 @@ export class Game {
           // autoplay lol
           if (this.debug && ball.y > this.paddle.maxY - this.paddle.height && ball.y < this.paddle.maxY) {
             const semiR = Math.round(ball.x - this.paddle.width / 2 + (Math.random() * this.paddle.width) / 2);
-            this.paddle.updatePosition(semiR, this.paddle.maxY);
+            this.paddle.handleMove(
+              (semiR * this.paddle.parent.offsetWidth) / 100,
+              ((this.paddle.maxY ?? this.paddle.y) * this.paddle.parent.offsetHeight) / 100,
+            );
           }
         }
       } else {
