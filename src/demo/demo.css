@@ -139,6 +139,14 @@
   --hud-text: hsl(13, 64%, 85%, 90%);
 }
 
+.lava .ball {
+  border-top-right-radius: 45%;
+  border-bottom-right-radius: 45%;
+  border-right-color: hsl(48, 86%, 69%);
+  border-right-style: dotted;
+  border-right-width: 4px;
+}
+
 .lava .ball.ball--destroyed {
   background: hsl(13, 89%, 23%, 95%);
   border: none;

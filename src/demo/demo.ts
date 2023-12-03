@@ -6,7 +6,14 @@ import './demo.css';
 import {BONUSES, LAYOUTS} from './presets';
 
 const ng = -Math.PI / 2;
-const ballBase = {x: 50, y: 20, radius: 1, movement: {speed: 0.8}, startingBonuses: [BONUSES.speedup1]};
+const ballBase = {
+  x: 50,
+  y: 20,
+  radius: 1,
+  movement: {speed: 0.8},
+  syncAngles: true,
+  startingBonuses: [BONUSES.speedup1],
+};
 const paddleConfig = {
   width: 13,
   height: 2.3,

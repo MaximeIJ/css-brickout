@@ -263,6 +263,8 @@ export type TurnStep = {
 export type MovingGameObjectConfig = GameObjectConfig & {
   // Either a set direction and speed, or a series of steps to loop through
   movement?: MovementProps | Array<TurnStep>;
+  // Whether to sync the angle with the movement angle
+  syncAngles?: boolean;
 };
 
 export class MovingGameObject extends GameObject {
@@ -276,6 +278,7 @@ export class MovingGameObject extends GameObject {
   protected pHeight = 100;
   protected pWidth = 100;
   active = true;
+  syncAngles = false;
 
   get speed(): number {
     return this._speed;
@@ -292,6 +295,9 @@ export class MovingGameObject extends GameObject {
 
   set movementAngle(angle: number) {
     this._movementAngle = angle;
+    if (this.syncAngles) {
+      this.angle = -angle;
+    }
     this.setD();
   }
 
@@ -307,15 +313,16 @@ export class MovingGameObject extends GameObject {
         this.movement = firstStep.movement;
       }
     } else {
-      this._movementAngle = movementConfig?.angle ?? 0;
-      this._speed = movementConfig?.speed ?? 0;
+      this.movementAngle = movementConfig?.angle ?? 0;
+      this.speed = movementConfig?.speed ?? 0;
       this.setD();
     }
   }
 
-  constructor({movement = {speed: 0, angle: 0}, ...rest}: MovingGameObjectConfig) {
+  constructor({movement = {speed: 0, angle: 0}, syncAngles, ...rest}: MovingGameObjectConfig) {
     if (Array.isArray(movement) || (movement as unknown as MovementProps)?.speed > 0) {
       super({...rest, className: `moving-object ${rest.className ?? ''}`});
+      this.syncAngles = syncAngles ?? false;
       // Reupdate element to calculate necessary ratios for movement props
       this.updateElement();
       if (Array.isArray(movement)) {
@@ -325,6 +332,7 @@ export class MovingGameObject extends GameObject {
       }
     } else {
       super(rest);
+      this.syncAngles = syncAngles ?? false;
     }
   }
 
