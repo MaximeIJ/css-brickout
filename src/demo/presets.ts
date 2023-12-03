@@ -104,8 +104,8 @@ export const LAYOUTS: Record<string, LayoutDefinitionConfig> = {
   },
   evenHighSmall: {
     type: 'even',
-    y: 10,
-    rows: 3,
+    y: 2,
+    rows: 4,
     cols: 13,
     height: 4,
   },

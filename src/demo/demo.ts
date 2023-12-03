@@ -5,44 +5,38 @@ import '../style.css';
 import './demo.css';
 import {BONUSES, LAYOUTS} from './presets';
 
-// Start the game loop
 const ng = -Math.PI / 2;
 const ballBase = {x: 50, y: 20, radius: 1, movement: {speed: 0.8}, startingBonuses: [BONUSES.speedup1]};
 const paddleConfig = {
-  width: 8.9,
+  width: 13,
   height: 2.3,
   startingBonuses: [BONUSES.grip1],
 };
 const playerConfig = {
   lives: 3,
 };
+const commonParams = {
+  options: {allowDebug: true},
+  ballConfigs: [
+    {
+      ...ballBase,
+      movement: {...ballBase.movement, angle: ng},
+    },
+  ],
+  paddleConfig,
+  playerConfig,
+};
 const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
   hello: {
-    allowDebug: true,
-    ballConfigs: [
-      {
-        ...ballBase,
-        movement: {...ballBase.movement, angle: ng},
-      },
-    ],
+    ...commonParams,
     levelConfig: {layout: LAYOUTS.hello},
-    paddleConfig,
-    playerConfig,
   },
   even: {
-    allowDebug: true,
-    ballConfigs: [
-      {
-        ...ballBase,
-        movement: {...ballBase.movement, angle: ng},
-      },
-    ],
+    ...commonParams,
     levelConfig: {layout: LAYOUTS.evenHighSmall},
-    paddleConfig,
-    playerConfig,
   },
   random: {
-    allowDebug: true,
+    ...commonParams,
     ballConfigs: [
       {
         ...ballBase,
@@ -52,11 +46,9 @@ const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
       },
     ],
     levelConfig: {layout: LAYOUTS.random},
-    paddleConfig,
-    playerConfig,
   },
   mixed: {
-    allowDebug: true,
+    ...commonParams,
     ballConfigs: [
       {
         ...ballBase,
@@ -93,7 +85,6 @@ const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
       ],
     },
     paddleConfig: {...paddleConfig, minY: 75, maxY: 97},
-    playerConfig,
   },
 };
 
