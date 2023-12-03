@@ -64,7 +64,7 @@
     "dev": "vite -c vite.config.demo.ts",
     "lint": "eslint . --fix && prettier -w .",
     "prepublishOnly": "npm run build && npm run test:run && npm run lint && clean-package",
-    "preversion": "auto-changelog -p && git add CHANGELOG.md",
+    "postversion": "auto-changelog -p && git add CHANGELOG.md",
     "publish:major": "npm version major && npm run custom:publish",
     "publish:minor": "npm version minor && npm run custom:publish",
     "publish:patch": "npm version patch && npm run custom:publish",
