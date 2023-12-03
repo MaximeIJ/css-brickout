@@ -9,7 +9,7 @@ export type PaddleConfig = GameObjectConfig & {
   minY?: number;
   // Default to y
   maxY?: number;
-  // Defaults to pi / 4
+  // Defaults to 0
   angleLimit?: number;
 };
 
@@ -20,13 +20,16 @@ export class Paddle extends GameObject {
   maxY: number;
   cursorX: number;
   cursorY: number;
-  angleLimit = 0.5;
+  angleLimit = 0;
   vtBound = true;
 
-  constructor({gripFactor, minY, maxY, ...config}: PaddleConfig) {
+  constructor({angleLimit, gripFactor, minY, maxY, ...config}: PaddleConfig) {
     super({...config, className: [...(config.className?.split(' ') ?? []), 'paddle'].join(' '), showTitle: true});
     if (gripFactor !== undefined) {
       this.gripFactor = gripFactor;
+    }
+    if (angleLimit !== undefined) {
+      this.angleLimit = angleLimit;
     }
     this.minY = minY ?? this.y;
     this.maxY = maxY ?? this.y;
@@ -91,7 +94,7 @@ export class Paddle extends GameObject {
         // Project the angle proportionally within the specified limit
         const angle = -1 * ratio * this.angleLimit;
 
-        this.angle = angle;
+        this.angle += angle / 10;
 
         this.cursorX = normX;
         this.cursorY = normY;

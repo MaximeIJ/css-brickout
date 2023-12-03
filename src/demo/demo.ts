@@ -10,6 +10,7 @@ const ballBase = {x: 50, y: 20, radius: 1, movement: {speed: 0.8}, startingBonus
 const paddleConfig = {
   width: 13,
   height: 2.3,
+  angleLimit: Math.PI / 4,
   startingBonuses: [BONUSES.grip1],
 };
 const playerConfig = {
