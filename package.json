@@ -21,6 +21,7 @@
   ],
   "files": [
     "dist",
+    "CHANGELOG.md",
     "README.md"
   ],
   "main": "./dist/css-brickout.umd.js",
@@ -64,7 +65,7 @@
     "dev": "vite -c vite.config.demo.ts",
     "lint": "eslint . --fix && prettier -w .",
     "prepublishOnly": "npm run build && npm run test:run && npm run lint && clean-package",
-    "postversion": "auto-changelog -p && git add CHANGELOG.md",
+    "postversion": "auto-changelog -p && git add CHANGELOG.md && git commit --amend --no-edit",
     "publish:major": "npm version major && npm run custom:publish",
     "publish:minor": "npm version minor && npm run custom:publish",
     "publish:patch": "npm version patch && npm run custom:publish",
