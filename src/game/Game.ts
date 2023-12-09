@@ -27,6 +27,7 @@ type GameOptions = {
   mouseoutPauseDelayMs: number;
   mouseoverResumeDelayMs: number;
   showCursorInPlay: boolean;
+  demoMode: boolean;
 };
 
 const DEFAULT_OPTIONS: GameOptions = {
@@ -37,6 +38,7 @@ const DEFAULT_OPTIONS: GameOptions = {
   mouseoutPauseDelayMs: 1000,
   mouseoverResumeDelayMs: 1000,
   showCursorInPlay: false,
+  demoMode: false,
 };
 
 export type GameParams = {
@@ -131,13 +133,17 @@ export class Game {
 
     // Event listeners
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
-    document.addEventListener('keydown', this.handleKeyPress);
     this.element.addEventListener('balldestroyed', this.handleBallLost);
     this.element.addEventListener('ballcollision', this.handleBallCollision);
     this.element.addEventListener('brickdestroyed', this.handleBrickDestroyed);
     this.element.addEventListener('mouseenter', this.handleMouseEnter);
     this.element.addEventListener('mouseleave', this.handleMouseLeave);
     new ResizeObserver(this.handleResize).observe(this.element);
+    if (!this.options.demoMode) {
+      document.addEventListener('keyup', this.handleKeyPress);
+    } else {
+      this.element.classList.add('demo');
+    }
 
     this.fpsInterval = Math.floor(1000.0 / (this.options.fps || 60)) || 1;
     this.fpsCap = this.options.capFps ? this.fpsInterval : 1;
@@ -418,7 +424,7 @@ export class Game {
 
   destroy = () => {
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
-    document.removeEventListener('keydown', this.handleKeyPress);
+    document.removeEventListener('keyup', this.handleKeyPress);
     this.element.removeEventListener('balldestroyed', this.handleBallLost);
     this.element.removeEventListener('ballcollision', this.handleBallCollision);
     this.element.removeEventListener('brickdestroyed', this.handleBrickDestroyed);

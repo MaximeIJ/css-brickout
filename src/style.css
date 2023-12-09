@@ -20,8 +20,8 @@
   grid-template-rows: max(3rem, 8%) 1fr max(3rem, 10%);
 }
 
-.game > .level {
-  cursor: crosshair;
+.game.demo {
+  pointer-events: none;
 }
 
 .game:not(.paused) .level * {
@@ -44,12 +44,13 @@
 
 /* Level */
 
-.level {
+.game > .level {
   background: var(--level-bg, transparent);
   height: 100%;
   width: 100%;
   position: relative;
   overflow: hidden;
+  cursor: crosshair;
 
   grid-column: 1 / 2;
   grid-row: 1 / 3;
