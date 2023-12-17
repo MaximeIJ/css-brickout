@@ -5,19 +5,22 @@ import {Ball, MovingGameObjectConfig, MovingGameObject} from './';
 export type BrickConfig = MovingGameObjectConfig & {
   hp?: number;
   breakthrough?: boolean;
+  ignoreMobile?: boolean;
 };
 
 export class Brick extends MovingGameObject {
-  breakthrough;
+  breakthrough: boolean;
+  ignoreMobile: boolean;
   destroyed = false;
   hp: number;
   maxHp: number;
 
-  constructor({hp = 1, breakthrough = false, ...config}: BrickConfig) {
+  constructor({hp = 1, breakthrough = false, ignoreMobile = false, ...config}: BrickConfig) {
     super({...config, className: [config.className ?? '', 'brick'].filter(Boolean).join(' '), showTitle: true});
     this.hp = hp;
     this.maxHp = hp;
     this.breakthrough = breakthrough;
+    this.ignoreMobile = ignoreMobile;
     this.applyBonuses();
     this.updateTitle();
   }

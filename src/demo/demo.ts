@@ -1,30 +1,33 @@
 import {Ball, BallDestroyedEvent} from '../game/Ball';
 import {Game, GameParams} from '../game/Game';
-
 import '../style.css';
 import './demo.css';
+import {clamp} from '../util/math';
+
 import {BONUSES, LAYOUTS} from './presets';
+
+const startingSpeed = 100;
 
 const ng = -Math.PI / 2;
 const ballBase = {
   x: 50,
   y: 20,
   radius: 1,
-  movement: {speed: 0.8},
+  movement: {speed: 0.9},
   syncAngles: true,
   startingBonuses: [BONUSES.speedup1],
 };
 const paddleConfig = {
   width: 13,
   height: 2.3,
-  angleLimit: Math.PI / 4,
+  angleLimit: Math.PI / 12,
   startingBonuses: [BONUSES.grip1],
 };
 const playerConfig = {
   lives: 3,
 };
 const commonParams = {
-  options: {allowDebug: true},
+  options: {allowDebug: true, updatesPerFrame: startingSpeed},
   ballConfigs: [
     {
       ...ballBase,
@@ -102,23 +105,6 @@ gameLoop.start();
 
 let lastTheme = 'classic';
 
-function onLayoutChange({target}: Event) {
-  const layout = (target as HTMLSelectElement)?.value;
-  gameLoop.destroy();
-  if (layout === 'even') {
-    gameLoop = new Game(inputMap.even);
-  } else if (layout === 'random') {
-    gameLoop = new Game(inputMap.random);
-  } else if (layout === 'mixed') {
-    gameLoop = new Game(inputMap.mixed);
-  } else if (layout === 'hello') {
-    gameLoop = new Game(inputMap.hello);
-  }
-  gameLoop.start();
-}
-
-document.getElementById('layout-type')?.addEventListener('change', onLayoutChange);
-
 function onThemeChange({target}: Event) {
   const className = (target as HTMLSelectElement)?.value;
   gameLoop.pause();
@@ -132,6 +118,40 @@ function onThemeChange({target}: Event) {
 }
 
 document.getElementById('theme')?.addEventListener('change', onThemeChange);
+
+function onLayoutChange({target}: Event) {
+  const layout = (target as HTMLSelectElement)?.value;
+  gameLoop.destroy();
+  if (layout === 'even') {
+    gameLoop = new Game(inputMap.even);
+  } else if (layout === 'random') {
+    gameLoop = new Game(inputMap.random);
+  } else if (layout === 'mixed') {
+    gameLoop = new Game(inputMap.mixed);
+  } else if (layout === 'hello') {
+    gameLoop = new Game(inputMap.hello);
+  }
+  setUpdatesFrame(100);
+  gameLoop.start();
+}
+
+document.getElementById('layout-type')?.addEventListener('change', onLayoutChange);
+
+function setUpdatesFrame(upf: number) {
+  gameLoop.options.updatesPerFrame = clamp(1, upf, 1000);
+  const labelElement = document.getElementById('updates-frame-label');
+  if (labelElement) {
+    labelElement.innerText = `${gameLoop.options.updatesPerFrame}`;
+  }
+}
+
+function onUpdatesFrameChange({target}: Event) {
+  const upf = (target as HTMLInputElement)?.value;
+  setUpdatesFrame(parseInt(upf));
+}
+
+document.getElementById('updates-frame')?.addEventListener('input', onUpdatesFrameChange);
+
 document.getElementById('game')?.addEventListener('balldestroyed', e => {
   const ball: Ball = (e as BallDestroyedEvent).detail;
   const particles = ball.emitParticles(10, ['ball--destroyed-particle'], 300, true);

@@ -380,7 +380,6 @@ export class MovingGameObject extends GameObject {
   processFrame(frameFraction = 1) {
     if (this.active) {
       this.updatePosition(undefined, undefined, frameFraction);
-      this.updateElementPosition();
     }
   }
 }

@@ -88,9 +88,7 @@ export class Level {
     // Assign bricks to strips
     this.bricks.forEach(brick => {
       // If it's mobile, add it to all strips
-      if (brick.speed) {
-        this._strips.forEach(strip => strip.push(brick));
-      } else {
+      if (!brick.speed || brick.ignoreMobile) {
         const leftStrip = Math.floor((brick.x - brick.width / 2) / this._stripW);
         const rightStrip = Math.floor((brick.x + brick.width / 2) / this._stripW);
         this._strips[leftStrip]?.push(brick);
@@ -114,6 +112,8 @@ export class Level {
     for (let i = left; i <= right && i < this._strips.length; i++) {
       res.push(...(this._strips[i] ?? []));
     }
+    // any mobile brick may be nearby
+    res.push(...this.mobileBricks);
     return res;
   }
 

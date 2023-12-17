@@ -28,6 +28,7 @@ type GameOptions = {
   mouseoverResumeDelayMs: number;
   showCursorInPlay: boolean;
   demoMode: boolean;
+  updatesPerFrame: number;
 };
 
 const DEFAULT_OPTIONS: GameOptions = {
@@ -39,6 +40,7 @@ const DEFAULT_OPTIONS: GameOptions = {
   mouseoverResumeDelayMs: 1000,
   showCursorInPlay: false,
   demoMode: false,
+  updatesPerFrame: 1,
 };
 
 export type GameParams = {
@@ -55,7 +57,7 @@ type PlayerParams = {
 };
 
 type State = 'paused' | 'playing' | 'debug' | 'won' | 'lost' | 'away' | 'starting';
-const PAUSABLE: Array<State> = ['playing', 'debug'];
+const PAUSABLE: Array<State> = ['playing', 'debug']; // todo: add 'demo' state where update can be called to kick off the loop. Possibly disable timer during that mode. Set state to get out of it.
 const RESUMABLE: Array<State> = ['paused', 'away'];
 
 // GameLoop class
@@ -189,14 +191,26 @@ export class Game {
         }
 
         this.paddle.updateElementPosition();
-        const frameFraction = msSinceLastFrame / this.fpsInterval;
-        this.level.mobileBricks.forEach(brick => brick.processFrame(frameFraction));
+        const frameFraction = msSinceLastFrame / (this.fpsInterval * this.options.updatesPerFrame);
 
+        // update numbers
+        for (let i = 0; i < this.options.updatesPerFrame; i++) {
+          this.level.mobileBricks.forEach(brick => brick.processFrame(frameFraction));
+          for (const ball of this.balls) {
+            if (ball.destroyed) {
+              continue;
+            }
+            ball.processFrame(frameFraction, this.level, this.paddle);
+          }
+        }
+
+        // update visuals
+        this.level.mobileBricks.forEach(brick => brick.updateElementPosition());
         for (const ball of this.balls) {
           if (ball.destroyed) {
             continue;
           }
-          ball.processFrame(frameFraction, this.level, this.paddle);
+          ball.updateElementPosition();
 
           // autoplay lol
           if (this.debug && ball.y > this.paddle.maxY - this.paddle.height && ball.y < this.paddle.maxY) {

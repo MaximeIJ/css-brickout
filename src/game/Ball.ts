@@ -265,7 +265,6 @@ export class Ball extends MovingGameObject {
     if (shouldUpdateLast) {
       this.updatePosition(undefined, undefined, frameFraction);
     }
-    this.updateElementPosition();
   }
 
   dispatchCollisionEvent(object: GameObject) {
