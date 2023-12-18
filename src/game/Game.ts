@@ -54,6 +54,7 @@ export type GameParams = {
 
 type PlayerParams = {
   lives: number;
+  score?: number;
 };
 
 type State = 'paused' | 'playing' | 'debug' | 'won' | 'lost' | 'away' | 'starting';
@@ -117,6 +118,7 @@ export class Game {
     // Set up player
     if (params.playerConfig) {
       this.lives = params.playerConfig.lives;
+      this.score = params.playerConfig.score ?? 0;
     }
     this.controls = new Controls({
       parent: this.element,
