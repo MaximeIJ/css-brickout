@@ -166,26 +166,28 @@ export class GameObject {
     this.element.innerHTML = content;
   }
 
+  recycleParticle(particle: HTMLElement): () => void {
+    return () => {
+      particle.className = 'particle';
+      particle.style.cssText = '';
+      particle.style.opacity = '0';
+      this.particles.push(particle);
+    };
+  }
+
   // pops a particle from the particle pool, creates one if none exist
   getParticleElement(recycleCondition: 'animationend' | 'transitionend' | number = 'animationend'): HTMLElement {
     const nextParticle = this.particles.pop();
     if (nextParticle) {
-      nextParticle.style.setProperty('transform', this.element.style.transform);
       return nextParticle;
     } else {
       const particle = document.createElement('particle');
       particle.classList.add('particle');
       this.parent.appendChild(particle);
       if (typeof recycleCondition === 'number') {
-        setTimeout(() => {
-          particle.className = 'particle';
-          this.particles.push(particle);
-        }, recycleCondition);
+        setTimeout(this.recycleParticle(particle), recycleCondition);
       } else {
-        particle.addEventListener(recycleCondition, () => {
-          particle.className = 'particle';
-          this.particles.push(particle);
-        });
+        particle.addEventListener(recycleCondition, this.recycleParticle(particle));
       }
       this.totalParticles++;
       particle.id = `${this.element.id}-particle-${this.totalParticles}`;
@@ -209,6 +211,7 @@ export class GameObject {
         particle.style.setProperty('width', this.element.clientWidth + 'px');
         particle.style.setProperty('height', this.element.clientHeight + 'px');
       }
+      particle.style.setProperty('opacity', '1');
       particle.style.setProperty('transform', this.element.style.transform);
       particles.push(particle);
     }
