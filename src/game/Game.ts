@@ -74,6 +74,7 @@ export class Game {
   lastFpsUpdate: number = Date.now();
   // Gameplay
   options: GameOptions;
+  private effectiveUpdatesPerFrame: number;
   fpsInterval: number;
   fpsCap: number;
   msSinceStart = 0;
@@ -114,6 +115,7 @@ export class Game {
     this.resumeLink = null;
 
     this.options = {...DEFAULT_OPTIONS, ...params.options};
+    this.effectiveUpdatesPerFrame = this.options.updatesPerFrame;
 
     // Set up player
     if (params.playerConfig) {
@@ -178,6 +180,10 @@ export class Game {
     this.dispatchGameEvent('gamestarted');
   };
 
+  setOverallSpeed = (speed: number) => {
+    this.effectiveUpdatesPerFrame = Math.round(this.options.updatesPerFrame / speed);
+  };
+
   update = () => {
     const now = Date.now();
     const msSinceLastFrame = now - this.lastFrameTime;
@@ -193,7 +199,7 @@ export class Game {
         }
 
         this.paddle.updateElementPosition();
-        const frameFraction = msSinceLastFrame / (this.fpsInterval * this.options.updatesPerFrame);
+        const frameFraction = msSinceLastFrame / (this.fpsInterval * this.effectiveUpdatesPerFrame);
 
         // update numbers
         for (let i = 0; i < this.options.updatesPerFrame; i++) {

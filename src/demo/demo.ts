@@ -145,12 +145,33 @@ function setUpdatesFrame(upf: number) {
   }
 }
 
-function onUpdatesFrameChange({target}: Event) {
+function onUpdatesPerFrameChange({target}: Event) {
   const upf = (target as HTMLInputElement)?.value;
   setUpdatesFrame(parseInt(upf));
+  // gotta reset speed to 1
+  setGameSpeed(1);
 }
 
-document.getElementById('updates-frame')?.addEventListener('input', onUpdatesFrameChange);
+document.getElementById('updates-frame')?.addEventListener('input', onUpdatesPerFrameChange);
+
+function setGameSpeed(speed: number) {
+  gameLoop.setOverallSpeed(clamp(0.05, speed, 3));
+  const labelElement = document.getElementById('game-speed-label');
+  const inputElement = document.getElementById('game-speed') as HTMLInputElement;
+  if (inputElement) {
+    inputElement.value = `${speed}`;
+  }
+  if (labelElement) {
+    labelElement.innerText = `${speed.toFixed(2)}X`;
+  }
+}
+
+function onGameSpeedChange({target}: Event) {
+  const speed = (target as HTMLInputElement)?.value;
+  setGameSpeed(parseFloat(speed));
+}
+
+document.getElementById('game-speed')?.addEventListener('input', onGameSpeedChange);
 
 document.getElementById('game')?.addEventListener('balldestroyed', e => {
   const ball: Ball = (e as BallDestroyedEvent).detail;
