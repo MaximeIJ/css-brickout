@@ -268,6 +268,7 @@ export class Game {
 
   handleBrickDestroyed = (event: Event) => {
     console.debug('BrickDestroyed', (event as BrickDestroyedEvent).detail);
+    this.level.mobileBricks = this.level.mobileBricks.filter(brick => !brick.destroyed);
     if (this.level.isDone()) {
       this.win();
     }

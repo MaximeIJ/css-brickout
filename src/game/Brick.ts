@@ -28,7 +28,7 @@ export class Brick extends MovingGameObject {
   takeHit(ball: Ball) {
     this.hp -= ball.damage;
     if (this.hp <= 0) {
-      this.destroy(false);
+      this.destroy(!this.permanent);
     }
   }
 
@@ -44,6 +44,7 @@ export class Brick extends MovingGameObject {
   destroy(forReal = true) {
     this.element.classList.add('brick--destroyed');
     this.destroyed = true;
+    this.active = false;
     const event: BrickDestroyedEvent = createEvent<Brick>('brickdestroyed', this);
     this.parent.dispatchEvent(event);
     if (forReal) {
