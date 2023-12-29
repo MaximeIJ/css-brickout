@@ -273,7 +273,7 @@ export type MovingGameObjectConfig = GameObjectConfig & {
 export class MovingGameObject extends GameObject {
   private _speed = 0;
   private _movementAngle = 0;
-  protected turnSteps: Array<TurnStep> = [];
+  turnSteps: Array<TurnStep> = [];
   protected dx = 0;
   protected dy = 0;
   protected fx = 0;
