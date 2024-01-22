@@ -27,7 +27,7 @@ export default defineConfig({
     dts({
       insertTypesEntry: true,
     }),
-    removeConsole({includes: ['log', 'warn', 'error', 'info', 'debug']}),
+    removeConsole({includes: ['log', 'warn', 'error', 'debug']}),
   ],
   test: {
     environment: 'jsdom',

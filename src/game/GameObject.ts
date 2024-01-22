@@ -53,6 +53,7 @@ export class GameObject {
     startingBonuses = [],
     showTitle = false,
     permanent = false,
+    ...rest // rest is used to allow for any other properties to be added to the object
   }: GameObjectConfig) {
     this.width = width;
     this.height = height;
@@ -61,6 +62,10 @@ export class GameObject {
     this.bonuses = startingBonuses;
     this.element = document.createElement('div');
     this.permanent = permanent;
+    // if anything remains in rest, add it as properties to this object
+    if (Object.keys(rest).length) {
+      Object.assign(this, rest);
+    }
     if (showTitle) {
       this.element.title = formatObjectTitle(this);
     }
