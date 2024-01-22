@@ -309,7 +309,7 @@ export class Game {
       if (this.state === 'playing') {
         this.state = 'debug';
       }
-      this.debug.setContent(this.state);
+      this.debug.setContent(this.options.demoMode ? 'demo' : this.state);
       this.debug.updateElement();
     }
   };
