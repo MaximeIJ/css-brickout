@@ -51,7 +51,7 @@
   position: relative;
   overflow: hidden;
   cursor: crosshair;
-
+  touch-action: none;
   grid-column: 1 / 2;
   grid-row: 1 / 3;
 }
