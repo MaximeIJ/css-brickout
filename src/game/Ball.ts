@@ -1,6 +1,6 @@
 import {AxisOverlap, Vector, a, clamp, createEvent, getOverlapsAndAxes, normalizeAngle, overlapOnAxis} from '../util';
 
-import {Brick, GameObject, Level, MovingGameObject, MovingGameObjectConfig, Paddle} from './';
+import {Brick, CompositeBrick, GameObject, Level, MovingGameObject, MovingGameObjectConfig, Paddle} from './';
 
 export type BallConfig = Omit<MovingGameObjectConfig, 'elementId'> & {
   idx: number;
@@ -82,16 +82,21 @@ export class Ball extends MovingGameObject {
 
       // Check for collision
       if (this.antiTunneling) {
-        // swept shape collision
+        // todo: remove swept shape collision?
         if (this.sweptShapeCollision(brick, frameFraction)) {
           hitBrick = true;
           this.handleBrickCollision(brick);
         }
       } else {
-        if (this.isColliding(brick)) {
-          hitBrick = true;
-          this.handleBrickCollision(brick);
-        }
+        // check if the brick has hitboxParts, if so, check collision with each part
+        const partsToCheck = brick.hitboxParts ?? [brick];
+        partsToCheck.some(part => {
+          if (this.isColliding(part)) {
+            // todo: identify which brick got hit if there are hitbox parts
+            hitBrick = true;
+            this.handleBrickCollision(part, brick);
+          }
+        });
       }
     }
 
@@ -132,10 +137,11 @@ export class Ball extends MovingGameObject {
     }
   }
 
-  handleBrickCollision(brick: Brick) {
+  handleBrickCollision(brick: Brick, composite?: CompositeBrick) {
+    const parentBrick = composite ?? brick;
     if (brick.breakthrough) {
-      brick.takeHit(this);
-      this.dispatchCollisionEvent(brick);
+      parentBrick.takeHit(this);
+      this.dispatchCollisionEvent(parentBrick);
       return;
     }
 
@@ -151,7 +157,7 @@ export class Ball extends MovingGameObject {
     this.correctPostion(overlapsAndAxes[0], brick);
 
     this.dispatchCollisionEvent(brick);
-    brick.takeHit(this);
+    parentBrick.takeHit(this);
   }
 
   handlePaddleCollision(paddle: Paddle, frameFraction = 1) {

@@ -54,6 +54,8 @@ export const BONUSES: Record<string, BonusConfig> = {
   // Brick
 };
 
+const rndTwist = 0.5 * Math.random();
+
 export const LAYOUTS: Record<string, LayoutDefinitionConfig> = {
   random: {
     type: 'custom',
@@ -144,6 +146,14 @@ export const LAYOUTS: Record<string, LayoutDefinitionConfig> = {
     cols: 13,
     height: 3,
   },
+  evenStress: {
+    type: 'even',
+    y: 13,
+    rows: 4,
+    cols: 50,
+    height: 1.5,
+    hp: 4,
+  },
   hello: {
     type: 'custom',
     bricks: [
@@ -190,6 +200,31 @@ export const LAYOUTS: Record<string, LayoutDefinitionConfig> = {
         movement: [
           {movement: {speed: 0.2, angle: -Math.PI / 2}, condition: mgo => mgo.y > 45},
           {movement: {speed: 0.1, angle: Math.PI / 2}, condition: mgo => mgo.y < 27},
+        ],
+      },
+    ],
+  },
+  composite: {
+    type: 'custom',
+    bricks: [
+      {
+        x: 0,
+        y: 0,
+        hp: 10,
+        width: 0,
+        height: 0,
+        hitboxParts: [
+          {
+            x: 13,
+            y: 58,
+            width: 16,
+            height: 8,
+            angle: rndTwist + (2 * Math.PI) / 3,
+            className: 'composite-inner',
+            hp: 10,
+          },
+          {x: 13, y: 58, width: 16, height: 8, angle: rndTwist + Math.PI / 3, className: 'composite-inner', hp: 10},
+          {x: 13, y: 58, width: 16, height: 8, angle: rndTwist, className: 'composite-inner', hp: 10},
         ],
       },
     ],

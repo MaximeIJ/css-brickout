@@ -1,4 +1,6 @@
-import {Ball, Brick, BrickConfig} from './';
+import {Ball, CompositeBrick, CompositeBrickConfig} from './';
+
+export type BrickProps = Omit<CompositeBrickConfig, 'parent'>;
 
 type LayoutDefinitionType = 'even' | 'custom';
 type LayoutDefinition = {
@@ -7,7 +9,7 @@ type LayoutDefinition = {
 /**
  * Lays bricks out evenly in a grid starting from x = 0 and y = y
  */
-type EvenLayoutDefinition = LayoutDefinition & {
+export type EvenLayoutDefinition = LayoutDefinition & {
   type: 'even';
   // Starting y position of the grid
   y: number;
@@ -17,17 +19,16 @@ type EvenLayoutDefinition = LayoutDefinition & {
   rows: number;
   // Number of columns
   cols: number;
+  hp?: number;
 };
 /**
  * Lays bricks out in a custom grid
  */
-type CustomLayoutDefinition = LayoutDefinition & {
+export type CustomLayoutDefinition = LayoutDefinition & {
   type: 'custom';
   // Array of bricks definitions with custom x, y, width, and height
   bricks: Array<BrickProps>;
 };
-
-export type BrickProps = Omit<BrickConfig, 'parent'>;
 
 export type LayoutDefinitionConfig = EvenLayoutDefinition | CustomLayoutDefinition;
 
@@ -37,22 +38,28 @@ export type LevelConfig = {
    * Layout(s) of the bricks, types can be mixed. Will be laid out in order.
    */
   layout: LayoutDefinitionConfig | Array<LayoutDefinitionConfig>;
+  /**
+   * Number of zones to divide the level into for collision detection
+   * @default 10
+   */
+  divisionFactor?: number;
 };
 
 export class Level {
   element: HTMLDivElement;
   parent: HTMLDivElement;
-  bricks: Array<Brick>;
-  mobileBricks: Array<Brick>;
+  bricks: Array<CompositeBrick>;
+  mobileBricks: Array<CompositeBrick>;
   left = 0;
-  _strips: Array<Array<Brick>>;
-  _stripW: number;
+  _divisionFactor: number;
+  _hitZones: Array<Array<Array<CompositeBrick>>>;
 
-  constructor({layout, parent}: LevelConfig) {
+  constructor({divisionFactor, layout, parent}: LevelConfig) {
     this.bricks = [];
     this.mobileBricks = [];
-    this._strips = [];
+    this._hitZones = [];
     this.parent = parent;
+    this._divisionFactor = divisionFactor ?? 10;
     if (document.getElementById('level')) {
       this.element = document.getElementById('level') as HTMLDivElement;
     } else {
@@ -68,32 +75,32 @@ export class Level {
     }
     this.left = this.bricks.length;
 
-    // Use the widest brick size to determine the strip size
-    let maxBrickWidth = 0;
-    this.bricks.forEach(brick => {
-      if (brick.width > maxBrickWidth) {
-        maxBrickWidth = brick.width;
+    for (let divRow = 0; divRow < this._divisionFactor; divRow++) {
+      this._hitZones.push([]);
+      for (let divCol = 0; divCol < this._divisionFactor; divCol++) {
+        this._hitZones[divRow].push([]);
       }
-      if (brick.speed) {
-        this.mobileBricks.push(brick);
-      }
-    });
-    // We want a round number of strips across the screen of width 100. What's the closest we can get?
-    const stripCount = Math.floor(100 / (maxBrickWidth + 1)); // +1 buffer to be sure
-    this._stripW = 100 / stripCount;
-    // Create the strips
-    for (let i = 0; i < stripCount; i++) {
-      this._strips.push([]);
     }
-    // Assign bricks to strips
+
+    // Assign bricks to strips and _hitZones
     this.bricks.forEach(brick => {
-      // If it's mobile, add it to all strips
-      if (!brick.speed || brick.ignoreMobile) {
-        const leftStrip = Math.floor((brick.x - brick.width / 2) / this._stripW);
-        const rightStrip = Math.floor((brick.x + brick.width / 2) / this._stripW);
-        this._strips[leftStrip]?.push(brick);
-        if (rightStrip !== leftStrip && rightStrip < stripCount) {
-          this._strips[rightStrip]?.push(brick);
+      if (brick.speed || brick.hitboxParts?.some(p => p.speed)) {
+        this.mobileBricks.push(brick);
+      } else {
+        const cbb = brick.compositeBoundingBox;
+        for (let divRow = 0; divRow < this._divisionFactor; divRow++) {
+          for (let divCol = 0; divCol < this._divisionFactor; divCol++) {
+            const x = divCol * (100 / this._divisionFactor);
+            const y = divRow * (100 / this._divisionFactor);
+            if (
+              cbb.topL.x < x + 100 / this._divisionFactor &&
+              cbb.topR.x > x &&
+              cbb.topL.y < y + 100 / this._divisionFactor &&
+              cbb.bottomL.y > y
+            ) {
+              this._hitZones[divRow][divCol].push(brick);
+            }
+          }
         }
       }
     });
@@ -105,16 +112,28 @@ export class Level {
     this.left--;
   };
 
-  getNearbyBricks(ball: Ball): Array<Brick> {
-    const res = [];
-    const left = Math.floor((ball.x - ball.radius) / this._stripW);
-    const right = Math.floor((ball.x + ball.radius) / this._stripW);
-    for (let i = left; i <= right && i < this._strips.length; i++) {
-      res.push(...(this._strips[i] ?? []));
+  getNearbyBricks(ball: Ball): Array<CompositeBrick> {
+    const res = new Set<CompositeBrick>();
+    // find all the zones the ball collides with, using the ball radius
+    const minDivRow = Math.max(0, Math.floor((ball.y - ball.radius) / (100 / this._divisionFactor)));
+    const maxDivRow = Math.min(
+      this._divisionFactor - 1,
+      Math.floor((ball.y + ball.radius) / (100 / this._divisionFactor)),
+    );
+    const minDivCol = Math.max(0, Math.floor((ball.x - ball.radius) / (100 / this._divisionFactor)));
+    const maxDivCol = Math.min(
+      this._divisionFactor - 1,
+      Math.floor((ball.x + ball.radius) / (100 / this._divisionFactor)),
+    );
+    for (let divRow = minDivRow; divRow <= maxDivRow; divRow++) {
+      for (let divCol = minDivCol; divCol <= maxDivCol; divCol++) {
+        this._hitZones[divRow][divCol].forEach(brick => res.add(brick));
+      }
     }
+
     // any mobile brick may be nearby
-    res.push(...this.mobileBricks);
-    return res;
+    this.mobileBricks.forEach(brick => res.add(brick));
+    return Array.from(res);
   }
 
   updateElements() {
@@ -128,25 +147,28 @@ export class Level {
       layout.forEach(layout => this.layBricks(layout, parent));
     }
     if (layout.type === 'even') {
-      const {y, height, rows, cols} = layout;
+      const {y, height, rows, cols, hp = 1} = layout;
       for (let i = 0; i < rows; i++) {
         const width = 100.0 / cols;
         for (let j = 0; j < cols; j++) {
           this.bricks.push(
-            new Brick({
+            new CompositeBrick({
               parent,
               width,
               height,
               x: width * (j + 0.5),
               y: y + height * i,
-              elementId: `brick-${this.left + i * cols + j}`,
+              hp,
+              elementId: `brick-${this.bricks.length}`,
             }),
           );
         }
       }
     } else if (layout.type === 'custom') {
-      layout.bricks.forEach((brick, idx) => {
-        this.bricks.push(new Brick({...brick, parent, elementId: brick.elementId ?? `brick-${this.left + idx}`}));
+      layout.bricks.forEach(brick => {
+        this.bricks.push(
+          new CompositeBrick({...brick, parent, elementId: brick.elementId ?? `brick-${this.bricks.length}`}),
+        );
       });
     }
   }

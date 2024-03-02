@@ -1,6 +1,7 @@
 // Dependencies first!
 export * from './GameObject';
 export * from './Clickable';
+export * from './Composite';
 export * from './Controls';
 export * from './Ball';
 export * from './Brick';

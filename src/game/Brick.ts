@@ -1,6 +1,6 @@
 import {createEvent} from '../util';
 
-import {Ball, MovingGameObjectConfig, MovingGameObject} from './';
+import {Ball, Composite, MovingGameObjectConfig, MovingGameObject} from './';
 
 export type BrickConfig = MovingGameObjectConfig & {
   hp?: number;
@@ -56,6 +56,59 @@ export class Brick extends MovingGameObject {
     this.element.classList.remove('brick--destroyed');
     this.destroyed = false;
     this.hp = this.maxHp;
+  }
+}
+
+export type CompositeBrickConfig = BrickConfig & {hitboxParts?: Array<Omit<BrickConfig, 'parent'>>};
+
+export class CompositeBrick extends Brick implements Composite {
+  hitboxParts?: Array<Brick>;
+
+  constructor(config: CompositeBrickConfig) {
+    super(config);
+    this.hitboxParts = config.hitboxParts?.map(
+      (part, idx) => new Brick({...part, parent: config.parent, elementId: `${config.elementId}-p${idx}`}),
+    );
+  }
+
+  // Always axis-aligned, contains all parts of the hitbox
+  get compositeBoundingBox() {
+    const allPoints = (this.hitboxParts ?? [this]).reduce(
+      (acc, part) => {
+        const partBox = part.boundingBox;
+        return {
+          x: [...acc.x, partBox.topL.x, partBox.topR.x, partBox.bottomL.x, partBox.bottomR.x],
+          y: [...acc.y, partBox.topL.y, partBox.topR.y, partBox.bottomL.y, partBox.bottomR.y],
+        };
+      },
+      {x: [], y: []} as {x: number[]; y: number[]},
+    );
+    return {
+      topL: {x: Math.min(...allPoints.x), y: Math.min(...allPoints.y)},
+      topR: {x: Math.max(...allPoints.x), y: Math.min(...allPoints.y)},
+      bottomL: {x: Math.min(...allPoints.x), y: Math.max(...allPoints.y)},
+      bottomR: {x: Math.max(...allPoints.x), y: Math.max(...allPoints.y)},
+    };
+  }
+
+  updateTitle(): void {
+    super.updateTitle();
+    this.hitboxParts?.forEach(part => part.updateTitle?.());
+  }
+
+  takeHit(ball: Ball) {
+    this.hitboxParts?.forEach(part => part.takeHit(ball));
+    super.takeHit(ball);
+  }
+
+  destroy(forReal = true) {
+    this.hitboxParts?.forEach(part => part.destroy(forReal));
+    super.destroy(forReal);
+  }
+
+  restore() {
+    this.hitboxParts?.forEach(part => part.restore());
+    super.restore();
   }
 }
 

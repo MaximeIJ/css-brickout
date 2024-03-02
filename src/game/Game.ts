@@ -8,6 +8,7 @@ import {
   Brick,
   BrickDestroyedEvent,
   Clickable,
+  CompositeBrick,
   Controls,
   Debug,
   HUD,
@@ -258,7 +259,7 @@ export class Game {
   handleBallCollision = (event: Event) => {
     const {ball, object} = (event as BallCollisionEvent).detail;
     let type = 'BallCollision';
-    if (object instanceof Brick) {
+    if (object instanceof Brick || object instanceof CompositeBrick) {
       type = 'BallBrickCollision';
     } else if (object instanceof Paddle) {
       type = 'BallPaddleCollision';

@@ -1,5 +1,6 @@
 import {Ball, BallDestroyedEvent} from '../game/Ball';
 import {Game, GameParams} from '../game/Game';
+import {EvenLayoutDefinition} from '../game/Level';
 import '../style.css';
 import './demo.css';
 import {clamp} from '../util/math';
@@ -37,7 +38,7 @@ const commonParams = {
   paddleConfig,
   playerConfig,
 };
-const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
+const inputMap: Record<'hello' | 'even' | 'stress' | 'random' | 'mixed', GameParams> = {
   hello: {
     ...commonParams,
     levelConfig: {layout: LAYOUTS.hello},
@@ -45,6 +46,27 @@ const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
   even: {
     ...commonParams,
     levelConfig: {layout: LAYOUTS.evenHighSmall},
+  },
+  stress: {
+    ...commonParams,
+    ballConfigs: Array.from({length: 30}, (_, i) => ({
+      ...ballBase,
+      radius: 0.45 + (i % 5) / 20,
+      x: 5 + (i + 1) * 3,
+      y: 2,
+      movement: {speed: 0.45 + 0.4 / (1 + (i % 5)), angle: ng + (i % 2 === 0 ? 0.25 : -0.25) * Math.random()},
+    })),
+    levelConfig: {
+      layout: [
+        {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 6, cols: 25, hp: 8},
+        LAYOUTS.evenStress,
+        {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 23, cols: 60, rows: 6, hp: 5},
+        {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 35, cols: 70},
+        {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 42, cols: 40},
+        {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 49, cols: 80, hp: 2},
+        {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 56, cols: 60, rows: 8},
+      ],
+    },
   },
   random: {
     ...commonParams,
@@ -92,6 +114,7 @@ const inputMap: Record<'hello' | 'even' | 'random' | 'mixed', GameParams> = {
         LAYOUTS.evenMidBig,
         LAYOUTS.evenLowSmall,
         LAYOUTS.evenBottomSingle,
+        LAYOUTS.composite,
         LAYOUTS.hello,
       ],
     },
@@ -121,18 +144,25 @@ document.getElementById('theme')?.addEventListener('change', onThemeChange);
 
 function onLayoutChange({target}: Event) {
   const layout = (target as HTMLSelectElement)?.value;
-  gameLoop.destroy();
-  if (layout === 'even') {
-    gameLoop = new Game(inputMap.even);
-  } else if (layout === 'random') {
-    gameLoop = new Game(inputMap.random);
-  } else if (layout === 'mixed') {
-    gameLoop = new Game(inputMap.mixed);
-  } else if (layout === 'hello') {
-    gameLoop = new Game(inputMap.hello);
-  }
-  setUpdatesFrame(100);
-  gameLoop.start();
+  document.getElementById('demo-screen')?.classList.add('loading');
+  // Using requestAnimationFrame to ensure the DOM update happens before the long-running process
+  setTimeout(async () => {
+    const promise = new Promise<void>(resolve => {
+      gameLoop.destroy();
+      const valid = Object.keys(inputMap).includes(layout);
+      if (valid) {
+        gameLoop = new Game(inputMap[layout as 'hello' | 'even' | 'stress' | 'random' | 'mixed']);
+      }
+      setUpdatesFrame(100);
+      gameLoop.start();
+      // Introduce a delay to ensure DOM update
+      setTimeout(() => {
+        document.getElementById('demo-screen')?.classList.remove('loading');
+        resolve();
+      }, 0);
+    });
+    await promise;
+  }, 100);
 }
 
 document.getElementById('layout-type')?.addEventListener('change', onLayoutChange);
