@@ -54,8 +54,10 @@
 }
 
 .composite-inner {
-  border: none;
+  border: var(--brick-border);
+  border-width: 0 3px 0 3px;
   background: var(--composite-bg);
+  box-sizing: border-box;
 }
 
 /* Themes */
@@ -66,11 +68,11 @@
   --ball-bg: hsl(334, 96%, 43%);
   --paddle-bg: hsl(121, 60%, 47%);
   --brick-bg: hsl(110, 2%, 35%, 69%);
-  --composite-bg: hsl(305, 66%, 53%);
+  --composite-bg: hsl(305, 26%, 53%);
   --paddle-border: hsl(20, 49%, 18%, 77%) solid 3px;
   --paddle-radius: 8px 8px 0 0;
   --ball-border: hsl(0, 0%, 14%) solid 2px;
-  --brick-border: hsl(20, 49%, 18%, 77%) solid 3px;
+  --brick-border: hsl(210, 20%, 60%) solid 1px;
   --text: hsl(212, 64%, 85%);
   --hud-bg: hsl(212, 29%, 50%);
   --controls-bg: hsl(212, 71%, 7%);
@@ -137,11 +139,11 @@
   --ball-bg: hsl(220, 66%, 64%);
   --paddle-bg: hsl(220, 100%, 67%);
   --brick-bg: hsl(33, 37%, 28%);
-  --composite-bg: hsl(129, 80%, 38%);
+  --composite-bg: hsl(129, 20%, 48%);
   --paddle-border: hsl(220, 63%, 85%) solid 3px;
   --paddle-radius: 5px 5px 16px 16px / 3px 3px 15px 15px;
   --ball-border: hsl(220, 63%, 85%) solid 2px;
-  --brick-border: hsl(33, 49%, 5%, 100%) solid 3px;
+  --brick-border: hsl(33, 49%, 5%, 100%) solid 2px;
   --text: hsl(13, 64%, 85%);
   --hud-text: hsl(13, 64%, 85%, 90%);
 }
@@ -218,6 +220,6 @@
     filter: grayscale(0) opacity(1);
   }
   100% {
-    filter: grayscale(1) opacity(0);
+    filter: grayscale(1) opacity(0.25);
   }
 }

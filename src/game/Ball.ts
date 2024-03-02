@@ -1,4 +1,4 @@
-import {AxisOverlap, Vector, a, clamp, createEvent, getOverlapsAndAxes, normalizeAngle, overlapOnAxis} from '../util';
+import {AxisOverlap, Vector, clamp, createEvent, getOverlapsAndAxes, normalizeAngle, overlapOnAxis} from '../util';
 
 import {Brick, CompositeBrick, GameObject, Level, MovingGameObject, MovingGameObjectConfig, Paddle} from './';
 
@@ -8,8 +8,6 @@ export type BallConfig = Omit<MovingGameObjectConfig, 'elementId'> & {
   radius: number;
   // damage inflicted on bricks
   damage?: number;
-  // whether the ball should be able to tunnel through bricks
-  antiTunneling?: boolean;
 };
 
 const MAX_ANGLE = 0.9 * Math.PI;
@@ -20,11 +18,10 @@ export class Ball extends MovingGameObject {
   radius = 0;
   damage = 1;
   rx = 0;
-  antiTunneling = false;
   // Prevents the ball from hitting the same object twice in a row
   antiJuggling: string | false = false;
 
-  constructor({idx, radius, movement, damage = 1, antiTunneling = false, ...objConfig}: BallConfig) {
+  constructor({idx, radius, movement, damage = 1, ...objConfig}: BallConfig) {
     super({
       ...objConfig,
       className: [...(objConfig.className?.split(' ') ?? []), 'ball'].join(' '),
@@ -34,7 +31,6 @@ export class Ball extends MovingGameObject {
     });
     this.radius = radius;
     this.damage = damage;
-    this.antiTunneling = antiTunneling;
     this.applyBonuses();
     this.updateElementSize();
     this.updateTitle();
@@ -63,11 +59,11 @@ export class Ball extends MovingGameObject {
    * @param paddle The player's paddle
    * @returns true if the position has been updated already
    */
-  handleLevelCollision(level: Level, paddle: Paddle, frameFraction = 1) {
+  handleLevelCollision(level: Level, paddle: Paddle) {
     const hitBoundary = this.handleBoundaryCollision();
     if (hitBoundary) {
       return false;
-    } else if (this.handlePaddleCollision(paddle, frameFraction)) {
+    } else if (this.handlePaddleCollision(paddle)) {
       return true;
     }
 
@@ -81,23 +77,15 @@ export class Ball extends MovingGameObject {
       if (brick.destroyed) continue;
 
       // Check for collision
-      if (this.antiTunneling) {
-        // todo: remove swept shape collision?
-        if (this.sweptShapeCollision(brick, frameFraction)) {
+      // check if the brick has hitboxParts, if so, check collision with each part
+      const partsToCheck = brick.hitboxParts ?? [brick];
+      partsToCheck.some(part => {
+        if (this.isColliding(part)) {
+          // todo: identify which brick got hit if there are hitbox parts
           hitBrick = true;
-          this.handleBrickCollision(brick);
+          this.handleBrickCollision(part, brick);
         }
-      } else {
-        // check if the brick has hitboxParts, if so, check collision with each part
-        const partsToCheck = brick.hitboxParts ?? [brick];
-        partsToCheck.some(part => {
-          if (this.isColliding(part)) {
-            // todo: identify which brick got hit if there are hitbox parts
-            hitBrick = true;
-            this.handleBrickCollision(part, brick);
-          }
-        });
-      }
+      });
     }
 
     return true;
@@ -160,8 +148,8 @@ export class Ball extends MovingGameObject {
     parentBrick.takeHit(this);
   }
 
-  handlePaddleCollision(paddle: Paddle, frameFraction = 1) {
-    const isColliding = this.antiTunneling ? this.sweptShapeCollision(paddle, frameFraction) : this.isColliding(paddle);
+  handlePaddleCollision(paddle: Paddle) {
+    const isColliding = this.isColliding(paddle);
 
     if (isColliding) {
       // Ball is coming from above the paddle, bounce it up
@@ -224,52 +212,12 @@ export class Ball extends MovingGameObject {
     }
   }
 
-  /**
-   * Uses swept collision to detect collision with a rectangle with anti tunneling
-   * Does NOT work with angled objects
-   * @param object GameObject to check collision with
-   * @param frameFraction duration of the interval (in frames)
-   * @returns whether objects are colliding
-   */
-  sweptShapeCollision(object: GameObject, frameFraction = 1): boolean {
-    const sweptVolumeX = this.x + Math.min(0, this.dx);
-    const sweptVolumeY = this.y + Math.min(0, this.dy);
-
-    // Check if swept volume intersects with the rectangle
-    if (
-      sweptVolumeX - this.rx < object.x + object.width / 2 &&
-      sweptVolumeX + this.rx > object.x - object.width / 2 &&
-      sweptVolumeY - this.radius < object.y + object.height / 2 &&
-      sweptVolumeY + this.radius > object.y - object.height / 2
-    ) {
-      // Collision detected, resolve it
-      const collisionX = this.dx > 0 ? object.x - object.width / 2 - this.rx : object.x + object.width / 2 + this.rx;
-      const collisionY =
-        this.dy > 0 ? object.y - object.height / 2 - this.radius : object.y + object.height / 2 + this.radius;
-
-      const timeOfCollisionX = (collisionX - this.x) / this.dx;
-      const timeOfCollisionY = (collisionY - this.y) / this.dy;
-
-      const actualTime = Math.min(a(timeOfCollisionX), a(timeOfCollisionY), frameFraction);
-
-      this.x += this.dx * actualTime;
-      this.y += this.dy * actualTime;
-      return true;
-    }
-    return false;
-  }
-
   processFrame(frameFraction = 1, level?: Level, paddle?: Paddle) {
     if (!this.active) return;
-    let shouldUpdateLast = this.antiTunneling;
-    if (!shouldUpdateLast) {
-      this.updatePosition(undefined, undefined, frameFraction);
-    }
+    this.updatePosition(undefined, undefined, frameFraction);
+
     if (level && paddle) {
-      shouldUpdateLast = !this.handleLevelCollision(level, paddle);
-    }
-    if (shouldUpdateLast) {
-      this.updatePosition(undefined, undefined, frameFraction);
+      !this.handleLevelCollision(level, paddle);
     }
   }
 

@@ -149,6 +149,7 @@ function onLayoutChange({target}: Event) {
   setTimeout(async () => {
     const promise = new Promise<void>(resolve => {
       gameLoop.destroy();
+      gameLoop.element.innerHTML = '';
       const valid = Object.keys(inputMap).includes(layout);
       if (valid) {
         gameLoop = new Game(inputMap[layout as 'hello' | 'even' | 'stress' | 'random' | 'mixed']);
