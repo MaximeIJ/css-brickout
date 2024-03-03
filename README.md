@@ -5,7 +5,6 @@
   <img alt="gameplay screenshot" src="https://github.com/MaximeIJ/css-brickout/assets/5600516/997e7a09-2852-4170-bdf1-8f2fcab09cd9" height=350 align="center" />
 </div>
 
-
 ## A timeless favorite...
 
 [Demo](https://maximeij.dev/css-brickout/)
@@ -67,6 +66,10 @@ These events are currently available and include the GameObject emitting it unle
 
 - `'brickdestroyed'`
 
+> [!IMPORTANT]
+> By default, the Game will set up listenners to decrease life and increase score on `balldestroyed` and `brickdestroyed` respectively.
+> These can be omitted with `{options: { skipDefaultRules: true}}`
+
 Example use:
 
 ```typescript
@@ -106,7 +109,12 @@ Yep! There's really only thing moving at 60FPS (the balls), and positioning them
 this.element.style.transform = `translateX(calc(${absX}px - 50%)) translateY(calc(${absY}px - 50%))`;
 ```
 
-The movement of the ball is not very smooth and the game does consume more power than it would if using optimized graphics like `canvas` and `svg`. I plan to decouple the rendering logic so we can create a more efficient rendering method to compare just exactly how big is the difference with CSS is. In the meantime this is a fun experiment.
+The movement of the ball is smooth but the game does consume more power than it would if using optimized graphics like `canvas` and `svg`. I plan to decouple the rendering logic so we can create a more efficient rendering method to compare just exactly how big is the difference with CSS is. In the meantime this is a fun experiment.
+
+In fact, even with non-trivial collision detection (see [geometry.ts](src/util/geometry.ts)), we can run it upwards of thousands of times per frame. The performance bottleneck is often first the repainting every frame, which will slow down FPS as the number of elements and the complexity of their styles (transparencies, blurs) increases.
+
+> [!NOTE]
+> The 60 FPS limit is often a result of `requestAnimationFrame` which, when uncapped by the device, the game can run up to triple the FPS.
 
 ## Recent changes
 

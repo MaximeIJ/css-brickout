@@ -28,8 +28,17 @@ type GameOptions = {
   mouseoutPauseDelayMs: number;
   mouseoverResumeDelayMs: number;
   showCursorInPlay: boolean;
+  // autoplays and doesn't respond to input or show control/hud elements
   demoMode: boolean;
+  /*
+   * # of updates to movement, including collision detection, per frame.
+   * Does not impact speed or visual updates (still 1/frame).
+   * Higher values can prevent tunneling and improve collision detection.
+   * See demo for example of stress test, where this is set to 20. On more normal level sizes, it can be up to 1000
+   */
   updatesPerFrame: number;
+  // Skips default event listeners: balldestroyed (lives--, respawning), ballcollision (console), brickdestroyed (score++, level end)
+  skipDefaultRules: boolean;
 };
 
 const DEFAULT_OPTIONS: GameOptions = {
@@ -42,6 +51,7 @@ const DEFAULT_OPTIONS: GameOptions = {
   showCursorInPlay: false,
   demoMode: false,
   updatesPerFrame: 1,
+  skipDefaultRules: false,
 };
 
 export type GameParams = {
@@ -140,9 +150,12 @@ export class Game {
 
     // Event listeners
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
-    this.element.addEventListener('balldestroyed', this.handleBallLost);
-    this.element.addEventListener('ballcollision', this.handleBallCollision);
-    this.element.addEventListener('brickdestroyed', this.handleBrickDestroyed);
+    // Game rules
+    if (!this.options.skipDefaultRules) {
+      this.element.addEventListener('balldestroyed', this.handleBallLost);
+      this.element.addEventListener('ballcollision', this.handleBallCollision);
+      this.element.addEventListener('brickdestroyed', this.handleBrickDestroyed);
+    }
     this.element.addEventListener('mouseenter', this.handleMouseEnter);
     this.element.addEventListener('mouseleave', this.handleMouseLeave);
     new ResizeObserver(this.handleResize).observe(this.element);
@@ -269,6 +282,8 @@ export class Game {
 
   handleBrickDestroyed = (event: Event) => {
     console.info('BrickDestroyed', (event as BrickDestroyedEvent).detail);
+    this.score += 1;
+    this.updateHUDScore();
     this.level.mobileBricks = this.level.mobileBricks.filter(brick => !brick.destroyed);
     if (this.level.isDone()) {
       this.win();
