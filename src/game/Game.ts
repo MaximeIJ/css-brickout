@@ -71,8 +71,8 @@ export class Game {
   ogParams: GameParams;
   // Debug
   debug: Debug | null;
-  lastFrameTime: number = Date.now();
-  lastFpsUpdate: number = Date.now();
+  lastFrameTime: number = performance.now();
+  lastFpsUpdate: number = performance.now();
   // Gameplay
   options: GameOptions;
   private effectiveUpdatesPerFrame: number;
@@ -186,7 +186,7 @@ export class Game {
   };
 
   update = () => {
-    const now = Date.now();
+    const now = performance.now();
     const msSinceLastFrame = now - this.lastFrameTime;
     if (PAUSABLE.includes(this.state)) {
       if (msSinceLastFrame >= this.fpsCap) {
@@ -435,7 +435,7 @@ export class Game {
       this.paused = null;
       this.state = this.debug ? 'debug' : 'playing';
       this.element.classList.remove('paused');
-      this.lastFrameTime = Date.now();
+      this.lastFrameTime = performance.now();
       this.dispatchGameEvent('gameresumed');
       this.update();
     }
