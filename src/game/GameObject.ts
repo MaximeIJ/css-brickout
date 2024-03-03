@@ -74,7 +74,9 @@ export class GameObject {
     }
     if (className) {
       const classNames = className.trim().split(' ');
-      this.element.classList.add(...classNames);
+      if (classNames.length) {
+        this.element.classList.add(...classNames);
+      }
     }
     parent.appendChild(this.element);
     this.updatePosition(x, y);
