@@ -157,7 +157,7 @@ export class GameObject {
     const absY = (this.y / 100.0) * offsetHeight;
     this.setStyle(
       'transform',
-      `translateX(calc(${absX}px - 50%)) translateY(calc(${absY}px - 50%)) rotate(var(--angle, 0rad))`,
+      `translateX(calc(${absX}px - 50%)) translateY(calc(${absY}px - 50%)) rotateZ(var(--angle, 0rad))`,
     );
     this.element.style.setProperty('--xp', this.x.toFixed(2));
     this.element.style.setProperty('--yp', this.y.toFixed(2));
