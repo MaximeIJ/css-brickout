@@ -65,9 +65,18 @@
         margin: 0.5rem 0;
       }
       #demo-screen {
-        width: min(1960px, 85vw);
+        width: min(1960px, 100%);
         height: min(1650px, 75vh);
         margin: 0 auto;
+
+        @media screen and (max-width: 600px) {
+          height: 63vh;
+        }
+        
+        @media screen and (max-height: 450px) {
+          height: 82vh;
+          width: 75%;
+        }
       }
     </style>
   </head>
@@ -98,19 +107,19 @@
             <label for="layout-type"
               >Brick layout
               <select id="layout-type">
-                <option value="hello">Hello!</option>
-                <option value="even">Even</option>
-                <option value="stress">Stress</option>
-                <option value="random">Custom</option>
-                <option value="mixed">Mixed</option>
+                <option value="hello">Welcome</option>
+                <option value="even">Even Steven</option>
+                <option value="stress">Stress Test</option>
+                <option value="random">Random Crap</option>
+                <option value="mixed">Kitchen Sink</option>
               </select>
             </label>
 
             <label for="theme"
               >Theme
               <select id="theme">
-                <option value="classic">Classic</option>
-                <option value="lava">Lava</option>
+                <option value="classic">Classic (never played it)</option>
+                <option value="lava">(the floor is) Lava</option>
               </select>
             </label>
           </div>
