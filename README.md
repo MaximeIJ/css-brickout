@@ -1,8 +1,10 @@
 # css-brickout [![npm (scoped)](https://img.shields.io/npm/v/@maximeij/css-brickout?color=green&label=npm%20package&logo=logo)](https://www.npmjs.com/package/@maximeij/css-brickout) [![image](https://github.com/MaximeIJ/css-brickout/assets/5600516/27a4f945-e91c-4f75-bdf3-80c689d8f453)](http://vanilla-js.com/)
 
-<p align="center">
-  <img alt="gameplay screenshot" src="https://github.com/MaximeIJ/css-brickout/assets/5600516/8ca67c1b-a7f6-4975-ae83-6992f616ad4b" height=250 align="center" />
-</p>
+<div align="center">
+  <img alt="gameplay screenshot" src="https://github.com/MaximeIJ/css-brickout/assets/5600516/28d48f7b-53e3-4542-aa39-e38f54f21ebc" height=350 align="center" />
+  <img alt="gameplay screenshot" src="https://github.com/MaximeIJ/css-brickout/assets/5600516/997e7a09-2852-4170-bdf1-8f2fcab09cd9" height=350 align="center" />
+</div>
+
 
 ## A timeless favorite...
 
