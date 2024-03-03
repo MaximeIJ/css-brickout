@@ -59,7 +59,7 @@ type PlayerParams = {
 };
 
 type State = 'paused' | 'playing' | 'debug' | 'won' | 'lost' | 'away' | 'starting';
-const PAUSABLE: Array<State> = ['playing', 'debug']; // todo: add 'demo' state where update can be called to kick off the loop. Possibly disable timer during that mode. Set state to get out of it.
+const PAUSABLE: Array<State> = ['playing', 'debug'];
 const RESUMABLE: Array<State> = ['paused', 'away'];
 
 // GameLoop class
@@ -231,7 +231,7 @@ export class Game {
           }
         }
       } else {
-        console.debug('skipping frame', msSinceLastFrame, this.fpsCap);
+        console.info('skipping frame', msSinceLastFrame, this.fpsCap);
       }
 
       requestAnimationFrame(() => this.update());
@@ -239,7 +239,7 @@ export class Game {
   };
 
   handleBallLost = (event: Event) => {
-    console.debug('BallLost', (event as BallDestroyedEvent).detail);
+    console.info('BallLost', (event as BallDestroyedEvent).detail);
     this.balls = this.balls.filter(ball => !ball.destroyed);
     if (this.balls.filter(b => b.active).length === 0) {
       setTimeout(() => {
@@ -264,11 +264,11 @@ export class Game {
     } else if (object instanceof Paddle) {
       type = 'BallPaddleCollision';
     }
-    console.debug(type, object?.constructor?.name, ball, object);
+    console.info(type, object?.constructor?.name, ball, object);
   };
 
   handleBrickDestroyed = (event: Event) => {
-    console.debug('BrickDestroyed', (event as BrickDestroyedEvent).detail);
+    console.info('BrickDestroyed', (event as BrickDestroyedEvent).detail);
     this.level.mobileBricks = this.level.mobileBricks.filter(brick => !brick.destroyed);
     if (this.level.isDone()) {
       this.win();
