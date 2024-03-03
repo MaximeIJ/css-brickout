@@ -64,15 +64,20 @@
 /* Classic */
 
 .classic {
-  --level-bg: linear-gradient(213deg, hsl(198, 82%, 55%) 30%, hsl(221, 100%, 63%) 60%);
-  --ball-bg: hsl(334, 96%, 43%);
-  --paddle-bg: hsl(121, 60%, 47%);
-  --brick-bg: hsl(110, 2%, 35%, 69%);
+  --level-bg: repeating-conic-gradient(
+    at 150% -50%,
+    hsl(198, 82%, 35%) 0deg,
+    hsl(198, 70%, 30%) 10deg,
+    hsl(198, 82%, 35%) 20deg
+  );
+  --ball-bg: hsl(53, 100%, 41%);
+  --paddle-bg: hsl(5, 80%, 40%);
+  --brick-bg: hsl(350, 65%, 50%, 50%);
   --composite-bg: hsl(305, 26%, 53%);
-  --paddle-border: hsl(20, 49%, 18%, 77%) solid 3px;
+  --paddle-border: hsl(105, 50%, 10%) solid 1px;
   --paddle-radius: 8px 8px 0 0;
-  --ball-border: hsl(0, 0%, 14%) solid 2px;
-  --brick-border: hsl(210, 20%, 60%) solid 1px;
+  --ball-border: hsl(0, 40%, 14%) solid 1px;
+  --brick-border: hsl(30, 90%, 10%) solid 1px;
   --text: hsl(212, 64%, 85%);
   --hud-bg: hsl(212, 29%, 50%);
   --controls-bg: hsl(212, 71%, 7%);
@@ -111,8 +116,8 @@
   box-shadow: 0px 3px 5px 1px hsl(240, 40%, 31%);
 }
 .classic .hello-bang {
-  --brick-bg: linear-gradient(
-    180deg,
+  --brick-bg: conic-gradient(
+    at 65% 35%,
     hsl(0, 74%, 68%),
     hsl(60, 74%, 68%),
     hsl(120, 74%, 68%),
@@ -120,10 +125,10 @@
     hsl(240, 74%, 68%),
     hsl(300, 74%, 68%)
   );
-  --brick-border: hsl(300, 74%, 68%) solid 2px;
+  --brick-border: hsl(180, 74%, 68%, 20%) solid 2px;
   border-width: 2px;
   border-radius: 10px 5%;
-  box-shadow: 0 0 10px 10px hsla(300, 100%, 88%, 0.477);
+  box-shadow: 0 0 5px 3px hsla(300, 100%, 88%, 0.477);
 }
 
 /* Lava */
@@ -133,19 +138,19 @@
       to bottom,
       hsl(13, 8%, 5%, 0%) 60%,
       hsl(13, 73%, 13%, 75%) 89%,
-      hsl(13, 89%, 23%, 90%) 90%
+      hsl(13, 89%, 23%, 90%) 99%
     ),
     hsl(13, 8%, 5%);
   --ball-bg: hsl(220, 66%, 64%);
   --paddle-bg: hsl(220, 100%, 67%);
-  --brick-bg: hsl(33, 37%, 28%);
+  --brick-bg: hsl(129, 45%, 35%);
   --composite-bg: hsl(129, 20%, 48%);
-  --paddle-border: hsl(220, 63%, 85%) solid 3px;
+  --paddle-border: hsl(220, 63%, 85%) solid 2px;
   --paddle-radius: 5px 5px 16px 16px / 3px 3px 15px 15px;
-  --ball-border: hsl(220, 63%, 85%) solid 2px;
-  --brick-border: hsl(33, 49%, 5%, 100%) solid 2px;
-  --text: hsl(13, 64%, 85%);
-  --hud-text: hsl(13, 64%, 85%, 90%);
+  --ball-border: hsl(220, 63%, 85%) solid 1px;
+  --brick-border: hsl(33, 49%, 5%, 100%) solid 1px;
+  --text: hsl(13, 64%, 90%);
+  --hud-text: hsl(13, 64%, 95%, 95%);
 }
 
 .lava .ball {

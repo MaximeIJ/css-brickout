@@ -108,12 +108,24 @@
 #debug {
   height: fit-content;
   width: fit-content;
-  background: #0008;
+  background: transparent;
   padding: 0.5%;
-  font-size: 1.5rem;
-  border-radius: 5%;
+  font-size: 0.6em;
+  letter-spacing: 0.1em;
+  line-height: 1.5em;
+  text-align: right;
   position: absolute;
+  right: 0%;
+  top: 50%;
+  transform: translate(0, -50%);
+  white-space: pre;
   z-index: 2;
+}
+
+.column #debug {
+  top: 4%;
+  left: 0.5%;
+  text-align: left;
 }
 
 /* Controls and HUD */

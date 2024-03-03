@@ -67,6 +67,7 @@ const inputMap: Record<'hello' | 'even' | 'stress' | 'random' | 'mixed', GamePar
         {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 56, cols: 60, rows: 8},
       ],
     },
+    paddleConfig: {...paddleConfig, minY: 78, maxY: 97, angleLimit: 0},
   },
   random: {
     ...commonParams,
@@ -154,8 +155,8 @@ function onLayoutChange({target}: Event) {
       if (valid) {
         gameLoop = new Game(inputMap[layout as 'hello' | 'even' | 'stress' | 'random' | 'mixed']);
       }
-      setUpdatesFrame(100);
       gameLoop.start();
+      setUpdatesFrame(layout === 'stress' ? 20 : 100);
       // Introduce a delay to ensure DOM update
       setTimeout(() => {
         document.getElementById('demo-screen')?.classList.remove('loading');
@@ -174,13 +175,13 @@ function setUpdatesFrame(upf: number) {
   if (labelElement) {
     labelElement.innerText = `${gameLoop.options.updatesPerFrame}`;
   }
+  // gotta reset speed to 1
+  setGameSpeed(1);
 }
 
 function onUpdatesPerFrameChange({target}: Event) {
   const upf = (target as HTMLInputElement)?.value;
   setUpdatesFrame(parseInt(upf));
-  // gotta reset speed to 1
-  setGameSpeed(1);
 }
 
 document.getElementById('updates-frame')?.addEventListener('input', onUpdatesPerFrameChange);

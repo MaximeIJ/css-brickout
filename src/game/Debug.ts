@@ -14,4 +14,16 @@ export class Debug extends GameObject {
       ...rest,
     });
   }
+
+  updateElementPosition(): void {
+    return;
+  }
+
+  setContent(content: string): void {
+    let fixed = content;
+    if (!content.includes('\n')) {
+      fixed += '\n&nbsp;';
+    }
+    super.setContent(fixed);
+  }
 }

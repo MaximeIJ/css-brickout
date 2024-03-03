@@ -195,7 +195,7 @@ export class Game {
         this.lastFrameTime = now;
         if (this.debug && now > this.lastFpsUpdate + 1000) {
           const fps = 1 + Math.round(1000.0 / msSinceLastFrame);
-          this.debug?.setContent(`FPS: ${fps.toFixed(0)} | ${this.options.demoMode ? 'demo' : this.state}`);
+          this.debug.setContent(`${this.options.demoMode ? 'demo' : this.state}\n${fps.toFixed(0)}fps`);
           this.lastFpsUpdate = now;
         }
 
