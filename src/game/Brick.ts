@@ -91,6 +91,21 @@ export class CompositeBrick extends Brick implements Composite {
     };
   }
 
+  updateElement(): void {
+    super.updateElement();
+    this.hitboxParts?.forEach(part => part.updateElement?.());
+  }
+
+  updateElementPosition(): void {
+    super.updateElementPosition();
+    this.hitboxParts?.forEach(part => part.updateElementPosition?.());
+  }
+
+  updateElementSize(): void {
+    super.updateElementSize();
+    this.hitboxParts?.forEach(part => part.updateElementSize?.());
+  }
+
   updateTitle(): void {
     super.updateTitle();
     this.hitboxParts?.forEach(part => part.updateTitle?.());

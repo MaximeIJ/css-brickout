@@ -49,10 +49,10 @@ const inputMap: Record<'hello' | 'even' | 'stress' | 'random' | 'mixed', GamePar
   },
   stress: {
     ...commonParams,
-    ballConfigs: Array.from({length: 30}, (_, i) => ({
+    ballConfigs: Array.from({length: 45}, (_, i) => ({
       ...ballBase,
       radius: 0.45 + (i % 5) / 20,
-      x: 5 + (i + 1) * 3,
+      x: 5 + (i + 1) * 2,
       y: 2,
       movement: {speed: 0.45 + 0.4 / (1 + (i % 5)), angle: ng + (i % 2 === 0 ? 0.25 : -0.25) * Math.random()},
     })),
