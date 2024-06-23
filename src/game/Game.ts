@@ -212,11 +212,11 @@ export class Game {
           this.lastFpsUpdate = now;
         }
 
-        this.paddle.updateElementPosition();
         const frameFraction = msSinceLastFrame / (this.fpsInterval * this.effectiveUpdatesPerFrame);
 
         // update numbers
         for (let i = 0; i < this.options.updatesPerFrame; i++) {
+          this.paddle.processFrame(frameFraction);
           this.level.mobileBricks.forEach(brick => brick.processFrame(frameFraction));
           for (const ball of this.balls) {
             if (ball.destroyed) {
@@ -227,6 +227,7 @@ export class Game {
         }
 
         // update visuals
+        this.paddle.updateElementPosition();
         this.level.mobileBricks.forEach(brick => brick.updateElementPosition());
         for (const ball of this.balls) {
           if (ball.destroyed) {
@@ -237,10 +238,7 @@ export class Game {
           // autoplay lol
           if (this.debug && ball.y > this.paddle.maxY - this.paddle.height && ball.y < this.paddle.maxY) {
             const semiR = Math.round(ball.x - this.paddle.width / 2 + (Math.random() * this.paddle.width) / 2);
-            this.paddle.handleMove(
-              (semiR * this.paddle.parent.offsetWidth) / 100,
-              ((this.paddle.maxY ?? this.paddle.y) * this.paddle.parent.offsetHeight) / 100,
-            );
+            this.paddle.handleMove(semiR, this.paddle.maxY ?? this.paddle.y);
           }
         }
       } else {

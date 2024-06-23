@@ -1,8 +1,8 @@
 import {clamp} from '../util';
 
-import {GameObject, GameObjectConfig} from './GameObject';
+import {MovingGameObject, MovingGameObjectConfig} from './GameObject';
 
-export type PaddleConfig = GameObjectConfig & {
+export type PaddleConfig = MovingGameObjectConfig & {
   // Defaults to 0.05
   gripFactor?: number;
   // Default to y
@@ -13,7 +13,7 @@ export type PaddleConfig = GameObjectConfig & {
   angleLimit?: number;
 };
 
-export class Paddle extends GameObject {
+export class Paddle extends MovingGameObject {
   // How much ball angle is modified when it hits the paddle further from the center
   gripFactor = 0.05;
   minY: number;
@@ -51,31 +51,61 @@ export class Paddle extends GameObject {
       const mouseX = clientX - rect.left;
       const mouseY = clientY - rect.top;
 
-      this.handleMove(mouseX, mouseY);
+      this.handleClientMove(mouseX, mouseY);
     }
   };
 
   handleTouchMove = (e: TouchEvent) => {
     // Get the first touch event in the touches list
     const touch = e.touches[0];
-    this.handleMove(touch.clientX, touch.clientY);
+    this.handleClientMove(touch.clientX, touch.clientY);
   };
 
-  handleMove = (x: number, y: number) => {
+  handleClientMove = (x: number, y: number) => {
     // Calculate the touch position relative to the window width
     const normX = (x / this.parent.offsetWidth) * 100;
     const normY = (y / this.parent.offsetHeight) * 100;
+    this.handleMove(normX, normY);
+  };
 
-    const paddleX = normX;
-    let paddleY;
+  handleMove = (x: number, y: number) => {
+    const targetPaddleX = x;
+    let targetPaddleY = this.y;
     if (!this.vtBound) {
-      paddleY = clamp(normY, this.maxY, this.minY);
+      targetPaddleY = clamp(y, this.maxY, this.minY);
     }
-    this.updatePosition(paddleX, paddleY);
+    if (!this.speed) {
+      this.updatePosition(targetPaddleX, targetPaddleY);
+    } else {
+      // set path
+      const movement = {speed: this.speed, angle: Math.atan2(targetPaddleY - this.y, targetPaddleX - this.x)};
+      let verifyX = (mgo: MovingGameObject) => mgo.x >= targetPaddleX;
+      if (this.x > targetPaddleX) {
+        verifyX = (mgo: MovingGameObject) => mgo.x <= targetPaddleX;
+      }
+      let verifyY = (mgo: MovingGameObject) => mgo.y >= targetPaddleY;
+      if (this.y < targetPaddleY) {
+        verifyY = (mgo: MovingGameObject) => mgo.y <= targetPaddleY;
+      }
+      this.movement = [
+        {
+          condition: mgo => {
+            if (verifyX(mgo) && verifyY(mgo)) {
+              this.active = false;
+              this.x = targetPaddleX;
+              this.y = targetPaddleY;
+            }
+            return !this.active;
+          },
+          movement,
+        },
+      ];
+      this.active = true;
+    }
 
     if (this.angleLimit !== 0) {
-      const dx = normX - this.cursorX;
-      const dy = normY - this.cursorY;
+      const dx = x - this.cursorX;
+      const dy = y - this.cursorY;
       const setAngle = () => {
         let dAngle = Math.atan2(dy, dx);
         if (dx < 0) {
@@ -96,8 +126,8 @@ export class Paddle extends GameObject {
 
         this.angle = clamp(this.angle - angle / 10, this.angleLimit, -this.angleLimit);
 
-        this.cursorX = normX;
-        this.cursorY = normY;
+        this.cursorX = x;
+        this.cursorY = y;
       };
       if (Math.abs(dx) > 2 && Math.abs(dy) > 0) {
         setAngle();
