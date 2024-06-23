@@ -5,9 +5,6 @@
   "description": "Classic Brickout Game Engine implemented in Typescript and rendered with CSS. No dependencies.",
   "author": "Maxime IJ",
   "license": "SEE LICENSE IN LICENSE",
-  "bugs": {
-    "url": "https://github.com/MaximeIJ/css-brickout/issues"
-  },
   "homepage": "https://maximeij.dev/css-brickout",
   "keywords": [
     "css",
