@@ -20,6 +20,9 @@ export class Ball extends MovingGameObject {
   rx = 0;
   // Prevents the ball from hitting the same object twice in a row
   antiJuggling: string | false = false;
+  // expose some internals as readonly
+  declare readonly dx: number;
+  declare readonly dy: number;
 
   constructor({idx, radius, movement, damage = 1, ...objConfig}: BallConfig) {
     super({

@@ -28,9 +28,8 @@ export class Paddle extends MovingGameObject {
     if (gripFactor !== undefined) {
       this.gripFactor = gripFactor;
     }
-    if (angleLimit !== undefined) {
-      this.angleLimit = angleLimit;
-    }
+    this.angle = 0;
+    this.angleLimit = angleLimit ?? 0;
     this.minY = minY ?? this.y;
     this.maxY = maxY ?? this.y;
     this.cursorX = this.x;
@@ -42,6 +41,15 @@ export class Paddle extends MovingGameObject {
     this.updateTitle();
     this.parent.addEventListener('touchmove', this.handleTouchMove, {passive: true});
     this.parent.addEventListener('mousemove', this.handleMouseMove);
+  }
+
+  set angle(angle: number) {
+    const newAngle = clamp(angle, this.angleLimit, -this.angleLimit);
+    super.angle = newAngle;
+  }
+
+  get angle() {
+    return super.angle;
   }
 
   handleMouseMove = ({clientX, clientY, currentTarget}: MouseEvent) => {
@@ -123,8 +131,9 @@ export class Paddle extends MovingGameObject {
 
         // Project the angle proportionally within the specified limit
         const angle = 1 * ratio * this.angleLimit;
+        const currentAngle = this.angle ?? 0;
 
-        this.angle = clamp(this.angle - angle / 10, this.angleLimit, -this.angleLimit);
+        this.angle = currentAngle - angle / 10;
 
         this.cursorX = x;
         this.cursorY = y;
