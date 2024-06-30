@@ -23,13 +23,13 @@ export class Paddle extends MovingGameObject {
   angleLimit = 0;
   vtBound = true;
 
-  constructor({angleLimit, gripFactor, minY, maxY, ...config}: PaddleConfig) {
+  constructor({angle, angleLimit, gripFactor, minY, maxY, ...config}: PaddleConfig) {
     super({...config, className: [...(config.className?.split(' ') ?? []), 'paddle'].join(' '), showTitle: true});
     if (gripFactor !== undefined) {
       this.gripFactor = gripFactor;
     }
-    this.angle = 0;
     this.angleLimit = angleLimit ?? 0;
+    this.angle = angle ?? 0;
     this.minY = minY ?? this.y;
     this.maxY = maxY ?? this.y;
     this.cursorX = this.x;

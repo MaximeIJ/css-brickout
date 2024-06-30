@@ -158,6 +158,7 @@ describe.concurrent('paddle angle PI / 4', () => {
       elementId: `paddle`,
       gripFactor: 0,
       angle: -Math.PI / 4,
+      angleLimit: Math.PI / 2,
     });
     p.updatePosition();
   });
