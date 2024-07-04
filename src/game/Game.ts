@@ -1,23 +1,6 @@
 import {createEvent} from '../util';
 
-import {
-  Ball,
-  BallCollisionEvent,
-  BallConfig,
-  BallDestroyedEvent,
-  Brick,
-  BrickDestroyedEvent,
-  Clickable,
-  CompositeBrick,
-  Controls,
-  Debug,
-  HUD,
-  Level,
-  LevelConfig,
-  Paddle,
-  PaddleConfig,
-  Pause,
-} from './';
+import {Ball, BallConfig, Clickable, Controls, Debug, HUD, Level, LevelConfig, Paddle, PaddleConfig, Pause} from './';
 
 type GameOptions = {
   fps: number;
@@ -153,7 +136,6 @@ export class Game {
     // Game rules
     if (!this.options.skipDefaultRules) {
       this.element.addEventListener('balldestroyed', this.handleBallLost);
-      this.element.addEventListener('ballcollision', this.handleBallCollision);
       this.element.addEventListener('brickdestroyed', this.handleBrickDestroyed);
     }
     this.element.addEventListener('mouseenter', this.handleMouseEnter);
@@ -241,7 +223,7 @@ export class Game {
             this.paddle.handleMove(semiR, this.paddle.maxY ?? this.paddle.y);
           }
         }
-      } else {
+      } else if (this.debug) {
         console.info('skipping frame', msSinceLastFrame, this.fpsCap);
       }
 
@@ -249,8 +231,7 @@ export class Game {
     }
   };
 
-  handleBallLost = (event: Event) => {
-    console.info('BallLost', (event as BallDestroyedEvent).detail);
+  handleBallLost = (_event: Event) => {
     this.balls = this.balls.filter(ball => !ball.destroyed);
     if (this.balls.filter(b => b.active).length === 0) {
       setTimeout(() => {
@@ -267,19 +248,7 @@ export class Game {
     }
   };
 
-  handleBallCollision = (event: Event) => {
-    const {ball, object} = (event as BallCollisionEvent).detail;
-    let type = 'BallCollision';
-    if (object instanceof Brick || object instanceof CompositeBrick) {
-      type = 'BallBrickCollision';
-    } else if (object instanceof Paddle) {
-      type = 'BallPaddleCollision';
-    }
-    console.info(type, object?.constructor?.name, ball, object);
-  };
-
-  handleBrickDestroyed = (event: Event) => {
-    console.info('BrickDestroyed', (event as BrickDestroyedEvent).detail);
+  handleBrickDestroyed = (_event: Event) => {
     this.score += 1;
     this.updateHUDScore();
     this.level.mobileBricks = this.level.mobileBricks.filter(brick => !brick.destroyed);
@@ -463,7 +432,6 @@ export class Game {
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     document.removeEventListener('keyup', this.handleKeyPress);
     this.element.removeEventListener('balldestroyed', this.handleBallLost);
-    this.element.removeEventListener('ballcollision', this.handleBallCollision);
     this.element.removeEventListener('brickdestroyed', this.handleBrickDestroyed);
     this.element.removeEventListener('mouseenter', this.handleMouseEnter);
     this.element.removeEventListener('mouseleave', this.handleMouseLeave);

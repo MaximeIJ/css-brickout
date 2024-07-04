@@ -86,13 +86,13 @@ export class Paddle extends MovingGameObject {
       this.updatePosition(targetPaddleX, targetPaddleY);
     } else {
       // set path
-      const movement = {speed: this.speed, angle: Math.atan2(targetPaddleY - this.y, targetPaddleX - this.x)};
+      const movement = {speed: this.speed, angle: -Math.atan2(targetPaddleY - this.y, targetPaddleX - this.x)};
       let verifyX = (mgo: MovingGameObject) => mgo.x >= targetPaddleX;
       if (this.x > targetPaddleX) {
         verifyX = (mgo: MovingGameObject) => mgo.x <= targetPaddleX;
       }
       let verifyY = (mgo: MovingGameObject) => mgo.y >= targetPaddleY;
-      if (this.y < targetPaddleY) {
+      if (this.y > targetPaddleY) {
         verifyY = (mgo: MovingGameObject) => mgo.y <= targetPaddleY;
       }
       this.movement = [
@@ -105,7 +105,7 @@ export class Paddle extends MovingGameObject {
             }
             return !this.active;
           },
-          movement,
+          movement: {...movement},
         },
       ];
       this.active = true;
