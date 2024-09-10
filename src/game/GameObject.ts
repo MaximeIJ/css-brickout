@@ -256,6 +256,10 @@ export class GameObject {
     this.element.remove();
     this.particles.forEach(particle => particle.remove());
   }
+
+  toString(): string {
+    return `${this.constructor.name}: ${this.element.id} (${this.x?.toFixed(2) ?? '?'}, ${this.y?.toFixed(2) ?? '?'})`;
+  }
 }
 export type MovementProps = {
   // Angle in radians
@@ -391,5 +395,13 @@ export class MovingGameObject extends GameObject {
     if (this.active) {
       this.updatePosition(undefined, undefined, frameFraction);
     }
+  }
+
+  toString(): string {
+    if (!this.movement.speed) {
+      return super.toString();
+    }
+    return `${super.toString()}
+${(this.movement.speed * 10).toFixed(2)} knots`;
   }
 }

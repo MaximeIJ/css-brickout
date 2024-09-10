@@ -32,15 +32,6 @@ export class Brick extends MovingGameObject {
     }
   }
 
-  updateTitle(): void {
-    super.updateTitle();
-    // Update only if it exists
-    if (this.element.title) {
-      this.element.title =
-        this.element.title + ' ' + this.hp + '/' + this.maxHp + ' HP' + (this.breakthrough ? ' (breakthrough)' : '');
-    }
-  }
-
   destroy(forReal = true) {
     this.element.classList.add('brick--destroyed');
     this.destroyed = true;
@@ -124,6 +115,11 @@ export class CompositeBrick extends Brick implements Composite {
   restore() {
     this.hitboxParts?.forEach(part => part.restore());
     super.restore();
+  }
+
+  toString(): string {
+    return `${super.toString()}
+${this.hp}/${this.maxHp} HP`;
   }
 }
 

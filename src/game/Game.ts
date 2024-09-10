@@ -249,8 +249,6 @@ export class Game {
   };
 
   handleBrickDestroyed = (_event: Event) => {
-    this.score += 1;
-    this.updateHUDScore();
     this.level.mobileBricks = this.level.mobileBricks.filter(brick => !brick.destroyed);
     if (this.level.isDone()) {
       this.win();

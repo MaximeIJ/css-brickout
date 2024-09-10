@@ -241,6 +241,11 @@ export class Ball extends MovingGameObject {
       super.destroy();
     }
   }
+
+  toString(): string {
+    return `${super.toString()}
+${this.damage ? `Damage: ${this.damage}` : ''}`;
+  }
 }
 
 export type BallDestroyedEvent = CustomEvent<Ball>;
