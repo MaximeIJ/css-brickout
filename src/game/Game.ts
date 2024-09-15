@@ -248,8 +248,7 @@ export class Game {
     }
   };
 
-  handleBrickDestroyed = (_event: Event) => {
-    this.level.mobileBricks = this.level.mobileBricks.filter(brick => !brick.destroyed);
+  handleBrickDestroyed = () => {
     if (this.level.isDone()) {
       this.win();
     }
