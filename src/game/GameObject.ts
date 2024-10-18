@@ -43,8 +43,6 @@ export class GameObject {
     bottomR: {x: 0, y: 0},
   };
   permanent = false;
-  particles: Array<HTMLElement> = [];
-  totalParticles = 0;
 
   constructor({
     game,
@@ -180,35 +178,6 @@ export class GameObject {
     this.element.innerHTML = content;
   }
 
-  recycleParticle(particle: HTMLElement): () => void {
-    return () => {
-      particle.className = 'particle';
-      particle.style.cssText = '';
-      particle.style.opacity = '0';
-      this.particles.push(particle);
-    };
-  }
-
-  // pops a particle from the particle pool, creates one if none exist
-  getParticleElement(recycleCondition: 'animationend' | 'transitionend' | number = 'animationend'): HTMLElement {
-    const nextParticle = this.particles.pop();
-    if (nextParticle) {
-      return nextParticle;
-    } else {
-      const particle = document.createElement('particle');
-      particle.classList.add('particle');
-      this.parent.element.appendChild(particle);
-      if (typeof recycleCondition === 'number') {
-        setTimeout(this.recycleParticle(particle), recycleCondition);
-      } else {
-        particle.addEventListener(recycleCondition, this.recycleParticle(particle));
-      }
-      this.totalParticles++;
-      particle.id = `${this.element.id}-particle-${this.totalParticles}`;
-      return particle;
-    }
-  }
-
   emitParticles(
     count: number,
     classNames?: Array<string>,
@@ -217,7 +186,7 @@ export class GameObject {
   ): Array<HTMLElement> {
     const particles: Array<HTMLElement> = [];
     for (let i = 0; i < count; i++) {
-      const particle = this.getParticleElement(recycleCondition);
+      const particle = this.game.level.getParticleElement(recycleCondition);
       if (classNames?.length) {
         particle.classList.add(...classNames);
       }
@@ -234,7 +203,6 @@ export class GameObject {
 
   destroy() {
     this.element.remove();
-    this.particles.forEach(particle => particle.remove());
   }
 
   toString(): string {

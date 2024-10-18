@@ -60,6 +60,8 @@ export class Level implements Responsive {
   fx = 1;
   fy = 1;
   sizes = {width: 0, height: 0};
+  particles: Array<HTMLElement> = [];
+  totalParticles = 0;
 
   constructor({divisionFactor, layout, game}: LevelConfig) {
     this.bricks = [];
@@ -202,6 +204,36 @@ export class Level implements Responsive {
     }
   }
 
+  recycleParticle(particle: HTMLElement): () => void {
+    return () => {
+      particle.className = 'particle';
+      particle.style.cssText = '';
+      particle.style.opacity = '0';
+      particle.innerHTML = '';
+      this.particles.push(particle);
+    };
+  }
+
+  // pops a particle from the particle pool, creates one if none exist
+  getParticleElement(recycleCondition: 'animationend' | 'transitionend' | number = 'animationend'): HTMLElement {
+    let nextParticle = this.particles.pop();
+    if (!nextParticle) {
+      nextParticle = document.createElement('particle');
+      nextParticle.classList.add('particle');
+      this.totalParticles++;
+      nextParticle.id = `${this.element.id}-particle-${this.totalParticles}`;
+    }
+    this.element.appendChild(nextParticle);
+    const recycler = this.recycleParticle(nextParticle);
+    if (typeof recycleCondition === 'number') {
+      setTimeout(recycler, recycleCondition);
+    } else {
+      nextParticle.addEventListener(recycleCondition, recycler, {once: true});
+    }
+
+    return nextParticle;
+  }
+
   isDone() {
     return !this.bricks.some(b => !b.permanent && !b.destroyed);
   }
@@ -209,5 +241,6 @@ export class Level implements Responsive {
   destroy() {
     this.element.removeEventListener('brickdestroyed', this.handleBrickDestroyed);
     this.bricks.forEach(brick => brick.destroy());
+    this.particles.forEach(particle => particle.remove());
   }
 }
