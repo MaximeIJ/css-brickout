@@ -42,9 +42,9 @@ export class Ball extends MovingGameObject {
   updateElementSize(): void {
     super.updateElementSize();
     // calc size based on height, adjust rx with aspect ratio
-    const pxRadius = Math.round((this.radius / 100.0) * this.pHeight);
+    const pxRadius = Math.round((this.radius / 100.0) * this.parent.sizes.height);
 
-    this.rx = (this.radius * this.pHeight) / this.pWidth;
+    this.rx = (this.radius * this.parent.sizes.height) / this.parent.sizes.width;
     this.width = this.rx * 2;
     this.height = this.radius * 2;
     this.element.style.setProperty('--diameter', pxRadius * 2 + 'px');
@@ -229,14 +229,14 @@ export class Ball extends MovingGameObject {
       ball: this,
       object,
     });
-    this.parent.dispatchEvent(event);
+    this.parent.element.dispatchEvent(event);
   }
 
   destroy(forReal = true) {
     this.element.classList.add('ball--destroyed');
     this.destroyed = true;
     const event: BallDestroyedEvent = createEvent<Ball>('balldestroyed', this);
-    this.parent.dispatchEvent(event);
+    this.parent.element.dispatchEvent(event);
     if (forReal) {
       super.destroy();
     }

@@ -1,5 +1,6 @@
 import {Clickable} from './Clickable';
 import {GameObject, PartialGameObjectConfig} from './GameObject';
+import {Responsive} from './Responsive';
 
 type Config = PartialGameObjectConfig & {
   handleFullscreen: () => void;
@@ -7,10 +8,11 @@ type Config = PartialGameObjectConfig & {
   handleDebug?: () => void;
 };
 
-export class Controls extends GameObject {
+export class Controls extends GameObject implements Responsive {
   fullscreen: Clickable;
   pause: Clickable;
   debug?: Clickable;
+  sizes = {width: 0, height: 0};
 
   constructor({elementId = 'controls', x = 0, y = 0, handleFullscreen, handlePause, handleDebug, ...rest}: Config) {
     super({
@@ -20,7 +22,8 @@ export class Controls extends GameObject {
       ...rest,
     });
     this.fullscreen = new Clickable({
-      parent: this.element,
+      game: this.game,
+      parent: this,
       elementId: 'ctrl-fullscreen',
       x: 0,
       y: 0,
@@ -29,7 +32,8 @@ export class Controls extends GameObject {
     this.fullscreen.element.title = 'Toggle fullscreen [F]';
     this.fullscreen.setContent('🖥️');
     this.pause = new Clickable({
-      parent: this.element,
+      game: this.game,
+      parent: this,
       elementId: 'ctrl-pause',
       x: 20,
       y: 0,
@@ -39,7 +43,8 @@ export class Controls extends GameObject {
     this.pause.setContent('⏸️');
     if (handleDebug) {
       this.debug = new Clickable({
-        parent: this.element,
+        game: this.game,
+        parent: this,
         elementId: 'ctrl-debug',
         x: 0,
         y: 0,
@@ -55,6 +60,12 @@ export class Controls extends GameObject {
     this.fullscreen.updateElementPosition();
     this.debug?.updateElementPosition();
     this.pause.updateElementPosition();
+  }
+
+  updateSizes() {
+    this.sizes.width = this.element.offsetWidth;
+    this.sizes.height = this.element.offsetHeight;
+    this.updateElement();
   }
 
   destroy(): void {

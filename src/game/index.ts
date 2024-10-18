@@ -11,3 +11,4 @@ export * from './HUD';
 export * from './Level';
 export * from './Paddle';
 export * from './Pause';
+export * from './Responsive';

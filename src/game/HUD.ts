@@ -1,11 +1,13 @@
 import {msToString} from '../util';
 
 import {GameObject, PartialGameObjectConfig} from './GameObject';
+import {Responsive} from './Responsive';
 
-export class HUD extends GameObject {
+export class HUD extends GameObject implements Responsive {
   lives: GameObject;
   time: GameObject;
   score: GameObject;
+  sizes = {width: 0, height: 0};
 
   constructor({elementId = 'hud', x = 0, y = 0, ...rest}: PartialGameObjectConfig) {
     super({
@@ -15,19 +17,22 @@ export class HUD extends GameObject {
       ...rest,
     });
     this.lives = new GameObject({
-      parent: this.element,
+      game: this.game,
+      parent: this,
       elementId: 'lives',
       x: 0,
       y: 0,
     });
     this.time = new GameObject({
-      parent: this.element,
+      game: this.game,
+      parent: this,
       elementId: 'time',
       x: 0,
       y: 0,
     });
     this.score = new GameObject({
-      parent: this.element,
+      game: this.game,
+      parent: this,
       elementId: 'score',
       x: 0,
       y: 0,
@@ -48,6 +53,13 @@ export class HUD extends GameObject {
     super.updateElementPosition();
     this.lives.updateElementPosition();
     this.score.updateElementPosition();
+    this.time.updateElementPosition();
+  }
+
+  updateSizes() {
+    this.sizes.width = this.element.offsetWidth;
+    this.sizes.height = this.element.offsetHeight;
+    this.updateElement();
   }
 
   destroy(): void {

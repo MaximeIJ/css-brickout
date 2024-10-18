@@ -215,7 +215,7 @@ document.getElementById('game')?.addEventListener('balldestroyed', e => {
   });
 });
 
-document.getElementById('game')?.addEventListener('brickdestroyed', e => {
+document.getElementById('game')?.addEventListener('brickdestroyed', () => {
   gameLoop.score += 1;
   gameLoop.updateHUDScore();
 });

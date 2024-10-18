@@ -204,6 +204,7 @@
 
 .resume-link {
   /* opacity pulse animation */
+  position: absolute;
   animation: pulse 3s infinite ease-in-out;
 }
 
@@ -211,8 +212,8 @@
   0% {
     opacity: 1;
   }
-  60% {
-    opacity: 0.5;
+  70% {
+    opacity: 0.75;
   }
   100% {
     opacity: 1;

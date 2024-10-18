@@ -19,7 +19,7 @@ export class Clickable extends GameObject {
   }
 
   destroy(): void {
-    this.parent.removeEventListener('click', this.onClick);
+    this.element.removeEventListener('click', this.onClick);
     super.destroy();
   }
 }

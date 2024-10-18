@@ -37,7 +37,7 @@ export class Brick extends MovingGameObject {
     this.destroyed = true;
     this.active = false;
     const event: BrickDestroyedEvent = createEvent<Brick>('brickdestroyed', this);
-    this.parent.dispatchEvent(event);
+    this.parent.element.dispatchEvent(event);
     if (forReal) {
       super.destroy();
     }
@@ -50,7 +50,7 @@ export class Brick extends MovingGameObject {
   }
 }
 
-export type CompositeBrickConfig = BrickConfig & {hitboxParts?: Array<Omit<BrickConfig, 'parent'>>};
+export type CompositeBrickConfig = BrickConfig & {hitboxParts?: Array<BrickConfig>};
 
 export class CompositeBrick extends Brick implements Composite {
   hitboxParts?: Array<Brick>;
@@ -58,7 +58,8 @@ export class CompositeBrick extends Brick implements Composite {
   constructor(config: CompositeBrickConfig) {
     super(config);
     this.hitboxParts = config.hitboxParts?.map(
-      (part, idx) => new Brick({...part, parent: config.parent, elementId: `${config.elementId}-p${idx}`}),
+      (part, idx) =>
+        new Brick({...part, game: config.game, parent: config.parent, elementId: `${config.elementId}-p${idx}`}),
     );
   }
 

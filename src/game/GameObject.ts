@@ -1,7 +1,11 @@
-import {BoundingBox, Vector, formatObjectTitle, pythagoras, rotatePoint} from '../util';
+import {BoundingBox, Vector, formatObjectTitle, rotatePoint} from '../util';
+
+import {Game} from './Game';
+import {Responsive} from './Responsive';
 
 export type GameObjectConfig = Vector & {
-  parent: HTMLDivElement;
+  game: Game;
+  parent?: Responsive;
   elementId?: string;
   className?: string;
   width?: number;
@@ -12,7 +16,7 @@ export type GameObjectConfig = Vector & {
   permanent?: boolean;
 };
 
-export type PartialGameObjectConfig = Required<Pick<GameObjectConfig, 'parent'>> & Partial<GameObjectConfig>;
+export type PartialGameObjectConfig = Required<Pick<GameObjectConfig, 'game'>> & Partial<GameObjectConfig>;
 
 export type BonusConfig = {
   cssClass: string;
@@ -30,7 +34,8 @@ export class GameObject {
   private _angle: number;
   bonuses: Array<BonusConfig>;
   element: HTMLDivElement;
-  parent: HTMLDivElement;
+  game: Game;
+  parent: Responsive;
   boundingBox: BoundingBox = {
     topL: {x: 0, y: 0},
     topR: {x: 0, y: 0},
@@ -42,7 +47,8 @@ export class GameObject {
   totalParticles = 0;
 
   constructor({
-    parent,
+    game,
+    parent = game,
     elementId,
     className,
     x,
@@ -58,6 +64,7 @@ export class GameObject {
     this.width = width;
     this.height = height;
     this._angle = angle;
+    this.game = game;
     this.parent = parent;
     this.bonuses = startingBonuses;
     this.element = document.createElement('div');
@@ -78,7 +85,7 @@ export class GameObject {
         this.element.classList.add(...classNames);
       }
     }
-    parent.appendChild(this.element);
+    this.parent.element.appendChild(this.element);
     this.updatePosition(x, y);
     this.angle = angle;
     this.updateElement();
@@ -95,12 +102,12 @@ export class GameObject {
   }
 
   updateElementSize(): void {
-    const {offsetWidth, offsetHeight} = this.parent;
+    const {width, height} = this.parent.sizes;
     if (this.width) {
-      this.element.style.width = `${Math.round(offsetWidth * (this.width / 100.0))}px`;
+      this.element.style.width = `${Math.round(width * (this.width / 100.0))}px`;
     }
     if (this.height) {
-      this.element.style.height = `${offsetHeight * (this.height / 100.0)}px`;
+      this.element.style.height = `${height * (this.height / 100.0)}px`;
     }
   }
 
@@ -154,9 +161,9 @@ export class GameObject {
   }
 
   updateElementPosition() {
-    const {offsetWidth, offsetHeight} = this.parent;
-    const absX = (this.x / 100.0) * offsetWidth;
-    const absY = (this.y / 100.0) * offsetHeight;
+    const {width, height} = this.parent.sizes;
+    const absX = (this.x / 100.0) * width;
+    const absY = (this.y / 100.0) * height;
     this.setStyle(
       'transform',
       `translateX(calc(${absX}px - 50%)) translateY(calc(${absY}px - 50%)) rotateZ(var(--angle, 0rad))`,
@@ -190,7 +197,7 @@ export class GameObject {
     } else {
       const particle = document.createElement('particle');
       particle.classList.add('particle');
-      this.parent.appendChild(particle);
+      this.parent.element.appendChild(particle);
       if (typeof recycleCondition === 'number') {
         setTimeout(this.recycleParticle(particle), recycleCondition);
       } else {
@@ -221,33 +228,6 @@ export class GameObject {
       particle.style.setProperty('opacity', '1');
       particle.style.setProperty('transform', this.element.style.transform);
       particles.push(particle);
-    }
-    return particles;
-  }
-
-  _emitParticles(
-    count: number,
-    classNames?: Array<string>,
-    durationMs = 500,
-    inheriteSize = false,
-  ): Array<HTMLElement> {
-    const particles: Array<HTMLElement> = [];
-    for (let i = 0; i < count; i++) {
-      const particle = document.createElement('particle');
-      particle.classList.add('particle');
-      if (classNames?.length) {
-        particle.classList.add(...classNames);
-      }
-      if (inheriteSize) {
-        particle.style.setProperty('width', this.element.clientWidth + 'px');
-        particle.style.setProperty('height', this.element.clientHeight + 'px');
-      }
-      particle.style.setProperty('transform', this.element.style.transform);
-      this.parent.appendChild(particle);
-      particles.push(particle);
-      setTimeout(() => {
-        particle.remove();
-      }, durationMs);
     }
     return particles;
   }
@@ -287,12 +267,16 @@ export class MovingGameObject extends GameObject {
   turnSteps: Array<TurnStep> = [];
   protected dx = 0;
   protected dy = 0;
-  protected fx = 0;
-  protected fy = 0;
-  protected pHeight = 100;
-  protected pWidth = 100;
   active = true;
   syncAngles = false;
+
+  get fx(): number {
+    return this.game?.level?.fx ?? 1;
+  }
+
+  get fy(): number {
+    return this.game?.level?.fy ?? 1;
+  }
 
   get speed(): number {
     return this._speed;
@@ -348,20 +332,6 @@ export class MovingGameObject extends GameObject {
       super(rest);
       this.syncAngles = syncAngles ?? false;
     }
-  }
-
-  updateSpeedRatios() {
-    const hypo = pythagoras(this.pWidth, this.pHeight);
-    // Account for aspect ratio
-    this.fx = this.pWidth / hypo;
-    this.fy = this.pHeight / hypo;
-  }
-
-  updateElementSize(): void {
-    this.pHeight = this.parent.offsetHeight || 100;
-    this.pWidth = this.parent.offsetWidth || 100;
-    this.updateSpeedRatios();
-    super.updateElementSize();
   }
 
   updatePosition(x?: number, y?: number, fraction = 1) {

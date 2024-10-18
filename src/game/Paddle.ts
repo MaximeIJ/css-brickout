@@ -39,8 +39,8 @@ export class Paddle extends MovingGameObject {
     }
     this.applyBonuses();
     this.updateTitle();
-    this.parent.addEventListener('touchmove', this.handleTouchMove, {passive: true});
-    this.parent.addEventListener('mousemove', this.handleMouseMove);
+    this.parent.element.addEventListener('touchmove', this.handleTouchMove, {passive: true});
+    this.parent.element.addEventListener('mousemove', this.handleMouseMove);
   }
 
   set angle(angle: number) {
@@ -71,8 +71,8 @@ export class Paddle extends MovingGameObject {
 
   handleClientMove = (x: number, y: number) => {
     // Calculate the touch position relative to the window width
-    const normX = (x / this.parent.offsetWidth) * 100;
-    const normY = (y / this.parent.offsetHeight) * 100;
+    const normX = (x / this.parent.sizes.width) * 100;
+    const normY = (y / this.parent.sizes.height) * 100;
     this.handleMove(normX, normY);
   };
 
@@ -145,8 +145,8 @@ export class Paddle extends MovingGameObject {
   };
 
   destroy(): void {
-    this.parent.removeEventListener('mousemove', this.handleMouseMove);
-    this.parent.removeEventListener('touchmove', this.handleTouchMove);
+    this.parent.element.removeEventListener('mousemove', this.handleMouseMove);
+    this.parent.element.removeEventListener('touchmove', this.handleTouchMove);
     super.destroy();
   }
 }

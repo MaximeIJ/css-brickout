@@ -1,6 +1,10 @@
-import {Ball, CompositeBrick, CompositeBrickConfig} from './';
+import {pythagoras} from '../util';
 
-export type BrickProps = Omit<CompositeBrickConfig, 'parent'>;
+import {Ball, BrickConfig, CompositeBrick, CompositeBrickConfig, Game, Responsive} from './';
+
+export type BrickProps = Omit<CompositeBrickConfig, 'game' | 'parent' | 'hitboxParts'> & {
+  hitboxParts?: Array<Omit<BrickConfig, 'game' | 'parent'>>;
+};
 
 type LayoutDefinitionType = 'even' | 'custom';
 type LayoutDefinition = {
@@ -33,7 +37,7 @@ export type CustomLayoutDefinition = LayoutDefinition & {
 export type LayoutDefinitionConfig = EvenLayoutDefinition | CustomLayoutDefinition;
 
 export type LevelConfig = {
-  parent: HTMLDivElement;
+  game: Game;
   /**
    * Layout(s) of the bricks, types can be mixed. Will be laid out in order.
    */
@@ -45,33 +49,36 @@ export type LevelConfig = {
   divisionFactor?: number;
 };
 
-export class Level {
+export class Level implements Responsive {
   element: HTMLDivElement;
-  parent: HTMLDivElement;
+  game: Game;
   bricks: Array<CompositeBrick>;
   mobileBricks: Array<CompositeBrick>;
   left = 0;
   _divisionFactor: number;
   _hitZones: Array<Array<Array<CompositeBrick>>>;
+  fx = 1;
+  fy = 1;
+  sizes = {width: 0, height: 0};
 
-  constructor({divisionFactor, layout, parent}: LevelConfig) {
+  constructor({divisionFactor, layout, game}: LevelConfig) {
     this.bricks = [];
     this.mobileBricks = [];
     this._hitZones = [];
-    this.parent = parent;
+    this.game = game;
     this._divisionFactor = divisionFactor ?? 10;
     if (document.getElementById('level')) {
       this.element = document.getElementById('level') as HTMLDivElement;
     } else {
       this.element = document.createElement('div');
-      parent.appendChild(this.element);
+      this.game.element.appendChild(this.element);
     }
     this.element.classList.add('level');
 
     if (layout instanceof Array) {
-      layout.forEach(l => this.layBricks(l, this.element));
+      layout.forEach(l => this.layBricks(l, this.game));
     } else {
-      this.layBricks(layout, this.element);
+      this.layBricks(layout, this.game);
     }
     this.left = this.bricks.length;
 
@@ -105,7 +112,9 @@ export class Level {
       }
     });
 
-    parent.addEventListener('brickdestroyed', this.handleBrickDestroyed);
+    this.updateSizes();
+
+    this.element.addEventListener('brickdestroyed', this.handleBrickDestroyed);
   }
 
   handleBrickDestroyed = () => {
@@ -142,9 +151,23 @@ export class Level {
     });
   }
 
-  layBricks(layout: LayoutDefinitionConfig, parent: HTMLDivElement) {
+  updateSizes() {
+    this.sizes.width = this.element.offsetWidth;
+    this.sizes.height = this.element.offsetHeight;
+    this.updateSpeedRatios();
+    this.updateElements();
+  }
+
+  updateSpeedRatios() {
+    const hypo = pythagoras(this.sizes.width, this.sizes.height);
+    // Account for aspect ratio
+    this.fx = this.sizes.width / hypo;
+    this.fy = this.sizes.height / hypo;
+  }
+
+  layBricks(layout: LayoutDefinitionConfig, game: Game) {
     if (layout instanceof Array) {
-      layout.forEach(layout => this.layBricks(layout, parent));
+      layout.forEach(layout => this.layBricks(layout, game));
     }
     if (layout.type === 'even') {
       const {y, height, rows, cols, hp = 1} = layout;
@@ -153,7 +176,8 @@ export class Level {
         for (let j = 0; j < cols; j++) {
           this.bricks.push(
             new CompositeBrick({
-              parent,
+              game,
+              parent: this,
               width,
               height,
               x: width * (j + 0.5),
@@ -167,7 +191,12 @@ export class Level {
     } else if (layout.type === 'custom') {
       layout.bricks.forEach(brick => {
         this.bricks.push(
-          new CompositeBrick({...brick, parent, elementId: brick.elementId ?? `brick-${this.bricks.length}`}),
+          new CompositeBrick({
+            ...brick,
+            game,
+            parent: this,
+            elementId: brick.elementId ?? `brick-${this.bricks.length}`,
+          } as CompositeBrickConfig),
         );
       });
     }
@@ -178,7 +207,7 @@ export class Level {
   }
 
   destroy() {
-    this.parent.removeEventListener('brickdestroyed', this.handleBrickDestroyed);
+    this.element.removeEventListener('brickdestroyed', this.handleBrickDestroyed);
     this.bricks.forEach(brick => brick.destroy());
   }
 }

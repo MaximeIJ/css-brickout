@@ -6,7 +6,7 @@ export class Debug extends GameObject {
     x = 50,
     y = 5,
     ...rest
-  }: Required<Pick<GameObjectConfig, 'parent'>> & Partial<GameObjectConfig>) {
+  }: Required<Pick<GameObjectConfig, 'game'>> & Partial<GameObjectConfig>) {
     super({
       elementId,
       x,
