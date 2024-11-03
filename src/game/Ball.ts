@@ -166,7 +166,7 @@ export class Ball extends MovingGameObject {
         (2 * Math.PI);
 
       // Calculate the new angle with skewness towards more vertical angles
-      const angleMultiplier = paddle.gripFactor; // Adjust this value to control the skewness
+      const angleMultiplier = paddle.curveFactor ?? 0; // Adjust this value to control the skewness
       const hitPositionSkewness = hitPositionNormalized * angleMultiplier;
 
       const nextAngle = normalizeAngle(-paddle.angle * 2 - incomingAngle) - hitPositionSkewness;

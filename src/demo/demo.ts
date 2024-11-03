@@ -22,7 +22,7 @@ const paddleConfig = {
   width: 13,
   height: 2.3,
   angleLimit: Math.PI / 12,
-  startingBonuses: [BONUSES.grip1],
+  startingBonuses: [BONUSES.curve1],
 };
 const playerConfig = {
   lives: 3,

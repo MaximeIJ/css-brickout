@@ -3,6 +3,8 @@ import {clamp} from '../util';
 import {MovingGameObject, MovingGameObjectConfig} from './GameObject';
 
 export type PaddleConfig = MovingGameObjectConfig & {
+  // Defaults to 0
+  curveFactor?: number;
   // Defaults to 0.05
   gripFactor?: number;
   // Default to y
@@ -15,6 +17,7 @@ export type PaddleConfig = MovingGameObjectConfig & {
 
 export class Paddle extends MovingGameObject {
   // How much ball angle is modified when it hits the paddle further from the center
+  curveFactor = 0;
   gripFactor = 0.05;
   minY: number;
   maxY: number;
@@ -23,8 +26,11 @@ export class Paddle extends MovingGameObject {
   angleLimit = 0;
   vtBound = true;
 
-  constructor({angle, angleLimit, gripFactor, minY, maxY, ...config}: PaddleConfig) {
+  constructor({angle, angleLimit, curveFactor, gripFactor, minY, maxY, ...config}: PaddleConfig) {
     super({...config, className: [...(config.className?.split(' ') ?? []), 'paddle'].join(' '), showTitle: true});
+    if (curveFactor !== undefined) {
+      this.curveFactor = curveFactor;
+    }
     if (gripFactor !== undefined) {
       this.gripFactor = gripFactor;
     }
@@ -50,6 +56,23 @@ export class Paddle extends MovingGameObject {
 
   get angle() {
     return super.angle;
+  }
+
+  updateElementSize(): void {
+    if (!this.curveFactor) {
+      return super.updateElementSize();
+    }
+    const {width, height} = this.parent.sizes;
+    if (this.width) {
+      this.element.style.width = `${Math.round(width * (this.width / 100.0))}px`;
+    }
+    if (this.height) {
+      // Adjust visual height to smooth out the curve
+      this.element.style.height = `${1.1 * height * (this.height / 100.0)}px`;
+      const radiusStr = `100% ${this.curveFactor * 100}%`;
+      this.element.style.borderTopLeftRadius = radiusStr;
+      this.element.style.borderTopRightRadius = radiusStr;
+    }
   }
 
   handleMouseMove = ({clientX, clientY, currentTarget}: MouseEvent) => {

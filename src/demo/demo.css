@@ -1,5 +1,5 @@
 /* Bonuses */
-.paddle.grip-1 {
+.paddle.curve-1 {
   background: radial-gradient(at 50% 100%, var(--paddle-bg), var(--paddle-bg) 63%, transparent 75%, transparent 100%),
     repeating-radial-gradient(
       circle at 50% -130%,
@@ -9,7 +9,7 @@
       var(--ball-bg) 13%
     );
 }
-.paddle.grip-2 {
+.paddle.curve-2 {
   background: radial-gradient(at 50% 110%, var(--paddle-bg), var(--paddle-bg) 55%, transparent 65%, transparent 100%),
     repeating-radial-gradient(
       circle at 50% -280%,

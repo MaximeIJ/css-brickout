@@ -78,7 +78,7 @@ export class GameObject {
       this.element.id = elementId;
     }
     if (className) {
-      const classNames = className.trim().split(' ');
+      const classNames = className.trim().split(' ').filter(Boolean);
       if (classNames.length) {
         this.element.classList.add(...classNames);
       }

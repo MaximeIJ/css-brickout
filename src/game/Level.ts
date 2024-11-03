@@ -54,7 +54,6 @@ export class Level implements Responsive {
   game: Game;
   bricks: Array<CompositeBrick>;
   mobileBricks: Array<CompositeBrick>;
-  left = 0;
   _divisionFactor: number;
   _hitZones: Array<Array<Array<CompositeBrick>>>;
   fx = 1;
@@ -82,7 +81,6 @@ export class Level implements Responsive {
     } else {
       this.layBricks(layout, this.game);
     }
-    this.left = this.bricks.length;
 
     for (let divRow = 0; divRow < this._divisionFactor; divRow++) {
       this._hitZones.push([]);
@@ -115,13 +113,7 @@ export class Level implements Responsive {
     });
 
     this.updateSizes();
-
-    this.element.addEventListener('brickdestroyed', this.handleBrickDestroyed);
   }
-
-  handleBrickDestroyed = () => {
-    this.left--;
-  };
 
   getNearbyBricks(ball: Ball): Array<CompositeBrick> {
     const res = new Set<CompositeBrick>();
@@ -239,7 +231,6 @@ export class Level implements Responsive {
   }
 
   destroy() {
-    this.element.removeEventListener('brickdestroyed', this.handleBrickDestroyed);
     this.bricks.forEach(brick => brick.destroy());
     this.particles.forEach(particle => particle.remove());
   }

@@ -1,9 +1,10 @@
 import {Ball, BonusConfig, GameObject, LayoutDefinitionConfig, Paddle} from '../game';
 
-const gripFactorEffect = (amount: number) => (paddle: GameObject) => {
-  (paddle as Paddle).gripFactor += amount;
+const curveFactorEffect = (amount: number) => (paddle: GameObject) => {
+  const previousValue = (paddle as Paddle).curveFactor;
+  (paddle as Paddle).curveFactor = amount;
   return (paddle: GameObject) => {
-    (paddle as Paddle).gripFactor -= amount;
+    (paddle as Paddle).curveFactor = previousValue;
   };
 };
 
@@ -16,16 +17,16 @@ const speedEffect = (amount: number) => (ball: GameObject) => {
 
 export const BONUSES: Record<string, BonusConfig> = {
   // Paddle
-  // Grips the edges of the paddle to the ball
-  grip1: {
-    cssClass: 'grip-1',
+  // curves the edges of the paddle to the ball
+  curve1: {
+    cssClass: 'curve-1',
     duration: 0,
-    effect: gripFactorEffect(0.4),
+    effect: curveFactorEffect(0.4),
   },
-  grip2: {
-    cssClass: 'grip-2',
+  curve2: {
+    cssClass: 'curve-2',
     duration: 0,
-    effect: gripFactorEffect(0.7),
+    effect: curveFactorEffect(0.6),
   },
 
   // Ball

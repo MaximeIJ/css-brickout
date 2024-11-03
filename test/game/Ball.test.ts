@@ -25,11 +25,11 @@ const makeBall = (angle: number, x: number, y: number) => {
   return b;
 };
 
-describe.concurrent('paddle no grip', () => {
+describe.concurrent('paddle no curve', () => {
   let p: Paddle;
 
   beforeAll(async () => {
-    p = new Paddle({x: 50, y: 50, width: 20, height: 5, game, elementId: `paddle`, gripFactor: 0});
+    p = new Paddle({x: 50, y: 50, width: 20, height: 5, game, elementId: `paddle`, curveFactor: 0});
     p.updatePosition();
   });
 
@@ -82,11 +82,11 @@ describe.concurrent('paddle no grip', () => {
   });
 });
 
-describe.concurrent('paddle heavy grip', () => {
+describe.concurrent('paddle heavy curve', () => {
   let p: Paddle;
 
   beforeAll(async () => {
-    p = new Paddle({x: 50, y: 50, width: 20, height: 5, game, elementId: `paddle`, gripFactor: 2});
+    p = new Paddle({x: 50, y: 50, width: 20, height: 5, game, elementId: `paddle`, curveFactor: 2});
     p.updatePosition();
   });
 
@@ -171,7 +171,7 @@ describe.concurrent('paddle angle PI / 4', () => {
       height: 5,
       game,
       elementId: `paddle`,
-      gripFactor: 0,
+      curveFactor: 0,
       angle: -Math.PI / 4,
       angleLimit: Math.PI / 2,
     });
