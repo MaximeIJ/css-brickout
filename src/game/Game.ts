@@ -192,6 +192,10 @@ export class Game implements Responsive {
     this.dispatchGameEvent('gamestarted');
   };
 
+  get speed() {
+    return this._speed;
+  }
+
   set speed(speed: number) {
     this._speed = Math.max(1 / 1_000, speed);
   }
