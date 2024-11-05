@@ -82,7 +82,7 @@ export class Game implements Responsive {
   lastFpsUpdate: number = performance.now();
   // Gameplay
   options: GameOptions;
-  private effectiveUpdatesPerFrame: number;
+  _speed = 1;
   fpsInterval: number;
   fpsCap: number;
   msSinceStart = 0;
@@ -124,7 +124,6 @@ export class Game implements Responsive {
     this.resumeLink = null;
 
     this.options = {...DEFAULT_OPTIONS, ...params.options};
-    this.effectiveUpdatesPerFrame = this.options.updatesPerFrame;
 
     // Set up player
     if (params.playerConfig) {
@@ -193,8 +192,15 @@ export class Game implements Responsive {
     this.dispatchGameEvent('gamestarted');
   };
 
+  set speed(speed: number) {
+    this._speed = Math.max(1 / 1_000, speed);
+  }
+
+  /**
+   * @deprecated Set speed instead
+   */
   setOverallSpeed = (speed: number) => {
-    this.effectiveUpdatesPerFrame = Math.round(this.options.updatesPerFrame / speed);
+    this.speed = speed;
   };
 
   update = () => {
@@ -202,7 +208,9 @@ export class Game implements Responsive {
     const msSinceLastFrame = now - this.lastFrameTime;
     if (PAUSABLE.includes(this.state)) {
       if (msSinceLastFrame >= this.fpsCap) {
-        this.msSinceStart += msSinceLastFrame;
+        const speed = this._speed || 1;
+        const virtualMsSinceLastFrame = msSinceLastFrame * speed;
+        this.msSinceStart += virtualMsSinceLastFrame;
         this.updateHUDTime();
         this.lastFrameTime = now;
         if (this.debug && now > this.lastFpsUpdate + 1000) {
@@ -211,10 +219,10 @@ export class Game implements Responsive {
           this.lastFpsUpdate = now;
         }
 
-        const frameFraction = msSinceLastFrame / (this.fpsInterval * this.effectiveUpdatesPerFrame);
+        const frameFraction = virtualMsSinceLastFrame / (this.fpsInterval * this.options.updatesPerFrame * speed);
 
         // update numbers
-        for (let i = 0; i < this.options.updatesPerFrame; i++) {
+        for (let i = 0; i < Math.ceil(this.options.updatesPerFrame * speed); i++) {
           this.paddle.processFrame(frameFraction);
           this.level.mobileBricks.forEach(brick => brick.processFrame(frameFraction));
           for (const ball of this.balls) {
