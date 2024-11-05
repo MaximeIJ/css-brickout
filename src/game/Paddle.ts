@@ -76,6 +76,9 @@ export class Paddle extends MovingGameObject {
   }
 
   handleMouseMove = ({clientX, clientY, currentTarget}: MouseEvent) => {
+    if (this.game.state !== 'playing') {
+      return;
+    }
     if (currentTarget instanceof HTMLElement) {
       // Get a relative mouse position on the container
       const rect = currentTarget.getBoundingClientRect();
@@ -87,6 +90,9 @@ export class Paddle extends MovingGameObject {
   };
 
   handleTouchMove = (e: TouchEvent) => {
+    if (this.game.state !== 'playing') {
+      return;
+    }
     // Get the first touch event in the touches list
     const touch = e.touches[0];
     this.handleClientMove(touch.clientX, touch.clientY);
