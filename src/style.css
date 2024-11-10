@@ -100,7 +100,10 @@
   border-width: 0;
   opacity: 0;
   visibility: hidden;
-  transition: border-width 250ms ease-out, opacity 200ms ease-in-out 100ms, background 120ms ease-in;
+  transition:
+    border-width 250ms ease-out,
+    opacity 200ms ease-in-out 100ms,
+    background 120ms ease-in;
 }
 
 /* Debug  */

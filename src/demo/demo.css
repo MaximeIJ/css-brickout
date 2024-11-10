@@ -41,13 +41,18 @@
 .ball--destroyed {
   border-width: 0;
   opacity: 0;
-  transition: border-width 50ms ease-out, opacity 150ms ease-in-out;
+  transition:
+    border-width 50ms ease-out,
+    opacity 150ms ease-in-out;
 }
 
 .particle.ball--destroyed-particle {
   border-radius: 50%;
   background: var(--ball-bg);
-  transition: top 300ms ease-out, left 250ms ease-out, opacity 100ms linear 200ms;
+  transition:
+    top 300ms ease-out,
+    left 250ms ease-out,
+    opacity 100ms linear 200ms;
   top: 0px;
   left: 0px;
   opacity: 1;
@@ -169,7 +174,10 @@
   opacity: 0;
   box-shadow: none;
   transform: perspective(10px) rotateX(55deg);
-  transition: height 120ms ease-out, width 330ms ease-in, opacity 200ms ease-in-out 150ms;
+  transition:
+    height 120ms ease-out,
+    width 330ms ease-in,
+    opacity 200ms ease-in-out 150ms;
 }
 
 .lava .hello-o:not(.brick--destroyed) {
