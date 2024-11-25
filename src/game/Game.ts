@@ -193,7 +193,7 @@ export class Game implements Responsive {
   };
 
   get speed() {
-    return this._speed;
+    return this._speed ?? 1;
   }
 
   set speed(speed: number) {
@@ -343,7 +343,8 @@ export class Game implements Responsive {
   updateSizes = (callResize = false) => {
     // if ratio is more vertical, apply the column class to this.element, otherwise remove it
     const {width, height} = this.element.getBoundingClientRect();
-    if (width / height < 1) {
+    if (width / height < 1.618) {
+      // golden ratio
       this.element.classList.add('column');
     } else {
       this.element.classList.remove('column');

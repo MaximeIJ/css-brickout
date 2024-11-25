@@ -169,7 +169,7 @@ export class Ball extends MovingGameObject {
       const angleMultiplier = paddle.curveFactor ?? 0; // Adjust this value to control the skewness
       const hitPositionSkewness = hitPositionNormalized * angleMultiplier;
 
-      const nextAngle = normalizeAngle(-paddle.angle * 2 - incomingAngle) - hitPositionSkewness;
+      const nextAngle = normalizeAngle(-paddle.angle * 2 - incomingAngle - hitPositionSkewness);
       this.movementAngle = clamp(nextAngle, MAX_ANGLE - paddle.angle, MIN_ANGLE - paddle.angle);
       this.correctPostion(getOverlapsAndAxes(paddle, this)[0], paddle);
 
