@@ -160,16 +160,16 @@ export class Ball extends MovingGameObject {
       const hitPosition = this.x - paddle.x;
       const hitPositionNormalized = hitPosition / (paddle.width / 2);
 
-      // Calculate the incoming angle of the ball
-      const incomingAngle =
-        (this.movementAngle > Math.PI ? (this.movementAngle % (2 * Math.PI)) - 2 * Math.PI : this.movementAngle) %
-        (2 * Math.PI);
-
-      // Calculate the new angle with skewness towards more vertical angles
       const angleMultiplier = paddle.curveFactor ?? 0; // Adjust this value to control the skewness
       const hitPositionSkewness = hitPositionNormalized * angleMultiplier;
 
-      const nextAngle = normalizeAngle(-paddle.angle * 2 - incomingAngle - hitPositionSkewness);
+      const overlapsAndAxes = getOverlapsAndAxes(paddle, this);
+      const {axis: maxOverlapAxis} = overlapsAndAxes[1];
+      const collisionAngle = -Math.atan2(maxOverlapAxis.y, maxOverlapAxis.x);
+
+      // Calculate the new angle after reflection
+      const nextAngle = normalizeAngle(2 * collisionAngle - this.movementAngle) - hitPositionSkewness;
+      // const nextAngle = normalizeAngle(-paddle.angle * 2 - incomingAngle - hitPositionSkewness);
       this.movementAngle = clamp(nextAngle, MAX_ANGLE - paddle.angle, MIN_ANGLE - paddle.angle);
       this.correctPostion(getOverlapsAndAxes(paddle, this)[0], paddle);
 

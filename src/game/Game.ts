@@ -198,6 +198,7 @@ export class Game implements Responsive {
 
   set speed(speed: number) {
     this._speed = Math.max(1 / 1_000, speed);
+    this.element.style.setProperty('--game-speed', `${this._speed}`);
   }
 
   /**
