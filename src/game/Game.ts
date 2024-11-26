@@ -35,6 +35,8 @@ type GameOptions = {
   updatesPerFrame: number;
   // Skips default event listeners: balldestroyed (lives--, respawning), ballcollision (console), brickdestroyed (score++, level end)
   skipDefaultRules: boolean;
+  // Aspect ratio for column layout
+  columnAspectRatio: number;
 };
 
 const DEFAULT_OPTIONS: GameOptions = {
@@ -48,6 +50,7 @@ const DEFAULT_OPTIONS: GameOptions = {
   demoMode: false,
   updatesPerFrame: 1,
   skipDefaultRules: false,
+  columnAspectRatio: 1.618, // golden ratio
 };
 
 export type GameParams = {
@@ -344,8 +347,7 @@ export class Game implements Responsive {
   updateSizes = (callResize = false) => {
     // if ratio is more vertical, apply the column class to this.element, otherwise remove it
     const {width, height} = this.element.getBoundingClientRect();
-    if (width / height < 1.618) {
-      // golden ratio
+    if (width / height < this.options.columnAspectRatio) {
       this.element.classList.add('column');
     } else {
       this.element.classList.remove('column');
