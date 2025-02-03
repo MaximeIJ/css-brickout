@@ -1,6 +1,6 @@
 {
   "name": "@maximeij/css-brickout",
-  "version": "0.17.6",
+  "version": "0.17.7",
   "type": "module",
   "description": "Classic Brickout Game Engine implemented in Typescript and rendered with CSS. No dependencies.",
   "author": "Maxime IJ",
