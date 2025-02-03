@@ -347,10 +347,14 @@ export class Game implements Responsive {
   updateSizes = (callResize = false) => {
     // if ratio is more vertical, apply the column class to this.element, otherwise remove it
     const {width, height} = this.element.getBoundingClientRect();
-    if (width / height < this.options.columnAspectRatio) {
+    const isColumn = this.element.classList.contains('column');
+    let hasChanged = false;
+    if (!isColumn && width / height < this.options.columnAspectRatio) {
       this.element.classList.add('column');
-    } else {
+      hasChanged = true;
+    } else if (isColumn && width / height >= this.options.columnAspectRatio) {
       this.element.classList.remove('column');
+      hasChanged = true;
     }
 
     this.sizes.width = width;
@@ -358,19 +362,31 @@ export class Game implements Responsive {
     if (callResize) {
       this.handleResize();
     }
+    return hasChanged;
   };
 
   handleResize = () => {
     this.debounce(() => {
-      this.updateSizes();
-      this.level.updateSizes();
-      this.paddle.updateElement();
-      this.balls.forEach(ball => ball.updateElement());
-      this.paused?.updateSizes();
-      this.resumeLink?.updateElement();
-      this.debug?.updateElement();
-      this.controls?.updateSizes();
-      this.hud?.updateSizes();
+      const layoutHasChanged = this.updateSizes();
+
+      const updateOthers = () => {
+        this.paused?.updateSizes();
+        this.resumeLink?.updateElement();
+        this.debug?.updateElement();
+        this.controls?.updateSizes();
+        this.hud?.updateSizes();
+        this.level.updateSizes();
+        this.paddle.updateElement();
+        this.balls.forEach(ball => ball.updateElement());
+      };
+      updateOthers();
+
+      if (layoutHasChanged) {
+        // Reupdate in case layout was still settling
+        setTimeout(() => {
+          updateOthers();
+        }, 1_000);
+      }
     })();
   };
 
