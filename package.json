@@ -3,7 +3,7 @@
   "version": "0.17.7",
   "type": "module",
   "description": "Classic Brickout Game Engine implemented in Typescript and rendered with CSS. No dependencies.",
-  "author": "Maxime IJ",
+  "author": "Maxime Lynx",
   "license": "SEE LICENSE IN LICENSE",
   "homepage": "https://maximeij.dev/css-brickout",
   "keywords": [

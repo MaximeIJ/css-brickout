@@ -59,7 +59,7 @@ These events are currently available and include the GameObject emitting it unle
 
 #### Ball events:
 
-- `'ballcollision'` (includes both the Ball and the GameObject it collided with)
+- `'ballcollision'` (includes both the Ball and the GameObject it collided with unless the collision was with the boundary)
 - `'balldestroyed'`
 
 #### Brick events:

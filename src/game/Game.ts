@@ -33,7 +33,7 @@ type GameOptions = {
    * See demo for example of stress test, where this is set to 20. On more normal level sizes, it can be up to 1000
    */
   updatesPerFrame: number;
-  // Skips default event listeners: balldestroyed (lives--, respawning), ballcollision (console), brickdestroyed (score++, level end)
+  // Skips default event listeners: balldestroyed (lives--, respawning), brickdestroyed (score++, level end)
   skipDefaultRules: boolean;
   // Aspect ratio for column layout
   columnAspectRatio: number;

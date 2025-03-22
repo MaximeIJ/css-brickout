@@ -187,7 +187,7 @@ function onUpdatesPerFrameChange({target}: Event) {
 document.getElementById('updates-frame')?.addEventListener('input', onUpdatesPerFrameChange);
 
 function setGameSpeed(speed: number) {
-  gameLoop.setOverallSpeed(clamp(0.05, speed, 20));
+  gameLoop.speed = clamp(0.05, speed, 20);
   const labelElement = document.getElementById('game-speed-label');
   const inputElement = document.getElementById('game-speed') as HTMLInputElement;
   if (inputElement) {

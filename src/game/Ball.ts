@@ -111,6 +111,7 @@ export class Ball extends MovingGameObject {
         this.x = 100 - this.rx;
       }
       this.antiJuggling = false;
+      this.dispatchCollisionEvent();
       return true;
     } else if (hitTop) {
       this.movementAngle = -this.movementAngle;
@@ -118,6 +119,7 @@ export class Ball extends MovingGameObject {
         this.y = this.radius;
       }
       this.antiJuggling = false;
+      this.dispatchCollisionEvent();
       return true;
     }
 
@@ -224,8 +226,8 @@ export class Ball extends MovingGameObject {
     }
   }
 
-  dispatchCollisionEvent(object: GameObject) {
-    const event: BallCollisionEvent = createEvent<{ball: Ball; object: GameObject}>('ballcollision', {
+  dispatchCollisionEvent(object?: GameObject) {
+    const event: BallCollisionEvent = createEvent<{ball: Ball; object?: GameObject}>('ballcollision', {
       ball: this,
       object,
     });
@@ -249,4 +251,4 @@ ${this.damage ? `Damage: ${this.damage}` : ''}`;
 }
 
 export type BallDestroyedEvent = CustomEvent<Ball>;
-export type BallCollisionEvent = CustomEvent<{ball: Ball; object: GameObject}>;
+export type BallCollisionEvent = CustomEvent<{ball: Ball; object?: GameObject}>;
