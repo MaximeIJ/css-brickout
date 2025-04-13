@@ -102,6 +102,8 @@ export class Game implements Responsive {
 
   constructor(params: GameParams) {
     this.ogParams = {...params};
+    this.options = {...DEFAULT_OPTIONS, ...params.options};
+
     this.element = document.getElementById(params.parentId ?? 'game') as HTMLDivElement;
     this.element.classList.add('game');
     if (!params.options?.showCursorInPlay) {
@@ -112,6 +114,16 @@ export class Game implements Responsive {
     this.level = new Level({
       ...params.levelConfig,
       game: this,
+      onLevelMounted: () => {
+        // Set up player
+        if (params.playerConfig) {
+          this.lives = params.playerConfig.lives;
+          this.score = params.playerConfig.score ?? 0;
+        }
+        this.setBalls();
+        this.updateSizes(true);
+        this.start();
+      },
     });
 
     this.paddle = new Paddle({
@@ -122,17 +134,10 @@ export class Game implements Responsive {
       x: params.paddleConfig?.x ?? 50,
       y: params.paddleConfig?.y ?? 83,
     });
+
     this.debug = null;
     this.paused = null;
     this.resumeLink = null;
-
-    this.options = {...DEFAULT_OPTIONS, ...params.options};
-
-    // Set up player
-    if (params.playerConfig) {
-      this.lives = params.playerConfig.lives;
-      this.score = params.playerConfig.score ?? 0;
-    }
     this.controls = new Controls({
       game: this,
       handleFullscreen: () => this.toggleFullscreen(),
@@ -144,9 +149,6 @@ export class Game implements Responsive {
     this.updateHUDLives();
     this.updateHUDScore();
     this.updateHUDTime();
-
-    this.setBalls();
-    this.updateSizes(true);
 
     // Event listeners
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
@@ -370,12 +372,12 @@ export class Game implements Responsive {
       const layoutHasChanged = this.updateSizes();
 
       const updateOthers = () => {
+        this.level.updateSizes();
         this.paused?.updateSizes();
         this.resumeLink?.updateElement();
         this.debug?.updateElement();
         this.controls?.updateSizes();
         this.hud?.updateSizes();
-        this.level.updateSizes();
         this.paddle.updateElement();
         this.balls.forEach(ball => ball.updateElement());
       };

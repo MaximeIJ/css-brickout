@@ -7,7 +7,7 @@ import {clamp} from '../util/math';
 
 import {BONUSES, LAYOUTS} from './presets';
 
-const startingSpeed = 100;
+const startingUpf = 50;
 
 const ng = -Math.PI / 2;
 const ballBase = {
@@ -28,7 +28,7 @@ const playerConfig = {
   lives: 3,
 };
 const commonParams = {
-  options: {allowDebug: true, updatesPerFrame: startingSpeed},
+  options: {allowDebug: true, updatesPerFrame: startingUpf},
   ballConfigs: [
     {
       ...ballBase,
@@ -58,12 +58,12 @@ const inputMap: Record<'hello' | 'even' | 'stress' | 'random' | 'mixed', GamePar
     })),
     levelConfig: {
       layout: [
-        {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 6, cols: 25, hp: 8},
+        {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 6, cols: 25},
         LAYOUTS.evenStress,
-        {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 23, cols: 60, rows: 6, hp: 5},
+        {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 23, cols: 60, rows: 6},
         {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 35, cols: 70},
         {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 42, cols: 40},
-        {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 49, cols: 80, hp: 2},
+        {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 49, cols: 80},
         {...(LAYOUTS.evenStress as EvenLayoutDefinition), y: 56, cols: 60, rows: 8},
       ],
     },
@@ -125,7 +125,6 @@ const inputMap: Record<'hello' | 'even' | 'stress' | 'random' | 'mixed', GamePar
 
 // Create game loop instance and start the game
 let gameLoop = new Game(inputMap.hello);
-gameLoop.start();
 
 let lastTheme = 'classic';
 
@@ -170,7 +169,7 @@ function onLayoutChange({target}: Event) {
 document.getElementById('layout-type')?.addEventListener('change', onLayoutChange);
 
 function setUpdatesFrame(upf: number) {
-  gameLoop.options.updatesPerFrame = clamp(1, upf, 1000);
+  gameLoop.options.updatesPerFrame = clamp(1, upf, 200);
   const labelElement = document.getElementById('updates-frame-label');
   if (labelElement) {
     labelElement.innerText = `${gameLoop.options.updatesPerFrame}`;

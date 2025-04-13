@@ -47,6 +47,7 @@ export type LevelConfig = {
    * @default 10
    */
   divisionFactor?: number;
+  onLevelMounted?: () => void;
 };
 
 export class Level implements Responsive {
@@ -61,20 +62,25 @@ export class Level implements Responsive {
   sizes = {width: 0, height: 0};
   particles: Array<HTMLElement> = [];
   totalParticles = 0;
+  onLevelMounted?: () => void;
 
-  constructor({divisionFactor, layout, game}: LevelConfig) {
+  constructor({divisionFactor, layout, game, onLevelMounted}: LevelConfig) {
     this.bricks = [];
     this.mobileBricks = [];
     this._hitZones = [];
     this.game = game;
+    this.onLevelMounted = onLevelMounted;
     this._divisionFactor = divisionFactor ?? 10;
-    if (document.getElementById('level')) {
-      this.element = document.getElementById('level') as HTMLDivElement;
+    const exisitingLevel = this.game.element.getElementsByClassName('level')[0];
+
+    const frag = document.createDocumentFragment();
+    if (exisitingLevel) {
+      this.element = exisitingLevel as HTMLDivElement;
     } else {
       this.element = document.createElement('div');
-      this.game.element.appendChild(this.element);
+      this.element.classList.add('level');
     }
-    this.element.classList.add('level');
+    frag.appendChild(this.element);
 
     if (layout instanceof Array) {
       layout.forEach(l => this.layBricks(l, this.game));
@@ -112,7 +118,11 @@ export class Level implements Responsive {
       }
     });
 
-    this.updateSizes();
+    // Mount the level element
+    requestAnimationFrame(() => {
+      this.game.element.appendChild(frag);
+      this.onLevelMounted?.();
+    });
   }
 
   getNearbyBricks(ball: Ball): Array<CompositeBrick> {

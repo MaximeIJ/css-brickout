@@ -153,7 +153,7 @@ export const LAYOUTS: Record<string, LayoutDefinitionConfig> = {
     rows: 4,
     cols: 50,
     height: 1.5,
-    hp: 4,
+    hp: 1,
   },
   hello: {
     type: 'custom',
