@@ -115,7 +115,7 @@ export class Ball extends MovingGameObject {
       return true;
     } else if (hitTop) {
       this.movementAngle = -this.movementAngle;
-      if (this.y - this.radius < 0) {
+      if (this.y - this.radius <= 0) {
         this.y = this.radius;
       }
       this.antiJuggling = false;
@@ -140,14 +140,13 @@ export class Ball extends MovingGameObject {
 
     const overlapsAndAxes = getOverlapsAndAxes(brick, this);
     const {axis: maxOverlapAxis} = overlapsAndAxes[1];
-    const collisionAngle = -Math.atan2(maxOverlapAxis.y, maxOverlapAxis.x);
+    const collisionAngle = Math.atan2(maxOverlapAxis.y, maxOverlapAxis.x);
 
     // Calculate the new angle after reflection
     const reflectedAngle = normalizeAngle(2 * collisionAngle - this.movementAngle);
 
     this.movementAngle = reflectedAngle;
-    // todo: correct position with min overlap
-    this.correctPostion(overlapsAndAxes[0], brick);
+    this.correctPostion(overlapsAndAxes[0]);
 
     this.dispatchCollisionEvent(brick);
     parentBrick.takeHit(this);
@@ -173,7 +172,7 @@ export class Ball extends MovingGameObject {
       const nextAngle = normalizeAngle(2 * collisionAngle - this.movementAngle) - hitPositionSkewness;
       // const nextAngle = normalizeAngle(-paddle.angle * 2 - incomingAngle - hitPositionSkewness);
       this.movementAngle = clamp(nextAngle, MAX_ANGLE - paddle.angle, MIN_ANGLE - paddle.angle);
-      this.correctPostion(getOverlapsAndAxes(paddle, this)[0], paddle);
+      this.correctPostion(overlapsAndAxes[0]);
 
       this.dispatchCollisionEvent(paddle);
       return true;
@@ -203,17 +202,11 @@ export class Ball extends MovingGameObject {
     return true; // Overlapping on all axes, collision detected
   }
 
-  correctPostion(axisOverlaps: AxisOverlap, object: GameObject): void {
+  correctPostion(axisOverlaps: AxisOverlap): void {
     const {overlap, axis} = axisOverlaps;
     if (overlap !== 0) {
-      if (object.x > this.x) {
-        axis.x *= -1;
-      }
-      if (object.y < this.y) {
-        axis.y *= -1;
-      }
-      this.x += axis.x * overlap;
-      this.y += axis.y * overlap;
+      this.x -= axis.x * overlap;
+      this.y -= axis.y * overlap;
     }
   }
 

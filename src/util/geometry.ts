@@ -65,13 +65,20 @@ export function overlapOnAxis(circle: Circle, axis: Vector, rectangleCorners: Bo
 export function getOverlapsAndAxes(rect: Rectangle, circle: Circle): Array<AxisOverlap> {
   return [
     {x: 1, y: 0}, // X-axis
-    {x: 0, y: -1}, // Y-axis
+    {x: 0, y: 1}, // Y-axis
   ]
-    .map(axis => {
-      const rotatedAxis = rotatePoint(axis.x, axis.y, 0, 0, rect.angle);
+    .map(baseAxis => {
+      const signX = Math.sign(rect.x - circle.x) || 1;
+      const signY = Math.sign(rect.y - circle.y) || 1;
+      const rotatedAxis = rotatePoint(signX * baseAxis.x, signY * baseAxis.y, 0, 0, rect.angle);
+      const axis: Vector = {x: rotatedAxis.x, y: rotatedAxis.y};
+      // Normalize the axis
+      const length = Math.sqrt(axis.x * axis.x + axis.y * axis.y);
+      axis.x /= length;
+      axis.y /= length;
       return {
-        overlap: overlapOnAxis(circle, rotatedAxis, rect.boundingBox),
-        axis: rotatedAxis,
+        overlap: overlapOnAxis(circle, axis, rect.boundingBox),
+        axis,
       };
     })
     .sort((a, b) => a.overlap - b.overlap);
