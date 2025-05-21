@@ -1,4 +1,4 @@
-import {AxisOverlap, Vector, clamp, createEvent, getOverlapsAndAxes, normalizeAngle, overlapOnAxis} from '../util';
+import {AxisOverlap, Vector, createEvent, getOverlapsAndAxes, normalizeAngle, overlapOnAxis} from '../util';
 
 import {Brick, CompositeBrick, GameObject, Level, MovingGameObject, MovingGameObjectConfig, Paddle} from './';
 
@@ -9,9 +9,6 @@ export type BallConfig = Omit<MovingGameObjectConfig, 'elementId'> & {
   // damage inflicted on bricks
   damage?: number;
 };
-
-const MAX_ANGLE = 0.9 * Math.PI;
-const MIN_ANGLE = 0.1 * Math.PI;
 
 export class Ball extends MovingGameObject {
   destroyed = false;
@@ -159,19 +156,18 @@ export class Ball extends MovingGameObject {
       // Ball is coming from above the paddle, bounce it up
       // Calculate the hit position on the paddle
       const hitPosition = this.x - paddle.x;
-      const hitPositionNormalized = hitPosition / (paddle.width / 2);
+      const hitPositionNormalized = Math.min(1, Math.max(-1, hitPosition / (paddle.width / 2)));
 
       const angleMultiplier = paddle.curveFactor ?? 0; // Adjust this value to control the skewness
-      const hitPositionSkewness = hitPositionNormalized * angleMultiplier;
+      const hitPositionSkewness = hitPositionNormalized * angleMultiplier * (Math.PI / 2);
 
       const overlapsAndAxes = getOverlapsAndAxes(paddle, this);
       const {axis: maxOverlapAxis} = overlapsAndAxes[1];
       const collisionAngle = -Math.atan2(maxOverlapAxis.y, maxOverlapAxis.x);
 
       // Calculate the new angle after reflection
-      const nextAngle = normalizeAngle(2 * collisionAngle - this.movementAngle) - hitPositionSkewness;
-      // const nextAngle = normalizeAngle(-paddle.angle * 2 - incomingAngle - hitPositionSkewness);
-      this.movementAngle = clamp(nextAngle, MAX_ANGLE - paddle.angle, MIN_ANGLE - paddle.angle);
+      const nextAngle = normalizeAngle(2 * collisionAngle - this.movementAngle - hitPositionSkewness);
+      this.movementAngle = nextAngle;
       this.correctPostion(overlapsAndAxes[0]);
 
       this.dispatchCollisionEvent(paddle);

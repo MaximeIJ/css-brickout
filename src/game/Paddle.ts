@@ -3,9 +3,9 @@ import {clamp} from '../util';
 import {MovingGameObject, MovingGameObjectConfig} from './GameObject';
 
 export type PaddleConfig = MovingGameObjectConfig & {
-  // Defaults to 0
+  // Defaults to 0 - 1 is a full curve
   curveFactor?: number;
-  // Defaults to 0.05
+  // Defaults to 0.05 - unused for now
   gripFactor?: number;
   // Default to y
   minY?: number;
@@ -16,8 +16,9 @@ export type PaddleConfig = MovingGameObjectConfig & {
 };
 
 export class Paddle extends MovingGameObject {
-  // How much ball angle is modified when it hits the paddle further from the center
+  // How much ball angle is modified when it hits the paddle further from the center. 1 = pi/2 at the edge
   curveFactor = 0;
+  // unused for now
   gripFactor = 0.05;
   minY: number;
   maxY: number;
