@@ -127,6 +127,10 @@ export class Ball extends MovingGameObject {
     }
   }
 
+  getCollisionOverlap(object: GameObject) {
+    return getOverlapsAndAxes(object, this);
+  }
+
   handleBrickCollision(brick: Brick, composite?: CompositeBrick) {
     const parentBrick = composite ?? brick;
     if (brick.breakthrough) {
@@ -135,15 +139,15 @@ export class Ball extends MovingGameObject {
       return;
     }
 
-    const overlapsAndAxes = getOverlapsAndAxes(brick, this);
+    const overlapsAndAxes = this.getCollisionOverlap(brick);
     const {axis: maxOverlapAxis} = overlapsAndAxes[1];
     const collisionAngle = Math.atan2(maxOverlapAxis.y, maxOverlapAxis.x);
 
     // Calculate the new angle after reflection
     const reflectedAngle = normalizeAngle(2 * collisionAngle - this.movementAngle);
 
-    this.movementAngle = reflectedAngle;
     this.correctPostion(overlapsAndAxes[0]);
+    this.movementAngle = reflectedAngle;
 
     this.dispatchCollisionEvent(brick);
     parentBrick.takeHit(this);
@@ -161,14 +165,14 @@ export class Ball extends MovingGameObject {
       const angleMultiplier = paddle.curveFactor ?? 0; // Adjust this value to control the skewness
       const hitPositionSkewness = hitPositionNormalized * angleMultiplier * (Math.PI / 2);
 
-      const overlapsAndAxes = getOverlapsAndAxes(paddle, this);
+      const overlapsAndAxes = this.getCollisionOverlap(paddle);
       const {axis: maxOverlapAxis} = overlapsAndAxes[1];
       const collisionAngle = -Math.atan2(maxOverlapAxis.y, maxOverlapAxis.x);
 
+      this.correctPostion(overlapsAndAxes[0]);
       // Calculate the new angle after reflection
       const nextAngle = normalizeAngle(2 * collisionAngle - this.movementAngle - hitPositionSkewness);
       this.movementAngle = nextAngle;
-      this.correctPostion(overlapsAndAxes[0]);
 
       this.dispatchCollisionEvent(paddle);
       return true;
@@ -199,10 +203,10 @@ export class Ball extends MovingGameObject {
   }
 
   correctPostion(axisOverlaps: AxisOverlap): void {
-    const {overlap, axis} = axisOverlaps;
-    if (overlap !== 0) {
-      this.x -= axis.x * overlap;
-      this.y -= axis.y * overlap;
+    const {adjustedCircle} = axisOverlaps;
+    if (adjustedCircle.x !== this.x || adjustedCircle.y !== this.y) {
+      this.x = adjustedCircle.x;
+      this.y = adjustedCircle.y;
     }
   }
 
