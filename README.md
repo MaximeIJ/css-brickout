@@ -1,13 +1,19 @@
 # css-brickout [![npm (scoped)](https://img.shields.io/npm/v/@maximeij/css-brickout?color=green&label=npm%20package&logo=logo)](https://www.npmjs.com/package/@maximeij/css-brickout) [![image](https://github.com/MaximeIJ/css-brickout/assets/5600516/27a4f945-e91c-4f75-bdf3-80c689d8f453)](http://vanilla-js.com/)
 
+# In action
+
 <div align="center">
-  <img alt="gameplay screenshot" src="https://github.com/MaximeIJ/css-brickout/assets/5600516/28d48f7b-53e3-4542-aa39-e38f54f21ebc" height=350 align="center" />
-  <img alt="gameplay screenshot" src="https://github.com/MaximeIJ/css-brickout/assets/5600516/997e7a09-2852-4170-bdf1-8f2fcab09cd9" height=350 align="center" />
+  <h2><a href="https://lynxlab.games/brickout/" target="blank">MAX Brickout: a free Roguelike</a></h2>
+  <img alt="engine demo gameplay screenshot 2" src="https://github.com/user-attachments/assets/8443f394-58d1-4689-8e9a-6237d6926d01" height=400 align="center" />
+  <img alt="engine demo gameplay screenshot 2" src="https://github.com/user-attachments/assets/e9fa185b-d306-4de4-9509-b65bac5cd14a" height=400 align="center" />
+  <h2><a href="https://maximeij.dev/css-brickout/" target="blank">Basic™ Engine Demo</a></h2>
+  <img alt="engine demo gameplay screenshot 2" src="https://github.com/MaximeIJ/css-brickout/assets/5600516/28d48f7b-53e3-4542-aa39-e38f54f21ebc" height=240 align="center" />
+  <img alt="engine demo gameplay screenshot 2" src="https://github.com/MaximeIJ/css-brickout/assets/5600516/997e7a09-2852-4170-bdf1-8f2fcab09cd9" height=240 align="center" />
 </div>
 
-## A timeless favorite...
+# In words
 
-[Demo](https://maximeij.dev/css-brickout/)
+## A timeless favorite...
 
 CSS Brickout (aka _CSS Breakout_) exposes a responsive, customizable, themable, extensible implementation of the beloved classic to the web. This 0 dependency library can be used in any ecosystem and framework.
 
@@ -119,8 +125,3 @@ In fact, even with non-trivial collision detection (see [geometry.ts](src/util/g
 ## Recent changes
 
 - [Changelog](CHANGELOG.md)
-
-## Coming soon
-
-- Bonus Drops + Effect Duration
-- Object properties as CSS variables
