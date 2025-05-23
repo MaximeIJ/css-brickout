@@ -1,4 +1,4 @@
-import {AxisOverlap, Vector, createEvent, getOverlapsAndAxes, normalizeAngle, overlapOnAxis} from '../util';
+import {Vector, createEvent, getAdjustedCollisionPosition, normalizeAngle, overlapOnAxis} from '../util';
 
 import {Brick, CompositeBrick, GameObject, Level, MovingGameObject, MovingGameObjectConfig, Paddle} from './';
 
@@ -59,11 +59,11 @@ export class Ball extends MovingGameObject {
    * @param paddle The player's paddle
    * @returns true if the position has been updated already
    */
-  handleLevelCollision(level: Level, paddle: Paddle) {
+  handleLevelCollision(level: Level, paddle: Paddle, frameFraction: number) {
     const hitBoundary = this.handleBoundaryCollision();
     if (hitBoundary) {
       return false;
-    } else if (this.handlePaddleCollision(paddle)) {
+    } else if (this.handlePaddleCollision(paddle, frameFraction)) {
       return true;
     }
 
@@ -81,9 +81,8 @@ export class Ball extends MovingGameObject {
       const partsToCheck = brick.hitboxParts ?? [brick];
       partsToCheck.some(part => {
         if (this.isColliding(part)) {
-          // todo: identify which brick got hit if there are hitbox parts
           hitBrick = true;
-          this.handleBrickCollision(part, brick);
+          this.handleBrickCollision(part, frameFraction, brick);
         }
       });
     }
@@ -127,55 +126,70 @@ export class Ball extends MovingGameObject {
     }
   }
 
-  getCollisionOverlap(object: GameObject) {
-    return getOverlapsAndAxes(object, this);
+  resolveCollision(object: GameObject, frameFraction = 1) {
+    const virtualCircle = {
+      x: this.x - this.dx * frameFraction,
+      y: this.y - this.dy * frameFraction,
+      radius: this.radius,
+      dx: this.dx * frameFraction,
+      dy: this.dy * frameFraction,
+    };
+    const collision = getAdjustedCollisionPosition(object, virtualCircle);
+    if (collision) {
+      const {normal, tmin} = collision;
+
+      const nextX = virtualCircle.x + virtualCircle.dx * tmin;
+      const nextY = virtualCircle.y + virtualCircle.dy * tmin;
+      if (!Number.isNaN(nextX) && !Number.isNaN(nextY)) {
+        this.x = nextX;
+        this.y = nextY;
+      }
+
+      const dot = virtualCircle.dx * normal.x + virtualCircle.dy * normal.y;
+      const reflectedDx = virtualCircle.dx - 2 * dot * normal.x;
+      const reflectedDy = virtualCircle.dy - 2 * dot * normal.y;
+      // Update movementAngle based on new reflected velocity
+      this.movementAngle = -Math.atan2(reflectedDy, reflectedDx);
+
+      this.antiJuggling = object.element.id;
+      return true;
+    } else {
+      console.warn('No collision detected');
+    }
   }
 
-  handleBrickCollision(brick: Brick, composite?: CompositeBrick) {
+  handleBrickCollision(brick: Brick, frameFraction = 1, composite?: CompositeBrick) {
     const parentBrick = composite ?? brick;
     if (brick.breakthrough) {
       parentBrick.takeHit(this);
       this.dispatchCollisionEvent(parentBrick);
+      this.antiJuggling = brick.element.id;
       return;
     }
 
-    const overlapsAndAxes = this.getCollisionOverlap(brick);
-    const {axis: maxOverlapAxis} = overlapsAndAxes[1];
-    const collisionAngle = Math.atan2(maxOverlapAxis.y, maxOverlapAxis.x);
-
-    // Calculate the new angle after reflection
-    const reflectedAngle = normalizeAngle(2 * collisionAngle - this.movementAngle);
-
-    this.correctPostion(overlapsAndAxes[0]);
-    this.movementAngle = reflectedAngle;
-
-    this.dispatchCollisionEvent(brick);
-    parentBrick.takeHit(this);
+    if (this.resolveCollision(brick, frameFraction)) {
+      this.dispatchCollisionEvent(brick);
+      parentBrick.takeHit(this);
+      return true;
+    }
   }
 
-  handlePaddleCollision(paddle: Paddle) {
+  handlePaddleCollision(paddle: Paddle, frameFraction = 1) {
     const isColliding = this.isColliding(paddle);
 
     if (isColliding) {
-      // Ball is coming from above the paddle, bounce it up
-      // Calculate the hit position on the paddle
-      const hitPosition = this.x - paddle.x;
-      const hitPositionNormalized = Math.min(1, Math.max(-1, hitPosition / (paddle.width / 2)));
+      if (this.resolveCollision(paddle, frameFraction)) {
+        // Ball is coming from above the paddle, bounce it up
+        // Calculate the hit position on the paddle
+        const hitPosition = this.x - paddle.x;
+        const hitPositionNormalized = Math.min(1, Math.max(-1, hitPosition / (paddle.width / 2)));
 
-      const angleMultiplier = paddle.curveFactor ?? 0; // Adjust this value to control the skewness
-      const hitPositionSkewness = hitPositionNormalized * angleMultiplier * (Math.PI / 2);
-
-      const overlapsAndAxes = this.getCollisionOverlap(paddle);
-      const {axis: maxOverlapAxis} = overlapsAndAxes[1];
-      const collisionAngle = -Math.atan2(maxOverlapAxis.y, maxOverlapAxis.x);
-
-      this.correctPostion(overlapsAndAxes[0]);
-      // Calculate the new angle after reflection
-      const nextAngle = normalizeAngle(2 * collisionAngle - this.movementAngle - hitPositionSkewness);
-      this.movementAngle = nextAngle;
-
-      this.dispatchCollisionEvent(paddle);
-      return true;
+        const angleMultiplier = paddle.curveFactor ?? 0; // Adjust this value to control the skewness
+        const hitPositionSkew = hitPositionNormalized * angleMultiplier * (Math.PI / 2);
+        this.movementAngle = normalizeAngle(this.movementAngle - hitPositionSkew);
+        this.dispatchCollisionEvent(paddle);
+        return true;
+      }
     }
   }
 
@@ -198,16 +212,7 @@ export class Ball extends MovingGameObject {
       }
     }
 
-    this.antiJuggling = object.element.id;
     return true; // Overlapping on all axes, collision detected
-  }
-
-  correctPostion(axisOverlaps: AxisOverlap): void {
-    const {adjustedCircle} = axisOverlaps;
-    if (adjustedCircle.x !== this.x || adjustedCircle.y !== this.y) {
-      this.x = adjustedCircle.x;
-      this.y = adjustedCircle.y;
-    }
   }
 
   processFrame(frameFraction = 1, level?: Level, paddle?: Paddle) {
@@ -215,7 +220,7 @@ export class Ball extends MovingGameObject {
     this.updatePosition(undefined, undefined, frameFraction);
 
     if (level && paddle) {
-      !this.handleLevelCollision(level, paddle);
+      !this.handleLevelCollision(level, paddle, frameFraction);
     }
   }
 
