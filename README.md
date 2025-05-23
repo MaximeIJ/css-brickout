@@ -4,11 +4,11 @@
 
 <div align="center">
   <h2><a href="https://lynxlab.games/brickout/" target="blank">MAX Brickout: a free Roguelike</a></h2>
-  <img alt="engine demo gameplay screenshot 2" src="https://github.com/user-attachments/assets/8443f394-58d1-4689-8e9a-6237d6926d01" height=400 align="center" />
-  <img alt="engine demo gameplay screenshot 2" src="https://github.com/user-attachments/assets/e9fa185b-d306-4de4-9509-b65bac5cd14a" height=400 align="center" />
+  <img alt="engine demo gameplay screenshot 2" src="https://github.com/user-attachments/assets/8443f394-58d1-4689-8e9a-6237d6926d01" height=380 align="center" />
+  <img alt="engine demo gameplay screenshot 2" src="https://github.com/user-attachments/assets/e9fa185b-d306-4de4-9509-b65bac5cd14a" height=380 align="center" />
   <h2><a href="https://maximeij.dev/css-brickout/" target="blank">Basic™ Engine Demo</a></h2>
-  <img alt="engine demo gameplay screenshot 2" src="https://github.com/MaximeIJ/css-brickout/assets/5600516/28d48f7b-53e3-4542-aa39-e38f54f21ebc" height=240 align="center" />
-  <img alt="engine demo gameplay screenshot 2" src="https://github.com/MaximeIJ/css-brickout/assets/5600516/997e7a09-2852-4170-bdf1-8f2fcab09cd9" height=240 align="center" />
+  <img alt="engine demo gameplay screenshot 2" src="https://github.com/MaximeIJ/css-brickout/assets/5600516/28d48f7b-53e3-4542-aa39-e38f54f21ebc" height=300 align="center" />
+  <img alt="engine demo gameplay screenshot 2" src="https://github.com/MaximeIJ/css-brickout/assets/5600516/997e7a09-2852-4170-bdf1-8f2fcab09cd9" height=300 align="center" />
 </div>
 
 # In words
