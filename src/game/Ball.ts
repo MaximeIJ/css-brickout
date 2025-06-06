@@ -38,13 +38,15 @@ export class Ball extends MovingGameObject {
 
   updateElementSize(): void {
     super.updateElementSize();
-    // calc size based on height, adjust rx with aspect ratio
-    const pxRadius = Math.round((this.radius / 100.0) * this.parent.sizes.height);
-
-    this.rx = (this.radius * this.parent.sizes.height) / this.parent.sizes.width;
+    this.rx = this.radius;
+    if (!Number.isNaN(this.parent.sizes.width)) {
+      const pxRadius = Math.round((this.radius / 100.0) * this.parent.sizes.height);
+      this.element.style.setProperty('--diameter', pxRadius * 2 + 'px');
+      // calc size based on height, adjust rx with aspect ratio
+      this.rx = (this.radius * this.parent.sizes.height) / this.parent.sizes.width;
+    }
     this.width = this.rx * 2;
     this.height = this.radius * 2;
-    this.element.style.setProperty('--diameter', pxRadius * 2 + 'px');
   }
 
   setD() {
