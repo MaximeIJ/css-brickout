@@ -47,12 +47,14 @@ export type LevelConfig = {
    * @default 10
    */
   divisionFactor?: number;
+  enableContainment?: boolean;
   onLevelMounted?: () => void;
 };
 
 export class Level implements Responsive {
   element: HTMLDivElement;
   game: Game;
+  brickMap: Record<string, CompositeBrick>;
   bricks: Array<CompositeBrick>;
   mobileBricks: Array<CompositeBrick>;
   _divisionFactor: number;
@@ -64,7 +66,7 @@ export class Level implements Responsive {
   totalParticles = 0;
   onLevelMounted?: () => void;
 
-  constructor({divisionFactor, layout, game, onLevelMounted}: LevelConfig) {
+  constructor({divisionFactor, enableContainment, layout, game, onLevelMounted}: LevelConfig) {
     this.bricks = [];
     this.mobileBricks = [];
     this._hitZones = [];
@@ -95,12 +97,40 @@ export class Level implements Responsive {
       }
     }
 
+    this.brickMap = {};
     // Assign bricks to strips and _hitZones
     this.bricks.forEach(brick => {
+      this.brickMap[brick.element.id] = brick;
       if (brick.speed || brick.hitboxParts?.some(p => p.speed)) {
         this.mobileBricks.push(brick);
       } else {
         const cbb = brick.compositeBoundingBox;
+        if (enableContainment) {
+          // contained brick compute
+          let smallestContainer: CompositeBrick | undefined;
+          this.bricks.forEach(outerBrick => {
+            if (
+              outerBrick !== brick &&
+              outerBrick.area > brick.area &&
+              (!smallestContainer || outerBrick.area < smallestContainer.area)
+            ) {
+              const outerCbb = outerBrick.compositeBoundingBox;
+              if (
+                cbb.topL.x < outerCbb.bottomR.x &&
+                cbb.bottomR.x > outerCbb.topL.x &&
+                cbb.topL.y < outerCbb.bottomR.y &&
+                cbb.bottomR.y > outerCbb.topL.y
+              ) {
+                smallestContainer = outerBrick;
+              }
+            }
+          });
+          if (smallestContainer !== undefined) {
+            brick.containedBy = smallestContainer.element.id;
+          }
+        }
+
+        // subdivision compute
         for (let divRow = 0; divRow < this._divisionFactor; divRow++) {
           for (let divCol = 0; divCol < this._divisionFactor; divCol++) {
             const x = divCol * (100 / this._divisionFactor);
@@ -125,6 +155,11 @@ export class Level implements Responsive {
     });
   }
 
+  brickCanCollide = (brick: CompositeBrick): boolean => {
+    // Arrow function to access `this` context
+    return !brick.containedBy || this.brickMap[brick.containedBy]?.destroyed;
+  };
+
   getNearbyBricks(ball: Ball): Array<CompositeBrick> {
     const res = new Set<CompositeBrick>();
     // find all the zones the ball collides with, using the ball radius
@@ -140,7 +175,7 @@ export class Level implements Responsive {
     );
     for (let divRow = minDivRow; divRow <= maxDivRow; divRow++) {
       for (let divCol = minDivCol; divCol <= maxDivCol; divCol++) {
-        this._hitZones[divRow][divCol].forEach(brick => res.add(brick));
+        this._hitZones[divRow][divCol].filter(this.brickCanCollide).forEach(brick => res.add(brick));
       }
     }
 

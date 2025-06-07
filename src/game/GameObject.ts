@@ -31,6 +31,7 @@ export class GameObject {
   y = 0;
   width: number;
   height: number;
+  area: number;
   private _angle: number;
   bonuses: Array<BonusConfig>;
   element: HTMLDivElement;
@@ -61,6 +62,7 @@ export class GameObject {
   }: GameObjectConfig) {
     this.width = width;
     this.height = height;
+    this.area = width * height;
     this._angle = angle;
     this.game = game;
     this.parent = parent;

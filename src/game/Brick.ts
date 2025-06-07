@@ -14,6 +14,7 @@ export class Brick extends MovingGameObject {
   destroyed = false;
   hp: number;
   maxHp: number;
+  containedBy?: string;
 
   constructor({hp = 1, breakthrough = false, ignoreMobile = false, ...config}: BrickConfig) {
     super({...config, className: [config.className ?? '', 'brick'].filter(Boolean).join(' '), showTitle: true});
