@@ -106,6 +106,7 @@ export class Level implements Responsive {
       } else {
         const cbb = brick.compositeBoundingBox;
         if (enableContainment) {
+          const epsilon = 0.1; // Small epsilon to avoid floating point issues
           // contained brick compute
           let smallestContainer: CompositeBrick | undefined;
           this.bricks.forEach(outerBrick => {
@@ -116,10 +117,10 @@ export class Level implements Responsive {
             ) {
               const outerCbb = outerBrick.compositeBoundingBox;
               if (
-                cbb.topL.x < outerCbb.bottomR.x &&
-                cbb.bottomR.x > outerCbb.topL.x &&
-                cbb.topL.y < outerCbb.bottomR.y &&
-                cbb.bottomR.y > outerCbb.topL.y
+                cbb.topL.x - epsilon > outerCbb.topL.x &&
+                cbb.topL.y - epsilon > outerCbb.topL.y &&
+                cbb.bottomR.x + epsilon < outerCbb.bottomR.x &&
+                cbb.bottomR.y + epsilon < outerCbb.bottomR.y
               ) {
                 smallestContainer = outerBrick;
               }
