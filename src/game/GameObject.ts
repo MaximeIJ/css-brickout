@@ -95,6 +95,9 @@ export class GameObject {
         this.element.classList.add(...classNames);
       }
     }
+    if (shape === 'circle') {
+      this.element.classList.add('circle');
+    }
     this.parent.element.appendChild(this.element);
     this.updatePosition(x, y);
     this.angle = angle;

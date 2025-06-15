@@ -136,10 +136,6 @@
   box-shadow: 0 0 5px 3px hsla(300, 100%, 88%, 0.477);
 }
 
-.classic .brick.circle {
-  border-radius: 50%;
-}
-
 /* Lava */
 
 .lava {
@@ -189,10 +185,6 @@
   border: none;
   /* opacity pulse animation */
   animation: ghost 25s infinite;
-}
-
-.lava .brick.circle {
-  border-radius: 50%;
 }
 
 @keyframes ghost {

@@ -95,6 +95,10 @@
   left: 0;
 }
 
+.brick.circle {
+  border-radius: 50%;
+}
+
 .brick--destroyed {
   background: transparent;
   border-width: 0;

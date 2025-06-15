@@ -241,7 +241,6 @@ export const LAYOUTS: Record<string, LayoutDefinitionConfig> = {
         width: 1,
         height: 13,
         shape: 'circle',
-        className: 'circle',
       },
     ],
   },
