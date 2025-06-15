@@ -1,26 +1,29 @@
+import {pythagoras} from './math';
+
 export type Vector = {
   x: number;
   y: number;
 };
 
+type Moving = {
+  dx?: number;
+  dy?: number;
+};
+
 export type BoundingBox = {topL: Vector; topR: Vector; bottomL: Vector; bottomR: Vector};
 
-export type Rectangle = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  angle: number;
-  boundingBox: BoundingBox;
-};
+export type Rectangle = Vector &
+  Moving & {
+    width: number;
+    height: number;
+    angle: number;
+    boundingBox: BoundingBox;
+  };
 
-export type Circle = {
-  x: number;
-  y: number;
-  dx: number;
-  dy: number;
-  radius: number;
-};
+export type Circle = Vector &
+  Moving & {
+    radius: number;
+  };
 
 export type AxisOverlap = {overlap: number; axis: Vector; adjustedCircle: Circle};
 
@@ -40,6 +43,15 @@ export function rotateVector(x: number, y: number, angle: number): Vector {
   return {
     x: cos * x - sin * y,
     y: sin * x + cos * y,
+  };
+}
+
+function normalize(vector: Vector): Vector {
+  const length = pythagoras(vector.x, vector.y);
+  if (length === 0) return {x: 0, y: 0};
+  return {
+    x: vector.x / length,
+    y: vector.y / length,
   };
 }
 
@@ -69,6 +81,7 @@ export function overlapOnAxis(circle: Circle, axis: Vector, rectangleCorners: Bo
 }
 
 const EPSILON = 1e-8;
+const MIN_PAST = -EPSILON;
 
 export function rayAABB(
   localP0: Vector,
@@ -124,17 +137,25 @@ type CollisionResult = {
   tmin: number;
 };
 
-export function getAdjustedCollisionPosition(rect: Rectangle, circle: Circle): CollisionResult | null {
+export function getCRCollisionPosition(rect: Rectangle, circle: Circle): CollisionResult | null {
   // Rotate to the rectangle's local space
   const P0 = {x: circle.x - rect.x, y: circle.y - rect.y};
   const localP0 = rotatePoint(P0.x, P0.y, 0, 0, -rect.angle);
-  const localVelocity = rotateVector(circle.dx, circle.dy, -rect.angle);
+  const relativeVelocity = {
+    x: (circle.dx ?? 0) - (rect.dx ?? 0),
+    y: (circle.dy ?? 0) - (rect.dy ?? 0),
+  };
+  const localVelocity = rotateVector(relativeVelocity.x, relativeVelocity.y, -rect.angle);
   const halfExtentsWithRadius = {x: rect.width / 2 + circle.radius, y: rect.height / 2 + circle.radius};
 
   const result = rayAABB(localP0, localVelocity, halfExtentsWithRadius);
   if (!result) return null;
 
   const {tmin, normal} = result;
+  if (tmin < MIN_PAST || tmin > 1) {
+    // console.warn('Collision time out of bounds', {circle, result, tmin});
+    return null; // Collision must happen within the time frame
+  }
 
   const hitPoint = {
     x: localP0.x + localVelocity.x * tmin,
@@ -151,6 +172,62 @@ export function getAdjustedCollisionPosition(rect: Rectangle, circle: Circle): C
   const collisionWorldNormal = rotateVector(normal.x, normal.y, rect.angle);
 
   return {position, normal: collisionWorldNormal, tmin};
+}
+
+export function getCCCollisionPosition(lead: Circle, other: Circle): CollisionResult | null {
+  const A0 = {x: lead.x, y: lead.y};
+  const B0 = {x: other.x, y: other.y};
+
+  const vA = {x: lead.dx ?? 0, y: lead.dy ?? 0};
+  const vB = {x: other.dx ?? 0, y: other.dy ?? 0}; // static if missing
+
+  const vRel = {x: vA.x - vB.x, y: vA.y - vB.y};
+  const r = lead.radius + other.radius;
+
+  const d = {x: A0.x - B0.x, y: A0.y - B0.y};
+
+  const a = vRel.x * vRel.x + vRel.y * vRel.y;
+  const b = 2 * (d.x * vRel.x + d.y * vRel.y);
+  const c = d.x * d.x + d.y * d.y - r * r;
+
+  const discriminant = b * b - 4 * a * c;
+  if (discriminant < 0 || a === 0) return null;
+
+  const sqrtDisc = Math.sqrt(discriminant);
+  const t1 = (-b - sqrtDisc) / (2 * a);
+  const t2 = (-b + sqrtDisc) / (2 * a);
+
+  // We want the earliest positive time in [0, 1]
+  const tmin = t1 >= MIN_PAST && t1 <= 1 ? t1 : t2 >= MIN_PAST && t2 <= 1 ? t2 : null;
+  if (tmin === null) return null;
+
+  // Move both to their positions at time tmin
+  const A_t = {
+    x: A0.x + vA.x * tmin,
+    y: A0.y + vA.y * tmin,
+  };
+  const B_t = {
+    x: B0.x + vB.x * tmin,
+    y: B0.y + vB.y * tmin,
+  };
+
+  // Compute normal from B to A at collision
+  const normal = normalize({
+    x: A_t.x - B_t.x,
+    y: A_t.y - B_t.y,
+  });
+
+  // Contact point is on surface of A in direction of normal
+  const contactPoint = {
+    x: A_t.x - lead.radius * normal.x,
+    y: A_t.y - lead.radius * normal.y,
+  };
+
+  return {
+    tmin,
+    position: contactPoint,
+    normal,
+  };
 }
 
 export function normalizeAngle(angle: number) {

@@ -100,6 +100,7 @@ export class Level implements Responsive {
     this.brickMap = {};
     // Assign bricks to strips and _hitZones
     this.bricks.forEach(brick => {
+      brick.updateBoundingBox();
       this.brickMap[brick.element.id] = brick;
       if (brick.speed || brick.hitboxParts?.some(p => p.speed)) {
         this.mobileBricks.push(brick);

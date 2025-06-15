@@ -1,8 +1,15 @@
-import {Vector, createEvent, getAdjustedCollisionPosition, normalizeAngle, overlapOnAxis} from '../util';
+import {
+  Vector,
+  createEvent,
+  getCCCollisionPosition,
+  getCRCollisionPosition,
+  normalizeAngle,
+  overlapOnAxis,
+} from '../util';
 
 import {Brick, CompositeBrick, GameObject, Level, MovingGameObject, MovingGameObjectConfig, Paddle} from './';
 
-export type BallConfig = Omit<MovingGameObjectConfig, 'elementId'> & {
+export type BallConfig = Omit<MovingGameObjectConfig, 'elementId' | 'shape'> & {
   idx: number;
   // % of the game's height (see updateElementSize)
   radius: number;
@@ -12,9 +19,7 @@ export type BallConfig = Omit<MovingGameObjectConfig, 'elementId'> & {
 
 export class Ball extends MovingGameObject {
   destroyed = false;
-  radius = 0;
   damage = 1;
-  rx = 0;
   // Prevents the ball from hitting the same object twice in a row
   antiJuggling: string | false = false;
   // expose some internals as readonly
@@ -28,6 +33,7 @@ export class Ball extends MovingGameObject {
       elementId: `ball-${idx}`,
       movement,
       showTitle: true,
+      shape: 'circle',
     });
     this.radius = radius;
     this.damage = damage;
@@ -36,19 +42,7 @@ export class Ball extends MovingGameObject {
     this.updateTitle();
   }
 
-  updateElementSize(): void {
-    super.updateElementSize();
-    this.rx = this.radius;
-    if (!Number.isNaN(this.parent.sizes.width)) {
-      const pxRadius = Math.round((this.radius / 100.0) * this.parent.sizes.height);
-      this.element.style.setProperty('--diameter', pxRadius * 2 + 'px');
-      // calc size based on height, adjust rx with aspect ratio
-      this.rx = (this.radius * this.parent.sizes.height) / this.parent.sizes.width;
-    }
-    this.width = this.rx * 2;
-    this.height = this.radius * 2;
-  }
-
+  // Used for cosmetics, can move to MovingGameObject
   setD() {
     super.setD();
     this.element.style.setProperty('--dx', this.dx + 'px');
@@ -136,7 +130,35 @@ export class Ball extends MovingGameObject {
       dx: this.dx * frameFraction,
       dy: this.dy * frameFraction,
     };
-    const collision = getAdjustedCollisionPosition(object, virtualCircle);
+    const castObj = object as MovingGameObject;
+    const baseVirtualObject = {
+      angle: object.angle,
+      boundingBox: object.boundingBox,
+      width: object.width,
+      height: object.height,
+      radius: object.shape === 'circle' ? object.radius : 0,
+    };
+    const virtualObject =
+      object instanceof MovingGameObject
+        ? {
+            ...baseVirtualObject,
+            x: object.x - castObj.dx * frameFraction,
+            y: object.y - castObj.dy * frameFraction,
+            dx: castObj.dx * frameFraction,
+            dy: castObj.dy * frameFraction,
+          }
+        : {
+            ...baseVirtualObject,
+            x: object.x,
+            y: object.y,
+            dx: 0,
+            dy: 0,
+          };
+    const collision =
+      object.shape === 'rectangle'
+        ? getCRCollisionPosition(virtualObject, virtualCircle)
+        : getCCCollisionPosition(virtualCircle, virtualObject);
+
     if (collision) {
       const {normal, tmin} = collision;
 
@@ -156,7 +178,7 @@ export class Ball extends MovingGameObject {
       this.antiJuggling = object.element.id;
       return true;
     } else {
-      console.warn('No collision detected');
+      // console.warn('No collision detected', virtualCircle, object.width, object.height, object.angle);
     }
   }
 

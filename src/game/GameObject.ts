@@ -14,6 +14,7 @@ export type GameObjectConfig = Vector & {
   startingBonuses?: Array<BonusConfig>;
   showTitle?: boolean;
   permanent?: boolean;
+  shape?: 'circle' | 'rectangle';
 };
 
 export type PartialGameObjectConfig = Required<Pick<GameObjectConfig, 'game'>> & Partial<GameObjectConfig>;
@@ -44,6 +45,10 @@ export class GameObject {
     bottomR: {x: 0, y: 0},
   };
   permanent = false;
+  shape = 'rectangle';
+  // for circle shapes
+  radius = 0;
+  rx = 0;
 
   constructor({
     game,
@@ -58,10 +63,15 @@ export class GameObject {
     startingBonuses = [],
     showTitle = false,
     permanent = false,
+    shape = 'rectangle',
     ...rest // rest is used to allow for any other properties to be added to the object
   }: GameObjectConfig) {
     this.width = width;
     this.height = height;
+    if (shape === 'circle') {
+      this.shape = 'circle';
+      this.radius = height / 2;
+    }
     this.area = width * height;
     this._angle = angle;
     this.game = game;
@@ -101,8 +111,23 @@ export class GameObject {
     this.element.style.setProperty('--angle', `${angle}rad`);
   }
 
+  updateCircleShape(): void {
+    this.rx = this.radius;
+    if (!Number.isNaN(this.parent?.sizes.width) && this.parent?.sizes.width > 0) {
+      const pxRadius = Math.round((this.radius / 100.0) * this.parent.sizes.height);
+      this.element.style.setProperty('--diameter', pxRadius * 2 + 'px');
+      this.rx = (this.radius * this.parent.sizes.height) / this.parent.sizes.width;
+    }
+    this.width = this.rx * 2;
+    this.height = this.radius * 2;
+    this.updateBoundingBox();
+  }
+
   updateElementSize(): void {
-    const {width, height} = this.parent.sizes;
+    const {width, height} = this.parent?.sizes ?? {width: 1, height: 1};
+    if (this.shape === 'circle') {
+      this.updateCircleShape();
+    }
     if (this.width) {
       this.element.style.width = `${Math.round(width * (this.width / 100.0))}px`;
     }
@@ -235,8 +260,8 @@ export class MovingGameObject extends GameObject {
   private _speed = 0;
   private _movementAngle = 0;
   turnSteps: Array<TurnStep> = [];
-  protected dx = 0;
-  protected dy = 0;
+  dx = 0;
+  dy = 0;
   active = true;
   syncAngles = false;
 
